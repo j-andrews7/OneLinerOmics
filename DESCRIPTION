@@ -7,11 +7,37 @@ Authors@R:
            family = "Andrews",
            role = c("aut", "cre"),
            email = "jared.andrews07@gmail.com",
-           comment = c(ORCID = "YOUR-ORCID-ID"))
+           comment = c(ORCID = "0000-0002-0780-6248"))
 Description: This package is a complement to Andrews et al, 2019. 
     It provides simple functions for major analysis steps dealing with
     both RNA-seq and ChIP-seq data in addition to a vignette detailing
     how it was used to process and analyze data in the paper.
 License: GPL-3 + file LICENSE
+Imports:
+    DESeq2,
+    ggplot2,
+    ChIPQC,
+    DiffBind,
+    RColorBrewer,
+    clusterProfiler,
+    DOSE,
+    ReactomePA,
+    cowplot,
+    ChIPseeker,
+    org.Hs.eg.db,
+    AnnotationDbi,
+    GenomicFeatures,
+    GenomicAlignments,
+    Rsamtools,
+    TxDb.Hsapiens.UCSC.hg19.knownGene,
+    plotly,
+    EZscRNA,
+    grDevices,
+    scales
+Remotes:
+    j-andrews7/EZscRNA
+URL: https://github.com/j-andrews7/AndrewsBCellLymphoma
+BugReports: https://github.com/j-andrews7/AndrewsBCellLymphoma/issues
 Encoding: UTF-8
 LazyData: true
+VignetteBuilder: knitr
