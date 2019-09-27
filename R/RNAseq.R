@@ -1,26 +1,54 @@
+#' Run DESeq2 analyses
+#'
+#' This function performs a high-level differential gene expression analysis 
+#' 
 #'
 #'
 #'
+#' @param outpath Path to directory to be used for output. Additional 
+#'   directories will be generated within this folder.
+#' @param quants.path Path to directory containing a directory for each sample
+#'   with a salmon-generated \code{quant.sf} file inside.
+#' @param samplesheet Path to samplesheet containing sample metadata.
+#' @param tx2gene Path to file with transcript IDs in first column and gene 
+#'   identifiers in second. Used for gene-level summarization.
+#' @param level String defining variable of interest.
+#' @param g1 String indicating group in \code{level} to compare to \code{g2}.
+#' @param g2 String indicating group in \code{level} to compare to \code{g1}.
+#' @param padj.thresh Number or numeric scalar indicating the adjusted p-value 
+#'   cutoff(s) to be used for determining "significant" differential expression.
+#'   If multiple are given, multiple tables/plots will be generated using all 
+#'   combinations of \code{padj.thresh} and \code{fc.thresh}.
+#' @param fc.thresh Number or numeric scalar indicating the log2 fold-change 
+#'   cutoff(s) to be used for determining "significant" differential expression.
+#'   If multiple are given, multiple tables/plots will be generated using all 
+#'   combinations of \code{padj.thresh} and \code{fc.thresh}.
+#' @param plot.annos String or character vector defining the column(s) in 
+#'   \code{samplesheet} to use to annotate figures.
+#' @param block String or character vector defining the column(s) in 
+#'   \code{samplesheet} to use to block for unwanted variance, e.g. batch or 
+#'   technical effects.
+#' @param read.filt Number indicating read threshold. Genes with fewer counts 
+#'   than this number summed across all samples will be removed from the
+#'   analysis.
+#' @return Named List containing a \linkS4class{DESeqDataSet} object from 
+#'   running \code{\link[DESeq2]{DESeq}}, a \linkS4class{DESeqResults} object 
+#'   from running \code{\link[DESeq2]{lfcShrink}}, and a 
+#'   \linkS4class{RangedSummarizedExperiment} object 
+#'   from running \code{\link[DESeq2]{rlog}}.
+#'   
+#' @import DESeq2
+#' @import ggplot2
+#' @importFrom pheatmap pheatmap
 #'
+#' @export
 #'
+#' @seealso
+#' \code{\link[DESeq2]{DESeq}}, for more about differential expression analysis.
 #'
-#'
-#'
-#'
-#'
-#'
-#'
-#'
-#'
-#'
-#'
-#'
-#'
-RunDESeq2 <- function(outpath, quantspath, samplesheet, tx2gene, level, g1, g2, 
-  plot_annos=NULL, block=NULL) {
-# plot_annos should be a vector of at least two columns from the sample sheet to use for labeling plots. 
-# g1 and g2 should be strings for the groups to be compared for the level (eg. "Progression", "Response")
-# block can either be a single string ("cells") or a vector of multiple (c("cells", "disease"))
+RunDESeq2 <- function(outpath, quants.path, samplesheet, tx2gene, level, g1, g2, 
+  padj.thresh = 0.05, fc.thresh = 2, plot.annos = NULL, block = NULL, 
+  read.filt = 100) {
     
   message("### EXPLORATORY DATA ANALYSIS ###\n")
   message("# SET DIRECTORY STRUCTURE AND MODEL DESIGN #\n")
@@ -28,36 +56,13 @@ RunDESeq2 <- function(outpath, quantspath, samplesheet, tx2gene, level, g1, g2,
   # Base folder to create output folders in. Create output folders.
   base <- outpath
   
-  # Determine if there is a blocking factor or not and set design.
-  if (!is.null(block)) {
-    design <- formula(paste("~", paste(c(block, level), sep = "", 
-      collapse = " + ")))
-    if (!dir.exists(file.path(base, paste0(block, "Block")))) {
-      dir.create(file.path(base, paste0(block, "Block")))
-    }
-    if (!dir.exists(file.path(base, paste0(block, "Block/GenericFigures")))) {
-      dir.create(file.path(base, paste0(block, "Block/GenericFigures")))
-    }
-    if (!dir.exists(file.path(base, paste0(block, "Block/GeneBoxPlots")))) {
-      dir.create(file.path(base, paste0(block, "Block/GeneBoxPlots")))
-    }
-    base <- file.path(base, paste0(block,"Block"))
-  } else {
-    design <- formula(paste("~", level))
-    if (!dir.exists(file.path(base, "NoBlock"))) {
-      dir.create(file.path(base, "NoBlock"))
-    }
-    if (!dir.exists(file.path(base, "NoBlock/GenericFigures"))) {
-      dir.create(file.path(base, "NoBlock/GenericFigures"))
-    }
-    if (!dir.exists(file.path(base, "NoBlock/GeneBoxPlots"))) {
-      dir.create(file.path(base, "NoBlock/GeneBoxPlots"))
-    }
-    base <- file.path(base, "NoBlock")
-  }
+  # Create directory structure and set design formula.
+  setup <- CreateOutputStructure(block = NULL, level, base)
+  base <- setup$base
+  design <- setup$design
   
-  if (is.null(plot_annos)) {
-      plot_annos <- level
+  if (is.null(plot.annos)) {
+      plot.annos <- level
   }
   
   message("# FILE LOADING & PRE-FILTERING #\n")
@@ -65,7 +70,7 @@ RunDESeq2 <- function(outpath, quantspath, samplesheet, tx2gene, level, g1, g2,
   tx2gene <- read.table(tx2gene, sep = "\t")    
   samples <- read.table(samplesheet, header = TRUE)
   rownames(samples) <- samples$name
-  files <- file.path(quantspath, samples$name, "quant.sf")
+  files <- file.path(quants.path, samples$name, "quant.sf")
   names(files) <- samples$name
 
   # Read in our actual count files now.
@@ -75,11 +80,11 @@ RunDESeq2 <- function(outpath, quantspath, samplesheet, tx2gene, level, g1, g2,
   # Create the DESeqDataSet object.
   dds <- DESeqDataSetFromTximport(txi, colData = samples, design = design)
 
-  # Pre-filter transcripts with really low read counts (<100 across all samples)
-  message(paste("\ndds starting with", nrow(dds), "genes."))
-  dds <- dds[rowSums(counts(dds)) >= 100,]
-  message(paste("\ndds has", nrow(dds), 
-    "genes after filtering rows with under 100 reads total.\n"))
+  # Pre-filter transcripts with really low read counts.
+  message(paste0("\ndds starting with", nrow(dds), "genes."))
+  dds <- dds[rowSums(counts(dds)) >= read.filt,]
+  message(paste0("\ndds has", nrow(dds), 
+    "genes after filtering rows with under ", read.filt, " reads total.\n"))
 
   message("\n# VARIANCE STABILIZATION COMPARISONS #\n")
   message(paste0(base, "/GenericFigures/transformation.pdf\n"))
@@ -87,7 +92,7 @@ RunDESeq2 <- function(outpath, quantspath, samplesheet, tx2gene, level, g1, g2,
   rld <- rlog(dds, blind = FALSE)
   vsd <- vst(dds, blind = FALSE)
 
-  pdf(paste(base,"/GenericFigures/transformation.pdf", sep = ""))
+  pdf(paste0(base,"/GenericFigures/transformation.pdf"))
 
   dds <- DESeq2::estimateSizeFactors(dds)
 
@@ -111,7 +116,7 @@ RunDESeq2 <- function(outpath, quantspath, samplesheet, tx2gene, level, g1, g2,
   sampleDists <- dist(t(assay(rld)))
 
   pdf(paste0(base, "/GenericFigures/samp_dist.pdf"))
-  ## ----distheatmap, fig.width = 6.1, fig.height = 4.5----------------------
+
   sampleDistMatrix <- as.matrix(sampleDists)
   rownames(sampleDistMatrix) <- paste(colData(rld)[,level], rld$name, 
     sep = " - ")
@@ -138,34 +143,22 @@ RunDESeq2 <- function(outpath, quantspath, samplesheet, tx2gene, level, g1, g2,
 
   ### PCA PLOTS ###
   message(paste0("# PCA PLOTS #\n", base, "/GenericFigures/pca.pdf\n"))
-  pcaData <- DESeq2::plotPCA(rld, intgroup = plot_annos, returnData = TRUE)
-  percentVar <- round(100 * attr(pcaData, "percentVar"))
+
   pdf(paste0(base, "/GenericFigures/pca.pdf"))
-  p <- DESeq2::plotPCA(rld, intgroup = plot_annos)
+  p <- DESeq2::plotPCA(rld, intgroup = level)
   print(p)
-  ## ----ggplotpca, fig.width=6, fig.height=4.5------------------------------
-  p <- ggplot(pcaData, aes(x = PC1, y = PC2, 
-    color = colData(rld)[,plot_annos[1]], 
-    shape = colData(rld)[,plot_annos[2]])) +
-    geom_point(size =3) +
-    xlab(paste0("PC1: ", percentVar[1], "% variance")) +
-    ylab(paste0("PC2: ", percentVar[2], "% variance")) +
-    coord_fixed()
-  print(p)
+
+
+
   # Now with only the groups we want to compare.
-  pcaData <- DESeq2::plotPCA(rld.sub, intgroup = plot_annos, returnData = TRUE)
-  percentVar <- round(100 * attr(pcaData, "percentVar"))
-  p <- DESeq2::plotPCA(rld.sub, intgroup = plot_annos)
+  p <- DESeq2::plotPCA(rld.sub, intgroup = level) +
+   ggtitle("All Genes")
   print(p)
-  ## ----ggplotpca, fig.width=6, fig.height=4.5------------------------------
-  p <- ggplot(pcaData, aes(x = PC1, y = PC2, 
-    color = colData(rld.sub)[,plot_annos[1]], 
-    shape = colData(rld.sub)[,plot_annos[2]])) +
-    geom_point(size =3) +
-    xlab(paste0("PC1: ", percentVar[1], "% variance")) +
-    ylab(paste0("PC2: ", percentVar[2], "% variance")) +
-    coord_fixed()
+
+  p <- DESeq2::plotPCA(rld.sub, intgroup = plot.annos) + 
+    ggtitle("All Genes")
   print(p)
+
   dev.off()
   
   #======================================#
@@ -214,8 +207,8 @@ RunDESeq2 <- function(outpath, quantspath, samplesheet, tx2gene, level, g1, g2,
           ggtitle(resSig$Gene[i]) + coord_trans(y = "log10")
         print(p)
         dev.off()
-           }
       }
+    }
   }
   
   ### DEG PCA PLOTS ###
@@ -229,7 +222,7 @@ RunDESeq2 <- function(outpath, quantspath, samplesheet, tx2gene, level, g1, g2,
   # Show only DEG genes and only the wanted groups.
   if (nrow(resSig) > 5) {
       rld.sub <- rld[resSig$Gene, colData(rld)[,level] %in% c(g1, g2)]
-      p <- DESeq2::plotPCA(rld.sub, intgroup = plot_annos) + 
+      p <- DESeq2::plotPCA(rld.sub, intgroup = plot.annos) + 
         ggtitle("DEGs - padj <= 0.1")
       print(p)
       p <- DESeq2::plotPCA(rld.sub, intgroup = level) + 
@@ -242,7 +235,7 @@ RunDESeq2 <- function(outpath, quantspath, samplesheet, tx2gene, level, g1, g2,
   # Show only DEG genes and only the wanted groups.
   if (nrow(resSig) > 5){
       rld.sub <- rld[resSig$Gene, colData(rld)[,level] %in% c(g1, g2)]
-      p <- DESeq2::plotPCA(rld.sub, intgroup = plot_annos) + 
+      p <- DESeq2::plotPCA(rld.sub, intgroup = plot.annos) + 
         ggtitle("DEGs - padj <= 0.1 & LFC >|< 2")
       print(p)
       p <- DESeq2::plotPCA(rld.sub, intgroup = level) + 
@@ -254,7 +247,7 @@ RunDESeq2 <- function(outpath, quantspath, samplesheet, tx2gene, level, g1, g2,
   if (nrow(resSig) > 5){
       # Show only DEG genes and only the wanted groups.
       rld.sub <- rld[resSig$Gene, colData(rld)[,level] %in% c(g1, g2)]
-      p <- DESeq2::plotPCA(rld.sub, intgroup = plot_annos) + 
+      p <- DESeq2::plotPCA(rld.sub, intgroup = plot.annos) + 
         ggtitle("DEGs - padj <= 0.05")
       print(p)
       p <- DESeq2::plotPCA(rld.sub, intgroup = level) + 
@@ -268,7 +261,7 @@ RunDESeq2 <- function(outpath, quantspath, samplesheet, tx2gene, level, g1, g2,
   # Show only DEG genes and only the wanted groups.
   if (nrow(resSig) > 5){
       rld.sub <- rld[resSig$Gene, colData(rld)[,level] %in% c(g1, g2)]
-      p <- DESeq2::plotPCA(rld.sub, intgroup = plot_annos) + 
+      p <- DESeq2::plotPCA(rld.sub, intgroup = plot.annos) + 
         ggtitle("DEGs - padj <= 0.05 & LFC >|< 2")
       print(p)
       p <- DESeq2::plotPCA(rld.sub, intgroup = level) + 
@@ -290,7 +283,7 @@ RunDESeq2 <- function(outpath, quantspath, samplesheet, tx2gene, level, g1, g2,
   topVarGenes <- head(order(rowVars(assay(rld)), decreasing = TRUE), 100)
   mat  <- assay(rld)[ topVarGenes, ]
   mat  <- mat - rowMeans(mat)
-  anno <- as.data.frame(colData(rld)[, plot_annos])
+  anno <- as.data.frame(colData(rld)[, plot.annos])
   pdf(paste0(base,"/Top100_VariableGenes_HeatmapDistances.pdf"))
   p <- pheatmap(mat, annotation_col = anno, main="Top 100 Variable Genes")
   print(p)
@@ -300,7 +293,7 @@ RunDESeq2 <- function(outpath, quantspath, samplesheet, tx2gene, level, g1, g2,
   topVarGenes <- head(order(rowVars(assay(rld.sub)), decreasing = TRUE), 100)
   mat  <- assay(rld.sub)[ topVarGenes, ]
   mat  <- mat - rowMeans(mat)
-  anno <- as.data.frame(colData(rld.sub)[, plot_annos])
+  anno <- as.data.frame(colData(rld.sub)[, plot.annos])
   p <- pheatmap(mat, annotation_col = anno, main = "Top 100 Variable Genes")
   print(p)
   
@@ -398,7 +391,7 @@ RunDESeq2 <- function(outpath, quantspath, samplesheet, tx2gene, level, g1, g2,
   message(paste0("\n# DEG HEATMAPS #\n"))
 
   pdf(paste0(base, "/DEG_Heatmaps.pdf"))
-  MakeHeatmaps(dds, res, rld, level, g1, g2, plot_annos)
+  MakeHeatmaps(dds, res, rld, level, g1, g2, plot.annos)
   dev.off()
 
   ### SAVING TABLES ###

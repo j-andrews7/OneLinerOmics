@@ -33,7 +33,12 @@ Imports:
     plotly,
     EZscRNA,
     grDevices,
-    scales
+    scales,
+    Formula,
+    pheatmap
+Suggests:
+    knitr,
+    rmarkdown
 Remotes:
     j-andrews7/EZscRNA
 URL: https://github.com/j-andrews7/AndrewsBCellLymphoma
@@ -41,3 +46,4 @@ BugReports: https://github.com/j-andrews7/AndrewsBCellLymphoma/issues
 Encoding: UTF-8
 LazyData: true
 VignetteBuilder: knitr
+RoxygenNote: 6.1.1

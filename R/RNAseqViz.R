@@ -1,4 +1,4 @@
-#' 
+#' Generate gene count heatmaps
 #'
 #'
 #'
