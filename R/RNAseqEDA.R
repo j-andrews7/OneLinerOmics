@@ -53,12 +53,14 @@ ApplyVarianceTransformations <- function (dds, outpath) {
 #'
 #' @importFrom grDevices pdf dev.off
 #' @importFrom stats dist
-#' @importFrom dichromat colorRampPalette
 #' @importFrom pheatmap pheatmap
 #'
 VizSampleDistances <- function(rld, vsd, outpath, level) {
   pdf(outpath)
   i <- 1
+
+  labs <- c("Sample Distances (rlog)", 
+    "Sample Distances (vst)")
 
   for (x in c(rld, vsd)) {
     sampleDists <- dist(t(assay(x)))
@@ -68,11 +70,15 @@ VizSampleDistances <- function(rld, vsd, outpath, level) {
       sep = " - ")
     colnames(sampleDistMatrix) <- NULL
     colors <- colorRampPalette(rev(brewer.pal(9, "Blues")))(255)
+
     p <- pheatmap(sampleDistMatrix,
-             clustering_distance_rows = sampleDists,
-             clustering_distance_cols = sampleDists,
-             col = colors)
+      clustering_distance_rows = sampleDists,
+      clustering_distance_cols = sampleDists,
+      col = colors, main = labs[i])
     print(p)
+
+    i <- i + 1
   }
+
   dev.off()
 }
