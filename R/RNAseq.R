@@ -52,11 +52,8 @@ RunDESeq2 <- function(outpath, quants.path, samplesheet, tx2gene, level, g1, g2,
     
   message("### EXPLORATORY DATA ANALYSIS ###\n")
   message("# SET DIRECTORY STRUCTURE AND MODEL DESIGN #\n")
-  ### SET DIRECTORY STRUCTURE AND MODEL DESIGN ###
-  # Base folder to create output folders in. Create output folders.
-  base <- outpath
-  
   # Create directory structure and set design formula.
+  base <- outpath
   setup <- CreateOutputStructure(block = NULL, level, base)
   base <- setup$base
   design <- setup$design
@@ -86,79 +83,40 @@ RunDESeq2 <- function(outpath, quants.path, samplesheet, tx2gene, level, g1, g2,
   message(paste0("\ndds has", nrow(dds), 
     "genes after filtering rows with under ", read.filt, " reads total.\n"))
 
-  message("\n# VARIANCE STABILIZATION COMPARISONS #\n")
-  message(paste0(base, "/GenericFigures/transformation.pdf\n"))
   ### VARIANCE STABILIZATION COMPARISONS ###
-  rld <- rlog(dds, blind = FALSE)
-  vsd <- vst(dds, blind = FALSE)
-
-  pdf(paste0(base,"/GenericFigures/transformation.pdf"))
-
-  dds <- DESeq2::estimateSizeFactors(dds)
-
-  df <- bind_rows(
-    as_data_frame(log2(counts(dds, normalized=TRUE)[, 1:2]+1)) %>%
-           mutate(transformation = "log2(x + 1)"),
-    as_data_frame(assay(rld)[, 1:2]) %>% mutate(transformation = "rlog"),
-    as_data_frame(assay(vsd)[, 1:2]) %>% mutate(transformation = "vst"))
-  
-  colnames(df)[1:2] <- c("x", "y")  
-
-  p <- ggplot(df, aes(x = x, y = y)) + geom_hex(bins = 80) +
-    coord_fixed() + facet_grid( . ~ transformation) 
-  print(p)
-
-  dev.off()
+  message("\n# VARIANCE STABILIZATION COMPARISONS #\n")
+  vst.out <- paste0(base,"/GenericFigures/transformation.pdf")
+  message(vst.out)
+  trans <- GetVarianceTransformations(dds, vst.out)
+  rld <- trans$rld
+  vsd <- trans$vsd
 
   ### SAMPLE DISTANCES ###
-  message(paste0("\n# PLOTTING SAMPLE DISTANCES #\n", base, 
-    "/GenericFigures/samp_dist.pdf\n"))
-  sampleDists <- dist(t(assay(rld)))
-
-  pdf(paste0(base, "/GenericFigures/samp_dist.pdf"))
-
-  sampleDistMatrix <- as.matrix(sampleDists)
-  rownames(sampleDistMatrix) <- paste(colData(rld)[,level], rld$name, 
-    sep = " - ")
-  colnames(sampleDistMatrix) <- NULL
-  colors <- colorRampPalette( rev(brewer.pal(9, "Blues")) )(255)
-  p <- pheatmap(sampleDistMatrix,
-           clustering_distance_rows = sampleDists,
-           clustering_distance_cols = sampleDists,
-           col = colors)
-  print(p)
-
-  # Now with only the groups we want to compare.
-  rld.sub = rld[, colData(rld)[, level] %in% c(g1, g2)]
-  sampleDists <- dist(t(assay(rld.sub)))
-  sampleDistMatrix <- as.matrix(sampleDists)
-  rownames(sampleDistMatrix) <- paste(colData(rld.sub)[, level], rld.sub$name, 
-    sep = " - ")
-  p <- pheatmap(sampleDistMatrix,
-           clustering_distance_rows = sampleDists,
-           clustering_distance_cols = sampleDists,
-           col = colors)
-  print(p)
-  dev.off()
+  message("\n# PLOTTING SAMPLE DISTANCES #\n")
+  dists.out <- paste0(base, "/GenericFigures/samp_dist.pdf")
+  message(dists.out)
+  VizSampleDistances(rld, dists.out, level, g1, g2)
 
   ### PCA PLOTS ###
   message(paste0("# PCA PLOTS #\n", base, "/GenericFigures/pca.pdf\n"))
 
   pdf(paste0(base, "/GenericFigures/pca.pdf"))
-  p <- DESeq2::plotPCA(rld, intgroup = level)
+  p <- DESeq2::plotPCA(rld, intgroup = level) +
+    ggtitle("All Genes")
   print(p)
 
-
+  rld.sub = rld[, colData(rld)[, level] %in% c(g1, g2)]
 
   # Now with only the groups we want to compare.
   p <- DESeq2::plotPCA(rld.sub, intgroup = level) +
    ggtitle("All Genes")
   print(p)
 
-  p <- DESeq2::plotPCA(rld.sub, intgroup = plot.annos) + 
-    ggtitle("All Genes")
-  print(p)
-
+  if (!plot.annos == level) {
+    p <- DESeq2::plotPCA(rld.sub, intgroup = plot.annos) + 
+      ggtitle("All Genes")
+    print(p)
+  }
   dev.off()
   
   #======================================#
@@ -190,7 +148,6 @@ RunDESeq2 <- function(outpath, quants.path, samplesheet, tx2gene, level, g1, g2,
         gsub('/','-',resSig$Gene[i]),".BoxPlot.pdf"))) {
         pdf(paste0(base, "/GeneBoxPlots/", gsub('/','-',resSig$Gene[i]), 
           ".BoxPlot.pdf"))
-        d <- plotCounts(dds, gene = resSig$Gene[i], intgroup = level)
         d <- plotCounts(dds, gene = resSig$Gene[i], intgroup = level, 
           returnData = T)
         p <- ggplot(d, aes(x = d[,level], y = count)) + 
