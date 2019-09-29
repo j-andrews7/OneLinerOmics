@@ -11,10 +11,10 @@ RunVarianceTransformations <- function (dds, base) {
 
   pdf(paste0(base,"/GenericFigures/transformation.pdf"))
 
-  dds <- DESeq2::estimateSizeFactors(dds)
+  dds <- estimateSizeFactors(dds)
 
   df <- bind_rows(
-    as_data_frame(log2(counts(dds, normalized=TRUE)[, 1:2]+1)) %>%
+    as_data_frame(log2(counts(dds, normalized=TRUE)[, 1:2] + 1)) %>%
            mutate(transformation = "log2(x + 1)"),
     as_data_frame(assay(rld)[, 1:2]) %>% mutate(transformation = "rlog"),
     as_data_frame(assay(vsd)[, 1:2]) %>% mutate(transformation = "vst"))
