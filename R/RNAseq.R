@@ -233,29 +233,6 @@ RunDESeq2 <- function(outpath, quants.path, samplesheet, tx2gene, level, g1, g2,
   plotMA(res, ylim = c(-5, 5))
   dev.off()
   
-  ### GENE CLUSTERING - VARIABLE ###
-  # First with all samples included.
-  message(paste0("\n# VARIABLE GENE CLUSTERING #\n", base, 
-    "/Top100_VariableGenes_HeatmapDistances.pdf\n"))
-  topVarGenes <- head(order(rowVars(assay(rld)), decreasing = TRUE), 100)
-  mat  <- assay(rld)[ topVarGenes, ]
-  mat  <- mat - rowMeans(mat)
-  anno <- as.data.frame(colData(rld)[, plot.annos])
-  pdf(paste0(base,"/Top100_VariableGenes_HeatmapDistances.pdf"))
-  p <- pheatmap(mat, annotation_col = anno, main="Top 100 Variable Genes")
-  print(p)
-
-  #Then with only the wanted groups.
-  rld.sub <- rld[, colData(rld)[,level] %in% c(g1, g2)]
-  topVarGenes <- head(order(rowVars(assay(rld.sub)), decreasing = TRUE), 100)
-  mat  <- assay(rld.sub)[ topVarGenes, ]
-  mat  <- mat - rowMeans(mat)
-  anno <- as.data.frame(colData(rld.sub)[, plot.annos])
-  p <- pheatmap(mat, annotation_col = anno, main = "Top 100 Variable Genes")
-  print(p)
-  
-  dev.off()
-  
   ### VOLCANO PLOT ###
   message(paste0("# VOLCANO PLOT #\n", getwd(), "/", substr(base, 2, 500), "/", 
     g1, "-v-", g2, ".DEGs.meanCounts50.Volcano.padj0.1.html\n"))
