@@ -35,7 +35,8 @@ Imports:
     grDevices,
     scales,
     Formula,
-    pheatmap
+    pheatmap,
+    vsn
 Suggests:
     knitr,
     rmarkdown

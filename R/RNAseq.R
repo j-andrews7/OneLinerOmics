@@ -85,7 +85,7 @@ RunDESeq2 <- function(outpath, quants.path, samplesheet, tx2gene, level, g1, g2,
 
   ### VARIANCE STABILIZATION COMPARISONS ###
   message("\n# VARIANCE STABILIZATION COMPARISONS #\n")
-  vst.out <- paste0(base,"/GenericFigures/transformation.pdf")
+  vst.out <- paste0(base,"/GenericFigures/VarianceTransformations.pdf")
   message(vst.out)
   trans <- GetVarianceTransformations(dds, vst.out)
   rld <- trans$rld
@@ -93,9 +93,9 @@ RunDESeq2 <- function(outpath, quants.path, samplesheet, tx2gene, level, g1, g2,
 
   ### SAMPLE DISTANCES ###
   message("\n# PLOTTING SAMPLE DISTANCES #\n")
-  dists.out <- paste0(base, "/GenericFigures/samp_dist.pdf")
+  dists.out <- paste0(base, "/GenericFigures/SampleDistances.pdf")
   message(dists.out)
-  VizSampleDistances(rld, dists.out, level, g1, g2)
+  VizSampleDistances(rld, vsd, dists.out, level)
 
   ### PCA PLOTS ###
   message(paste0("# PCA PLOTS #\n", base, "/GenericFigures/pca.pdf\n"))
@@ -105,7 +105,7 @@ RunDESeq2 <- function(outpath, quants.path, samplesheet, tx2gene, level, g1, g2,
     ggtitle("All Genes")
   print(p)
 
-  rld.sub = rld[, colData(rld)[, level] %in% c(g1, g2)]
+  rld.sub <- rld[, colData(rld)[, level] %in% c(g1, g2)]
 
   # Now with only the groups we want to compare.
   p <- DESeq2::plotPCA(rld.sub, intgroup = level) +
