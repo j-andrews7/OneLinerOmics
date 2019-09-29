@@ -34,7 +34,6 @@ Imports:
     EZscRNA,
     grDevices,
     scales,
-    Formula,
     pheatmap,
     vsn
 Suggests:
