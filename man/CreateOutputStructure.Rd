@@ -4,7 +4,7 @@
 \alias{CreateOutputStructure}
 \title{Create output directory structure}
 \usage{
-CreateOutputStructure(block = NULL, level, base)
+CreateOutputStructure(block, level, base)
 }
 \arguments{
 \item{block}{String or character vector defining the variable(s) to use to 

@@ -32,10 +32,10 @@
 #'   than this number summed across all samples will be removed from the
 #'   analysis.
 #' @return Named List containing a \linkS4class{DESeqDataSet} object from 
-#'   running \code{\link[DESeq2]{DESeq}}, a \linkS4class{DESeqResults} object 
-#'   from running \code{\link[DESeq2]{lfcShrink}}, and a 
-#'   \linkS4class{RangedSummarizedExperiment} object 
-#'   from running \code{\link[DESeq2]{rlog}}.
+#'   running \code{\link[DESeq2]{DESeq}}, a 
+#'   \linkS4class{RangedSummarizedExperiment} object from running 
+#'   \code{\link[DESeq2]{rlog}}, and a \linkS4class{RangedSummarizedExperiment} 
+#'   object from running \code{\link[DESeq2]{vst}}.
 #'   
 #' @import DESeq2
 #' @import ggplot2
@@ -48,13 +48,13 @@
 #'
 RunDESeq2 <- function(outpath, quants.path, samplesheet, tx2gene, level, g1, g2, 
   padj.thresh = 0.05, fc.thresh = 2, plot.annos = NULL, block = NULL, 
-  read.filt = 100) {
+  read.filt = 10) {
     
   message("### EXPLORATORY DATA ANALYSIS ###\n")
   message("# SET DIRECTORY STRUCTURE AND MODEL DESIGN #\n")
   # Create directory structure and set design formula.
   base <- outpath
-  setup <- CreateOutputStructure(block = NULL, level, base)
+  setup <- CreateOutputStructure(block, level, base)
   base <- setup$base
   design <- setup$design
   
@@ -62,8 +62,8 @@ RunDESeq2 <- function(outpath, quants.path, samplesheet, tx2gene, level, g1, g2,
       plot.annos <- level
   }
   
-  message("# FILE LOADING & PRE-FILTERING #\n")
   ### FILE LOADING & PRE-FILTERING ###
+  message("# FILE LOADING & PRE-FILTERING #\n")
   tx2gene <- read.table(tx2gene, sep = "\t")    
   samples <- read.table(samplesheet, header = TRUE)
   rownames(samples) <- samples$name
@@ -73,7 +73,7 @@ RunDESeq2 <- function(outpath, quants.path, samplesheet, tx2gene, level, g1, g2,
   # Read in our actual count files now.
   txi <- tximport(files, type = "salmon", tx2gene = tx2gene)
 
-  message(paste0("\n\nDesign is: ", design, "\n\n"))
+  message(paste0("\nDesign is: ", design, "\n"))
   # Create the DESeqDataSet object.
   dds <- DESeqDataSetFromTximport(txi, colData = samples, design = design)
 
@@ -87,7 +87,7 @@ RunDESeq2 <- function(outpath, quants.path, samplesheet, tx2gene, level, g1, g2,
   message("\n# VARIANCE STABILIZATION COMPARISONS #\n")
   vst.out <- paste0(base,"/GenericFigures/VarianceTransformations.pdf")
   message(vst.out)
-  trans <- GetVarianceTransformations(dds, vst.out)
+  trans <- RunVarianceTransformations(dds, vst.out)
   rld <- trans$rld
   vsd <- trans$vsd
 
@@ -95,34 +95,25 @@ RunDESeq2 <- function(outpath, quants.path, samplesheet, tx2gene, level, g1, g2,
   message("\n# PLOTTING SAMPLE DISTANCES #\n")
   dists.out <- paste0(base, "/GenericFigures/SampleDistances.pdf")
   message(dists.out)
-  VizSampleDistances(rld, vsd, dists.out, level)
+  RunSampleDistances(rld, vsd, dists.out, level, plot.annos)
 
   ### PCA PLOTS ###
-  message(paste0("# PCA PLOTS #\n", base, "/GenericFigures/pca.pdf\n"))
+  message("\n# PCA PLOTS #\n")
+  pca.out <- paste0(base, "/GenericFigures/pca.pdf")
+  message(pca.out)
 
-  pdf(paste0(base, "/GenericFigures/pca.pdf"))
-  p <- DESeq2::plotPCA(rld, intgroup = level) +
-    ggtitle("All Genes")
-  print(p)
-
-  rld.sub <- rld[, colData(rld)[, level] %in% c(g1, g2)]
-
-  # Now with only the groups we want to compare.
-  p <- DESeq2::plotPCA(rld.sub, intgroup = level) +
-   ggtitle("All Genes")
-  print(p)
-
-  if (!plot.annos == level) {
-    p <- DESeq2::plotPCA(rld.sub, intgroup = plot.annos) + 
-      ggtitle("All Genes")
-    print(p)
-  }
-  dev.off()
+  RunPCA(rld, vsd, pca.out, level, plot.annos)
   
   #======================================#
   ### DIFFERENTIAL EXPRESSION ANALYSIS ###
   message("\n### DIFFERENTIAL EXPRESSION ANALYSIS ###\n")
   dds <- DESeq(dds)
+
+  return(list(dds = dds, rld = rld, vsd = vsd))
+
+
+
+
   res <- lfcShrink(dds, contrast=c(level, g1, g2), type='ashr')
   
   ### PLOTTING THE RESULTS ###
@@ -190,7 +181,7 @@ RunDESeq2 <- function(outpath, quants.path, samplesheet, tx2gene, level, g1, g2,
   # Now with lfc threshold on genes as well.
   resSig <- subset(resSig, log2FoldChange >= 2 | log2FoldChange <= -2)
   # Show only DEG genes and only the wanted groups.
-  if (nrow(resSig) > 5){
+  if (nrow(resSig) > 5) {
       rld.sub <- rld[resSig$Gene, colData(rld)[,level] %in% c(g1, g2)]
       p <- DESeq2::plotPCA(rld.sub, intgroup = plot.annos) + 
         ggtitle("DEGs - padj <= 0.1 & LFC >|< 2")
@@ -201,7 +192,7 @@ RunDESeq2 <- function(outpath, quants.path, samplesheet, tx2gene, level, g1, g2,
   }
   
   resSig <- subset(resdata, padj <= 0.05)
-  if (nrow(resSig) > 5){
+  if (nrow(resSig) > 5) {
       # Show only DEG genes and only the wanted groups.
       rld.sub <- rld[resSig$Gene, colData(rld)[,level] %in% c(g1, g2)]
       p <- DESeq2::plotPCA(rld.sub, intgroup = plot.annos) + 
@@ -216,7 +207,7 @@ RunDESeq2 <- function(outpath, quants.path, samplesheet, tx2gene, level, g1, g2,
   resSig <- subset(resdata, padj <= 0.05)
   resSig <- subset(resSig, log2FoldChange >= 2 | log2FoldChange <= -2)
   # Show only DEG genes and only the wanted groups.
-  if (nrow(resSig) > 5){
+  if (nrow(resSig) > 5) {
       rld.sub <- rld[resSig$Gene, colData(rld)[,level] %in% c(g1, g2)]
       p <- DESeq2::plotPCA(rld.sub, intgroup = plot.annos) + 
         ggtitle("DEGs - padj <= 0.05 & LFC >|< 2")

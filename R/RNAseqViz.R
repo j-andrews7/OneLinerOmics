@@ -7,8 +7,8 @@
 #'
 #'
 #'
-PlotHeatmaps <- function(dds, res, rld, level, g1, g2, plot_annos = NULL) {
-  # plot_annos should be a vector of at least two columns from the sample sheet to use for labeling plots. 
+PlotHeatmaps <- function(dds, res, rld, level, g1, g2, plot.annos = NULL) {
+  # plot.annos should be a vector of at least two columns from the sample sheet to use for labeling plots. 
   # g1 and g2 should be strings for the groups to be compared for the level (eg. "Progression", "Response")
   # dds must be a DESeqExperiment object.
   # rld is the log-transformed dds object.
@@ -19,7 +19,7 @@ PlotHeatmaps <- function(dds, res, rld, level, g1, g2, plot_annos = NULL) {
   breaks <- c(seq(-3, -1.251, length=250), seq(-1.25, -0.1001, length=250), 
     seq(-0.1, 0.1, length=1), seq(0.1001, 1.25, length=250), 
     seq(1.251, 3, length=250))
-  colors <- dichromat::colorRampPalette(c("#053061","#2166ac", "#f5f5f5", 
+  colors <- colorRampPalette(c("#053061","#2166ac", "#f5f5f5", 
     "#b2182b", "#67001f"))(n = 1000)
   
   ### Now let's throw in a LFC magnitude threshold. 
@@ -45,7 +45,7 @@ PlotHeatmaps <- function(dds, res, rld, level, g1, g2, plot_annos = NULL) {
     if (!(ncol(x) == ncol(x.sub))) {
 
       # Set which columns we want to use for annotating samples.
-      annotation_data <- as.data.frame(colData(rld)[plot_annos])
+      annotation_data <- as.data.frame(colData(rld)[plot.annos])
 
       matrix <- x.sub[res100,]
       # Plot the top 100.

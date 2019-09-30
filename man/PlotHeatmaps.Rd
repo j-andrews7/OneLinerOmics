@@ -4,7 +4,7 @@
 \alias{PlotHeatmaps}
 \title{Generate gene count heatmaps}
 \usage{
-PlotHeatmaps(dds, res, rld, level, g1, g2, plot_annos = NULL)
+PlotHeatmaps(dds, res, rld, level, g1, g2, plot.annos = NULL)
 }
 \description{
 Generate gene count heatmaps

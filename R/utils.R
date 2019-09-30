@@ -13,7 +13,7 @@
 #'
 #' @importFrom stats formula
 #'
-CreateOutputStructure <- function(block = NULL, level, base) {
+CreateOutputStructure <- function(block, level, base) {
 
   # Generate folders and craft design.
   if (!is.null(block)) {
