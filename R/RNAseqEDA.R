@@ -5,6 +5,7 @@
 #' @importFrom ggplot2 ggplot aes geom_hex facet_grid coord_fixed ggtitle
 #' @importFrom dplyr bind_rows as_data_frame mutate
 #' @importFrom vsn meanSdPlot
+#' @importFrom SummarizedExperiment assay
 #'
 RunVarianceTransformations <- function (dds, outpath) {
   message("This may take a while if you have many samples.")
@@ -54,6 +55,7 @@ RunVarianceTransformations <- function (dds, outpath) {
 #' @importFrom grDevices pdf dev.off
 #' @importFrom stats dist
 #' @importFrom pheatmap pheatmap
+#' @importFrom SummarizedExperiment assay
 #'
 RunSampleDistances <- function(rld, vsd, outpath, level, plot.annos) {
 

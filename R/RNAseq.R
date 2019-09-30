@@ -13,8 +13,6 @@
 #' @param tx2gene Path to file with transcript IDs in first column and gene 
 #'   identifiers in second. Used for gene-level summarization.
 #' @param level String defining variable of interest.
-#' @param g1 String indicating group in \code{level} to compare to \code{g2}.
-#' @param g2 String indicating group in \code{level} to compare to \code{g1}.
 #' @param padj.thresh Number or numeric scalar indicating the adjusted p-value 
 #'   cutoff(s) to be used for determining "significant" differential expression.
 #'   If multiple are given, multiple tables/plots will be generated using all 
@@ -40,13 +38,15 @@
 #' @import DESeq2
 #' @import ggplot2
 #' @importFrom pheatmap pheatmap
+#' @importFrom tximport tximport
 #'
 #' @export
 #'
 #' @seealso
 #' \code{\link[DESeq2]{DESeq}}, for more about differential expression analysis.
+#' \code{\link{ProcessDEGs}}, for analyzing and visualizing the results.
 #'
-RunDESeq2 <- function(outpath, quants.path, samplesheet, tx2gene, level, g1, g2, 
+RunDESeq2 <- function(outpath, quants.path, samplesheet, tx2gene, level,  
   padj.thresh = 0.05, fc.thresh = 2, plot.annos = NULL, block = NULL, 
   read.filt = 10) {
     
@@ -109,12 +109,67 @@ RunDESeq2 <- function(outpath, quants.path, samplesheet, tx2gene, level, g1, g2,
   message("\n### DIFFERENTIAL EXPRESSION ANALYSIS ###\n")
   dds <- DESeq(dds)
 
+  message("\n# SAVING ROBJECTS #\n")
+  message(paste0("DESeq2: ", paste0(base, "/Robjects/dds.rds")))
+  message(paste0("Regularized log transformation: ", 
+    paste0(base, "/Robjects/rld.rds")))
+  message(paste0("Variance stabilized transformation: ", 
+    paste0(base, "/Robjects/vld.rds")))
+  saveRDS(dds, file=paste0(base, "/Robjects/dds.rds"))
+  saveRDS(rld, file=paste0(base, "/Robjects/rld.rds"))
+  saveRDS(vld, file=paste0(base, "/Robjects/vld.rds"))
+
   return(list(dds = dds, rld = rld, vsd = vsd))
+}
 
 
+#' Extract, visualize, and save DEG lists
+#'
+#' 
+#' @param dds A \linkS4class{DESeqDataSet} object as returned by 
+#'   \link{RunDESeq2}.
+#' @param rld A \linkS4class{RangedSummarizedExperiment} object of rlog
+#'   \code{\link[DESeq2]{rlog}} transformed counts as returned by
+#'   \link{RunDESeq2}.
+#' @param vsd A \linkS4class{RangedSummarizedExperiment} object of rlog
+#'   \code{\link[DESeq2]{vst}} transformed counts as returned by
+#'   \link{RunDESeq2}.
+#' @param outpath Path to directory to be used for output.
+#' @param level String defining variable of interest.
+#' @param padj.thresh Number or numeric scalar indicating the adjusted p-value 
+#'   cutoff(s) to be used for determining "significant" differential expression.
+#'   If multiple are given, multiple tables/plots will be generated using all 
+#'   combinations of \code{padj.thresh} and \code{fc.thresh}.
+#' @param fc.thresh Number or numeric scalar indicating the log2 fold-change 
+#'   cutoff(s) to be used for determining "significant" differential expression.
+#'   If multiple are given, multiple tables/plots will be generated using all 
+#'   combinations of \code{padj.thresh} and \code{fc.thresh}.
+#' @param top.n Number of differentially expressed genes to create boxplots for, 
+#'   ranked by adj. p-value after applying \code{padj.thresh} and 
+#'   \code{fc.thresh} thresholds. If multiple thresholds are provided, the 
+#'   lowest fold-change and highest adj. p-value thresholds will be used. 
+#'
+#'   Plots will be created for each comparison. 
+#'
+#' @importFrom DESeq2 lfcShrink counts plotCounts
+#' @importFrom magrittr %>%
+#'
+#' @export
+#'
+ProcessDEGs <- function(dds, rld, vsd, outpath, level, padj.thresh = 0.05, 
+  fc.thresh = 2, top.n = 100) {
 
+  # Get all possible sample comparisons.
+  combs <- combn(colData(rld)[,level], 2)
+  combs.seq <- seq(1, length(combs), by = 2)
 
-  res <- lfcShrink(dds, contrast=c(level, g1, g2), type='ashr')
+  res.list <- list()
+  for (samp in combs.seq) {
+    g1 <- combs[samp]
+    g2 <- combs[samp + 1]
+    res <- lfcShrink(dds, contrast=c(level, g1, g2), type='ashr')
+    res.list[[paste0(g1, "v", g2)]] <- res
+  }
   
   ### PLOTTING THE RESULTS ###
   # This gets all the normalized counts for all genes/samples.
@@ -134,7 +189,7 @@ RunDESeq2 <- function(outpath, quants.path, samplesheet, tx2gene, level, g1, g2,
   line = c("#1F78B4", "#33A02C", "#FF7F00", "#6A3D9A", 
     "#e7298a", "#a6761d", "#1b9e77")
   if (nrow(resSig) > 5) {
-    for (i in 1:nrow(resSig)){
+    for (i in 1:nrow(resSig)) {
       if (!file.exists(paste0(base, "/GeneBoxPlots/", 
         gsub('/','-',resSig$Gene[i]),".BoxPlot.pdf"))) {
         pdf(paste0(base, "/GeneBoxPlots/", gsub('/','-',resSig$Gene[i]), 
