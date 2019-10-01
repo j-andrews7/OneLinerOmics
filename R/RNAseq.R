@@ -42,6 +42,8 @@
 #'
 #' @export
 #'
+#' @author Jared Andrews
+#'
 #' @seealso
 #' \code{\link[DESeq2]{DESeq}}, for more about differential expression analysis.
 #' \code{\link{ProcessDEGs}}, for analyzing and visualizing the results.
@@ -128,10 +130,10 @@ RunDESeq2 <- function(outpath, quants.path, samplesheet, tx2gene, level,
 #' 
 #' @param dds A \linkS4class{DESeqDataSet} object as returned by 
 #'   \link{RunDESeq2}.
-#' @param rld A \linkS4class{RangedSummarizedExperiment} object of rlog
+#' @param rld A \linkS4class{RangedSummarizedExperiment} object of 
 #'   \code{\link[DESeq2]{rlog}} transformed counts as returned by
 #'   \link{RunDESeq2}.
-#' @param vsd A \linkS4class{RangedSummarizedExperiment} object of rlog
+#' @param vsd A \linkS4class{RangedSummarizedExperiment} object of 
 #'   \code{\link[DESeq2]{vst}} transformed counts as returned by
 #'   \link{RunDESeq2}.
 #' @param outpath Path to directory to be used for output.
@@ -155,6 +157,8 @@ RunDESeq2 <- function(outpath, quants.path, samplesheet, tx2gene, level,
 #' @importFrom magrittr %>%
 #'
 #' @export
+#'
+#' @author Jared Andrews
 #'
 ProcessDEGs <- function(dds, rld, vsd, outpath, level, padj.thresh = 0.05, 
   fc.thresh = 2, top.n = 100) {

@@ -5,7 +5,7 @@
 #'
 #'
 #'
-#'
+#' @author Jared Andrews
 #'
 PlotHeatmaps <- function(dds, res, rld, level, g1, g2, plot.annos = NULL) {
   # plot.annos should be a vector of at least two columns from the sample sheet to use for labeling plots. 
@@ -79,8 +79,31 @@ PlotHeatmaps <- function(dds, res, rld, level, g1, g2, plot.annos = NULL) {
   }
 }
 
+#'
+#'
+#'
+#'
+#'
+#'
+#'
+#'
+#'
+#'
+#'
+#' @import ggplot2
+#' @importFrom DESeq2 counts plotCounts
+#'
+#' @author Jared Andrews
+#'
+PlotBoxplots <- function(res.list, dds, outpath, padj.thresh, fc.thresh) {
 
-PlotBoxplots <- function() {
+  resdata <- merge(as.data.frame(res), 
+    as.data.frame(counts(dds, normalized=TRUE)), by="row.names", sort=FALSE)
+  names(resdata)[1] <- "Gene"
+
+  # Make table for just DEGs.
+  resSig <- subset(resdata, padj <= 0.1)
+
   message("Creating boxplots for all genes with padj <= 0.1")
   # If you have >7 levels for your contrast, you need to add colors here.
   fill = c("#A6CEE3", "#B2DF8A", "#FDBF6F", "#CAB2D6", 
