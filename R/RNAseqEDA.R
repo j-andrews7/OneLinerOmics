@@ -6,6 +6,8 @@
 #' @importFrom dplyr bind_rows as_data_frame mutate
 #' @importFrom vsn meanSdPlot
 #'
+#' @author Jared Andrews
+#'
 ApplyVarianceTransformations <- function (dds, outpath) {
   message("This may take a while if you have many samples.")
   rld <- rlog(dds, blind = FALSE)
@@ -54,6 +56,8 @@ ApplyVarianceTransformations <- function (dds, outpath) {
 #' @importFrom grDevices pdf dev.off
 #' @importFrom stats dist
 #' @importFrom pheatmap pheatmap
+#'
+#' @author Jared Andrews
 #'
 VizSampleDistances <- function(rld, vsd, outpath, level) {
   pdf(outpath)

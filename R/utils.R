@@ -13,6 +13,8 @@
 #'
 #' @importFrom stats formula
 #'
+#' @author Jared Andrews
+#'
 CreateOutputStructure <- function(block = NULL, level, base) {
 
   # Generate folders and craft design.
