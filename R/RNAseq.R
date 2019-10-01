@@ -13,8 +13,6 @@
 #' @param tx2gene Path to file with transcript IDs in first column and gene 
 #'   identifiers in second. Used for gene-level summarization.
 #' @param level String defining variable of interest.
-#' @param g1 String indicating group in \code{level} to compare to \code{g2}.
-#' @param g2 String indicating group in \code{level} to compare to \code{g1}.
 #' @param padj.thresh Number or numeric scalar indicating the adjusted p-value 
 #'   cutoff(s) to be used for determining "significant" differential expression.
 #'   If multiple are given, multiple tables/plots will be generated using all 
@@ -32,29 +30,31 @@
 #'   than this number summed across all samples will be removed from the
 #'   analysis.
 #' @return Named List containing a \linkS4class{DESeqDataSet} object from 
-#'   running \code{\link[DESeq2]{DESeq}}, a \linkS4class{DESeqResults} object 
-#'   from running \code{\link[DESeq2]{lfcShrink}}, and a 
-#'   \linkS4class{RangedSummarizedExperiment} object 
-#'   from running \code{\link[DESeq2]{rlog}}.
+#'   running \code{\link[DESeq2]{DESeq}}, a 
+#'   \linkS4class{RangedSummarizedExperiment} object from running 
+#'   \code{\link[DESeq2]{rlog}}, and a \linkS4class{RangedSummarizedExperiment} 
+#'   object from running \code{\link[DESeq2]{vst}}.
 #'   
 #' @import DESeq2
 #' @import ggplot2
 #' @importFrom pheatmap pheatmap
+#' @importFrom tximport tximport
 #'
 #' @export
 #'
 #' @seealso
 #' \code{\link[DESeq2]{DESeq}}, for more about differential expression analysis.
+#' \code{\link{ProcessDEGs}}, for analyzing and visualizing the results.
 #'
-RunDESeq2 <- function(outpath, quants.path, samplesheet, tx2gene, level, g1, g2, 
+RunDESeq2 <- function(outpath, quants.path, samplesheet, tx2gene, level,  
   padj.thresh = 0.05, fc.thresh = 2, plot.annos = NULL, block = NULL, 
-  read.filt = 100) {
+  read.filt = 10) {
     
   message("### EXPLORATORY DATA ANALYSIS ###\n")
   message("# SET DIRECTORY STRUCTURE AND MODEL DESIGN #\n")
   # Create directory structure and set design formula.
   base <- outpath
-  setup <- CreateOutputStructure(block = NULL, level, base)
+  setup <- CreateOutputStructure(block, level, base)
   base <- setup$base
   design <- setup$design
   
@@ -62,8 +62,8 @@ RunDESeq2 <- function(outpath, quants.path, samplesheet, tx2gene, level, g1, g2,
       plot.annos <- level
   }
   
-  message("# FILE LOADING & PRE-FILTERING #\n")
   ### FILE LOADING & PRE-FILTERING ###
+  message("# FILE LOADING & PRE-FILTERING #\n")
   tx2gene <- read.table(tx2gene, sep = "\t")    
   samples <- read.table(samplesheet, header = TRUE)
   rownames(samples) <- samples$name
@@ -73,7 +73,7 @@ RunDESeq2 <- function(outpath, quants.path, samplesheet, tx2gene, level, g1, g2,
   # Read in our actual count files now.
   txi <- tximport(files, type = "salmon", tx2gene = tx2gene)
 
-  message(paste0("\n\nDesign is: ", design, "\n\n"))
+  message(paste0("\nDesign is: ", design, "\n"))
   # Create the DESeqDataSet object.
   dds <- DESeqDataSetFromTximport(txi, colData = samples, design = design)
 
@@ -87,7 +87,7 @@ RunDESeq2 <- function(outpath, quants.path, samplesheet, tx2gene, level, g1, g2,
   message("\n# VARIANCE STABILIZATION COMPARISONS #\n")
   vst.out <- paste0(base,"/GenericFigures/VarianceTransformations.pdf")
   message(vst.out)
-  trans <- GetVarianceTransformations(dds, vst.out)
+  trans <- RunVarianceTransformations(dds, vst.out)
   rld <- trans$rld
   vsd <- trans$vsd
 
@@ -95,35 +95,81 @@ RunDESeq2 <- function(outpath, quants.path, samplesheet, tx2gene, level, g1, g2,
   message("\n# PLOTTING SAMPLE DISTANCES #\n")
   dists.out <- paste0(base, "/GenericFigures/SampleDistances.pdf")
   message(dists.out)
-  VizSampleDistances(rld, vsd, dists.out, level)
+  RunSampleDistances(rld, vsd, dists.out, level, plot.annos)
 
   ### PCA PLOTS ###
-  message(paste0("# PCA PLOTS #\n", base, "/GenericFigures/pca.pdf\n"))
+  message("\n# PCA PLOTS #\n")
+  pca.out <- paste0(base, "/GenericFigures/pca.pdf")
+  message(pca.out)
 
-  pdf(paste0(base, "/GenericFigures/pca.pdf"))
-  p <- DESeq2::plotPCA(rld, intgroup = level) +
-    ggtitle("All Genes")
-  print(p)
-
-  rld.sub <- rld[, colData(rld)[, level] %in% c(g1, g2)]
-
-  # Now with only the groups we want to compare.
-  p <- DESeq2::plotPCA(rld.sub, intgroup = level) +
-   ggtitle("All Genes")
-  print(p)
-
-  if (!plot.annos == level) {
-    p <- DESeq2::plotPCA(rld.sub, intgroup = plot.annos) + 
-      ggtitle("All Genes")
-    print(p)
-  }
-  dev.off()
+  RunPCA(rld, vsd, pca.out, level, plot.annos)
   
   #======================================#
   ### DIFFERENTIAL EXPRESSION ANALYSIS ###
   message("\n### DIFFERENTIAL EXPRESSION ANALYSIS ###\n")
   dds <- DESeq(dds)
-  res <- lfcShrink(dds, contrast=c(level, g1, g2), type='ashr')
+
+  message("\n# SAVING ROBJECTS #\n")
+  message(paste0("DESeq2: ", paste0(base, "/Robjects/dds.rds")))
+  message(paste0("Regularized log transformation: ", 
+    paste0(base, "/Robjects/rld.rds")))
+  message(paste0("Variance stabilized transformation: ", 
+    paste0(base, "/Robjects/vld.rds")))
+  saveRDS(dds, file=paste0(base, "/Robjects/dds.rds"))
+  saveRDS(rld, file=paste0(base, "/Robjects/rld.rds"))
+  saveRDS(vld, file=paste0(base, "/Robjects/vld.rds"))
+
+  return(list(dds = dds, rld = rld, vsd = vsd))
+}
+
+
+#' Extract, visualize, and save DEG lists
+#'
+#' 
+#' @param dds A \linkS4class{DESeqDataSet} object as returned by 
+#'   \link{RunDESeq2}.
+#' @param rld A \linkS4class{RangedSummarizedExperiment} object of rlog
+#'   \code{\link[DESeq2]{rlog}} transformed counts as returned by
+#'   \link{RunDESeq2}.
+#' @param vsd A \linkS4class{RangedSummarizedExperiment} object of rlog
+#'   \code{\link[DESeq2]{vst}} transformed counts as returned by
+#'   \link{RunDESeq2}.
+#' @param outpath Path to directory to be used for output.
+#' @param level String defining variable of interest.
+#' @param padj.thresh Number or numeric scalar indicating the adjusted p-value 
+#'   cutoff(s) to be used for determining "significant" differential expression.
+#'   If multiple are given, multiple tables/plots will be generated using all 
+#'   combinations of \code{padj.thresh} and \code{fc.thresh}.
+#' @param fc.thresh Number or numeric scalar indicating the log2 fold-change 
+#'   cutoff(s) to be used for determining "significant" differential expression.
+#'   If multiple are given, multiple tables/plots will be generated using all 
+#'   combinations of \code{padj.thresh} and \code{fc.thresh}.
+#' @param top.n Number of differentially expressed genes to create boxplots for, 
+#'   ranked by adj. p-value after applying \code{padj.thresh} and 
+#'   \code{fc.thresh} thresholds. If multiple thresholds are provided, the 
+#'   lowest fold-change and highest adj. p-value thresholds will be used. 
+#'
+#'   Plots will be created for each comparison. 
+#'
+#' @importFrom DESeq2 lfcShrink counts plotCounts
+#' @importFrom magrittr %>%
+#'
+#' @export
+#'
+ProcessDEGs <- function(dds, rld, vsd, outpath, level, padj.thresh = 0.05, 
+  fc.thresh = 2, top.n = 100) {
+
+  # Get all possible sample comparisons.
+  combs <- combn(colData(rld)[,level], 2)
+  combs.seq <- seq(1, length(combs), by = 2)
+
+  res.list <- list()
+  for (samp in combs.seq) {
+    g1 <- combs[samp]
+    g2 <- combs[samp + 1]
+    res <- lfcShrink(dds, contrast=c(level, g1, g2), type='ashr')
+    res.list[[paste0(g1, "v", g2)]] <- res
+  }
   
   ### PLOTTING THE RESULTS ###
   # This gets all the normalized counts for all genes/samples.
@@ -143,7 +189,7 @@ RunDESeq2 <- function(outpath, quants.path, samplesheet, tx2gene, level, g1, g2,
   line = c("#1F78B4", "#33A02C", "#FF7F00", "#6A3D9A", 
     "#e7298a", "#a6761d", "#1b9e77")
   if (nrow(resSig) > 5) {
-    for (i in 1:nrow(resSig)){
+    for (i in 1:nrow(resSig)) {
       if (!file.exists(paste0(base, "/GeneBoxPlots/", 
         gsub('/','-',resSig$Gene[i]),".BoxPlot.pdf"))) {
         pdf(paste0(base, "/GeneBoxPlots/", gsub('/','-',resSig$Gene[i]), 
@@ -190,7 +236,7 @@ RunDESeq2 <- function(outpath, quants.path, samplesheet, tx2gene, level, g1, g2,
   # Now with lfc threshold on genes as well.
   resSig <- subset(resSig, log2FoldChange >= 2 | log2FoldChange <= -2)
   # Show only DEG genes and only the wanted groups.
-  if (nrow(resSig) > 5){
+  if (nrow(resSig) > 5) {
       rld.sub <- rld[resSig$Gene, colData(rld)[,level] %in% c(g1, g2)]
       p <- DESeq2::plotPCA(rld.sub, intgroup = plot.annos) + 
         ggtitle("DEGs - padj <= 0.1 & LFC >|< 2")
@@ -201,7 +247,7 @@ RunDESeq2 <- function(outpath, quants.path, samplesheet, tx2gene, level, g1, g2,
   }
   
   resSig <- subset(resdata, padj <= 0.05)
-  if (nrow(resSig) > 5){
+  if (nrow(resSig) > 5) {
       # Show only DEG genes and only the wanted groups.
       rld.sub <- rld[resSig$Gene, colData(rld)[,level] %in% c(g1, g2)]
       p <- DESeq2::plotPCA(rld.sub, intgroup = plot.annos) + 
@@ -216,7 +262,7 @@ RunDESeq2 <- function(outpath, quants.path, samplesheet, tx2gene, level, g1, g2,
   resSig <- subset(resdata, padj <= 0.05)
   resSig <- subset(resSig, log2FoldChange >= 2 | log2FoldChange <= -2)
   # Show only DEG genes and only the wanted groups.
-  if (nrow(resSig) > 5){
+  if (nrow(resSig) > 5) {
       rld.sub <- rld[resSig$Gene, colData(rld)[,level] %in% c(g1, g2)]
       p <- DESeq2::plotPCA(rld.sub, intgroup = plot.annos) + 
         ggtitle("DEGs - padj <= 0.05 & LFC >|< 2")

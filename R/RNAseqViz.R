@@ -7,8 +7,8 @@
 #'
 #'
 #'
-PlotHeatmaps <- function(dds, res, rld, level, g1, g2, plot_annos = NULL) {
-  # plot_annos should be a vector of at least two columns from the sample sheet to use for labeling plots. 
+PlotHeatmaps <- function(dds, res, rld, level, g1, g2, plot.annos = NULL) {
+  # plot.annos should be a vector of at least two columns from the sample sheet to use for labeling plots. 
   # g1 and g2 should be strings for the groups to be compared for the level (eg. "Progression", "Response")
   # dds must be a DESeqExperiment object.
   # rld is the log-transformed dds object.
@@ -19,7 +19,7 @@ PlotHeatmaps <- function(dds, res, rld, level, g1, g2, plot_annos = NULL) {
   breaks <- c(seq(-3, -1.251, length=250), seq(-1.25, -0.1001, length=250), 
     seq(-0.1, 0.1, length=1), seq(0.1001, 1.25, length=250), 
     seq(1.251, 3, length=250))
-  colors <- dichromat::colorRampPalette(c("#053061","#2166ac", "#f5f5f5", 
+  colors <- colorRampPalette(c("#053061","#2166ac", "#f5f5f5", 
     "#b2182b", "#67001f"))(n = 1000)
   
   ### Now let's throw in a LFC magnitude threshold. 
@@ -45,7 +45,7 @@ PlotHeatmaps <- function(dds, res, rld, level, g1, g2, plot_annos = NULL) {
     if (!(ncol(x) == ncol(x.sub))) {
 
       # Set which columns we want to use for annotating samples.
-      annotation_data <- as.data.frame(colData(rld)[plot_annos])
+      annotation_data <- as.data.frame(colData(rld)[plot.annos])
 
       matrix <- x.sub[res100,]
       # Plot the top 100.
@@ -74,6 +74,41 @@ PlotHeatmaps <- function(dds, res, rld, level, g1, g2, plot_annos = NULL) {
           scale="row", breaks=breaks, show_rownames = F, 
           main="ALL DE Genes - padj <= 0.1 & LFC >|< 2 - RLD", cluster_cols=F, 
           fontsize_row=3, fontsize_col=5)
+      }
+    }
+  }
+}
+
+
+PlotBoxplots <- function() {
+  message("Creating boxplots for all genes with padj <= 0.1")
+  # If you have >7 levels for your contrast, you need to add colors here.
+  fill = c("#A6CEE3", "#B2DF8A", "#FDBF6F", "#CAB2D6", 
+    "#f4cae4", "#f1e2cc", "#b3e2cd")
+  line = c("#1F78B4", "#33A02C", "#FF7F00", "#6A3D9A", 
+    "#e7298a", "#a6761d", "#1b9e77")
+  if (nrow(resSig) > 5) {
+    for (i in 1:nrow(resSig)) {
+      if (!file.exists(paste0(base, "/GeneBoxPlots/", 
+        gsub('/','-',resSig$Gene[i]),".BoxPlot.pdf"))) {
+        pdf(paste0(base, "/GeneBoxPlots/", gsub('/','-',resSig$Gene[i]), 
+          ".BoxPlot.pdf"))
+        d <- plotCounts(dds, gene = resSig$Gene[i], intgroup = level, 
+          returnData = T)
+        p <- ggplot(d, aes(x = d[,level], y = count)) + 
+          geom_boxplot(fill = fill[1:length(levels(colData(rld)[,level]))], 
+            colour = line[1:length(levels(colData(rld)[,level]))]) + 
+          ggtitle(resSig$Gene[i]) + coord_trans(y = "log10")
+        print(p)
+
+        d <- plotCounts(dds, gene = resSig$Gene[i], intgroup = level, 
+          returnData = T)
+        e <- subset(d, (get(level) == g1 | get(level) == g2))
+        p <- ggplot(e, aes(x = e[,level], y = count)) + 
+          geom_boxplot(fill=fill[1:2],colour=line[1:2]) + 
+          ggtitle(resSig$Gene[i]) + coord_trans(y = "log10")
+        print(p)
+        dev.off()
       }
     }
   }

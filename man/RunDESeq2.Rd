@@ -6,7 +6,7 @@
 \usage{
 RunDESeq2(outpath, quants.path, samplesheet, tx2gene, level, g1, g2,
   padj.thresh = 0.05, fc.thresh = 2, plot.annos = NULL,
-  block = NULL, read.filt = 100)
+  block = NULL, read.filt = 10)
 }
 \arguments{
 \item{outpath}{Path to directory to be used for output. Additional 
@@ -49,10 +49,10 @@ analysis.}
 }
 \value{
 Named List containing a \linkS4class{DESeqDataSet} object from 
-  running \code{\link[DESeq2]{DESeq}}, a \linkS4class{DESeqResults} object 
-  from running \code{\link[DESeq2]{lfcShrink}}, and a 
-  \linkS4class{RangedSummarizedExperiment} object 
-  from running \code{\link[DESeq2]{rlog}}.
+  running \code{\link[DESeq2]{DESeq}}, a 
+  \linkS4class{RangedSummarizedExperiment} object from running 
+  \code{\link[DESeq2]{rlog}}, and a \linkS4class{RangedSummarizedExperiment} 
+  object from running \code{\link[DESeq2]{vst}}.
 }
 \description{
 This function performs a high-level differential gene expression analysis

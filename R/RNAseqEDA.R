@@ -5,6 +5,7 @@
 #' @importFrom ggplot2 ggplot aes geom_hex facet_grid coord_fixed ggtitle
 #' @importFrom dplyr bind_rows as_data_frame mutate
 #' @importFrom vsn meanSdPlot
+#' @importFrom SummarizedExperiment assay
 #'
 #' @author Jared Andrews
 #'
@@ -22,11 +23,11 @@ ApplyVarianceTransformations <- function (dds, outpath) {
            mutate(transformation = "log2(x + 1)"),
     as_data_frame(assay(rld)[, 1:2]) %>% mutate(transformation = "rlog"),
     as_data_frame(assay(vsd)[, 1:2]) %>% mutate(transformation = "vst"))
-  
-  colnames(df)[1:2] <- c("x", "y")  
+
+  colnames(df)[1:2] <- c("x", "y")
 
   p <- ggplot(df, aes(x = x, y = y)) + geom_hex(bins = 80) +
-    coord_fixed() + facet_grid( . ~ transformation) 
+    coord_fixed() + facet_grid( . ~ transformation)
   print(p)
 
   # Plots to compare variance and counts.
@@ -38,7 +39,7 @@ ApplyVarianceTransformations <- function (dds, outpath) {
 
   ntd.p$gg <- ntd.p$gg + ggtitle("Transformation: log2(x + 1)")
   rld.p$gg <- rld.p$gg + ggtitle("Transformation: regularized log (rlog)")
-  vsd.p$gg <- vsd.p$gg + 
+  vsd.p$gg <- vsd.p$gg +
     ggtitle("Transformation: variance stabilizing transformation")
 
   print(ntd.p$gg)
@@ -56,33 +57,90 @@ ApplyVarianceTransformations <- function (dds, outpath) {
 #' @importFrom grDevices pdf dev.off
 #' @importFrom stats dist
 #' @importFrom pheatmap pheatmap
+#' @importFrom SummarizedExperiment assay
 #'
 #' @author Jared Andrews
 #'
-VizSampleDistances <- function(rld, vsd, outpath, level) {
+RunSampleDistances <- function(rld, vsd, outpath, level, plot.annos) {
+
   pdf(outpath)
   i <- 1
 
-  labs <- c("Sample Distances (rlog)", 
+  labs <- c("Sample Distances (rlog)",
     "Sample Distances (vst)")
 
   for (x in c(rld, vsd)) {
     sampleDists <- dist(t(assay(x)))
-
     sampleDistMatrix <- as.matrix(sampleDists)
-    rownames(sampleDistMatrix) <- paste(colData(x)[,level], x$name, 
+    rownames(sampleDistMatrix) <- paste(colData(x)[,level], x$name,
       sep = " - ")
     colnames(sampleDistMatrix) <- NULL
     colors <- colorRampPalette(rev(brewer.pal(9, "Blues")))(255)
 
+    # Get annotation data.
+    annotation.data <- as.data.frame(colData(x)[plot.annos])
+
     p <- pheatmap(sampleDistMatrix,
       clustering_distance_rows = sampleDists,
       clustering_distance_cols = sampleDists,
-      col = colors, main = labs[i])
+      col = colors, main = labs[i], annotation_col = annotation.data)
     print(p)
 
     i <- i + 1
   }
+
+  dev.off()
+}
+
+
+#' Plot PCAs from variance stabilized counts
+#'
+#' @importFrom grDevices pdf dev.off
+#' @importFrom ggplot2 ggtitle
+#' @importFrom utils combn
+#'
+RunPCA <- function(rld, vsd, outpath, level, plot.annos) {
+
+  pdf(outpath)
+  i <- 1
+
+  labs <- c("All Genes (rlog)",
+    "All Genes (vst)")
+
+  # Get all possible comparisons.
+  combs <- combn(colData(rld)[,level], 2)
+  combs.seq <- seq(1, length(combs), by = 2)
+
+
+  for (x in c(rld, vsd)) {
+    p <- DESeq2::plotPCA(x, intgroup = level) +
+      ggtitle(labs[i])
+    print(p)
+
+    if (!plot.annos == level) {
+      p <- DESeq2::plotPCA(x, intgroup = plot.annos) +
+        ggtitle(labs[i])
+      print(p)
+    }
+
+    # PCA for all possible sample comparisons.
+    for (samp in combs.seq) {
+      x.sub <- x[, colData(x)[, level] %in% c(combs[samp], combs[samp + 1])]
+
+      p <- DESeq2::plotPCA(x, intgroup = level) +
+        ggtitle(paste0(labs[i], " - ", combs[samp], " v ", combs[samp + 1]))
+      print(p)
+
+      if (!plot.annos == level) {
+        p <- DESeq2::plotPCA(x, intgroup = plot.annos) +
+          ggtitle(paste0(labs[i], " - ", combs[samp], " v ", combs[samp + 1]))
+        print(p)
+      }
+    }
+
+    i <- i + 1
+  }
+
 
   dev.off()
 }
