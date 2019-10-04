@@ -1,3 +1,20 @@
+#' Perform GO/Pathway enrichment for DEGs via enrichR
+#'
+#' 
+#'
+#' 
+#'
+#'
+#'
+#' 
+#'
+#'
+#'
+#' 
+#' @importFrom EZscRNA RunEnrichr VizEnrichments
+#'
+#' @author Jared Andrews
+#'
 DoEnrichments <- function(samp1, samp2, results, baseout, padj.thresh = 0.01, 
   lfc.thresh = 2, top.n = NULL) {
 

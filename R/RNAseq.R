@@ -39,6 +39,7 @@
 #' @import ggplot2
 #' @importFrom pheatmap pheatmap
 #' @importFrom tximport tximport
+#' @importFrom utils read.table write.csv
 #'
 #' @export
 #'
@@ -89,7 +90,7 @@ RunDESeq2 <- function(outpath, quants.path, samplesheet, tx2gene, level,
   message("\n# VARIANCE STABILIZATION COMPARISONS #\n")
   vst.out <- paste0(base,"/GenericFigures/VarianceTransformations.pdf")
   message(vst.out)
-  trans <- RunVarianceTransformations(dds, vst.out)
+  trans <- GetVarianceTransformations(dds, vst.out)
   rld <- trans$rld
   vsd <- trans$vsd
 
@@ -97,14 +98,14 @@ RunDESeq2 <- function(outpath, quants.path, samplesheet, tx2gene, level,
   message("\n# PLOTTING SAMPLE DISTANCES #\n")
   dists.out <- paste0(base, "/GenericFigures/SampleDistances.pdf")
   message(dists.out)
-  RunSampleDistances(rld, vsd, dists.out, level, plot.annos)
+  GetSampleDistances(rld, vsd, dists.out, level, plot.annos)
 
   ### PCA PLOTS ###
   message("\n# PCA PLOTS #\n")
   pca.out <- paste0(base, "/GenericFigures/pca.pdf")
   message(pca.out)
 
-  RunPCA(rld, vsd, pca.out, level, plot.annos)
+  GetPCAs(rld, vsd, pca.out, level, plot.annos)
   
   #======================================#
   ### DIFFERENTIAL EXPRESSION ANALYSIS ###
@@ -116,10 +117,10 @@ RunDESeq2 <- function(outpath, quants.path, samplesheet, tx2gene, level,
   message(paste0("Regularized log transformation: ", 
     paste0(base, "/Robjects/rld.rds")))
   message(paste0("Variance stabilized transformation: ", 
-    paste0(base, "/Robjects/vld.rds")))
+    paste0(base, "/Robjects/vsd.rds")))
   saveRDS(dds, file=paste0(base, "/Robjects/dds.rds"))
   saveRDS(rld, file=paste0(base, "/Robjects/rld.rds"))
-  saveRDS(vld, file=paste0(base, "/Robjects/vld.rds"))
+  saveRDS(vsd, file=paste0(base, "/Robjects/vsd.rds"))
 
   return(list(dds = dds, rld = rld, vsd = vsd))
 }
@@ -155,6 +156,7 @@ RunDESeq2 <- function(outpath, quants.path, samplesheet, tx2gene, level,
 #'
 #' @importFrom DESeq2 lfcShrink counts plotCounts
 #' @importFrom magrittr %>%
+#' @importFrom htmlwidgets saveWidget
 #'
 #' @export
 #'

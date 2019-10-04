@@ -4,7 +4,7 @@
 \alias{RunDESeq2}
 \title{Run DESeq2 analyses}
 \usage{
-RunDESeq2(outpath, quants.path, samplesheet, tx2gene, level, g1, g2,
+RunDESeq2(outpath, quants.path, samplesheet, tx2gene, level,
   padj.thresh = 0.05, fc.thresh = 2, plot.annos = NULL,
   block = NULL, read.filt = 10)
 }
@@ -21,10 +21,6 @@ with a salmon-generated \code{quant.sf} file inside.}
 identifiers in second. Used for gene-level summarization.}
 
 \item{level}{String defining variable of interest.}
-
-\item{g1}{String indicating group in \code{level} to compare to \code{g2}.}
-
-\item{g2}{String indicating group in \code{level} to compare to \code{g1}.}
 
 \item{padj.thresh}{Number or numeric scalar indicating the adjusted p-value 
 cutoff(s) to be used for determining "significant" differential expression.
@@ -59,4 +55,8 @@ This function performs a high-level differential gene expression analysis
 }
 \seealso{
 \code{\link[DESeq2]{DESeq}}, for more about differential expression analysis.
+\code{\link{ProcessDEGs}}, for analyzing and visualizing the results.
+}
+\author{
+Jared Andrews
 }

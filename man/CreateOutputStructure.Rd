@@ -7,7 +7,7 @@
 CreateOutputStructure(block, level, base)
 }
 \arguments{
-\item{block}{String or character vector defining the variable(s) to use to 
+\item{block}{String or character vector defining the variable(s) to use to
 block for unwanted variance, e.g. batch or technical effects.}
 
 \item{level}{String defining variable of interest.}
@@ -19,5 +19,8 @@ A named List containing the modified base output path and design
 }
 \description{
 \code{CreateOutputStructure} generates the output directories used by
-\code{\link{RunDESeq2}}.
+\code{\link{RunDESeq2}} and \code{\link{ProcessDEGs}}.
+}
+\author{
+Jared Andrews
 }

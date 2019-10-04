@@ -1,13 +1,28 @@
 #' Generate gene count heatmaps
 #'
+#' @param outpath Path to directory to be used for output. 
+#' @param level String defining variable of interest.
+#' @param padj.thresh Number or numeric scalar indicating the adjusted p-value 
+#'   cutoff(s) to be used for determining "significant" differential expression.
+#'   If multiple are given, multiple tables/plots will be generated using all 
+#'   combinations of \code{padj.thresh} and \code{fc.thresh}.
+#' @param fc.thresh Number or numeric scalar indicating the log2 fold-change 
+#'   cutoff(s) to be used for determining "significant" differential expression.
+#'   If multiple are given, multiple tables/plots will be generated using all 
+#'   combinations of \code{padj.thresh} and \code{fc.thresh}.
+#' @param outpath Path to directory to be used for output. 
+#' @param plot.annos String or character vector defining the column(s) to use to 
+#'   annotate figures.
 #'
-#'
-#'
-#'
+#' @importFrom pheatmap pheatmap
+#' @importFrom grDevices colorRampPalette pdf dev.off
+#' @importFrom SummarizedExperiment assay
+#' @importClassesFrom SummarizedExperiment SummarizedExperiment
 #'
 #' @author Jared Andrews
 #'
-PlotHeatmaps <- function(dds, res, rld, level, g1, g2, plot.annos = NULL) {
+PlotHeatmaps <- function(dds, res, rld, vsd, level, g1, g2, padj.thresh, 
+  fc.thresh, outpath, plot.annos = NULL) {
   # plot.annos should be a vector of at least two columns from the sample sheet to use for labeling plots. 
   # g1 and g2 should be strings for the groups to be compared for the level (eg. "Progression", "Response")
   # dds must be a DESeqExperiment object.
@@ -30,11 +45,11 @@ PlotHeatmaps <- function(dds, res, rld, level, g1, g2, plot.annos = NULL) {
     x <- assay(rld)
     matrix <- x[resDEG,]
 
-    pheatmap(matrix, annotation_col=annotation_data, col=colors, scale="row", 
+    pheatmap(matrix, annotation_col=annotation_data, color=colors, scale="row", 
       breaks=breaks, show_rownames = F, 
       main="ALL DE Genes - padj <= 0.1 & LFC >|< 1 - RLD", fontsize_row=3,
       fontsize_col=5)
-    pheatmap(matrix, annotation_col=annotation_data, col=colors, scale="row", 
+    pheatmap(matrix, annotation_col=annotation_data, color=colors, scale="row", 
       breaks=breaks, show_rownames = F, 
       main="ALL DE Genes - padj <= 0.1 & LFC >|< 1 - RLD", cluster_cols=F, 
       fontsize_row=3, fontsize_col=5)
@@ -49,12 +64,12 @@ PlotHeatmaps <- function(dds, res, rld, level, g1, g2, plot.annos = NULL) {
 
       matrix <- x.sub[res100,]
       # Plot the top 100.
-      pheatmap(matrix, annotation_col=annotation_data, col=colors, scale="row", 
-        breaks=breaks, show_rownames = T, 
+      pheatmap(matrix, annotation_col=annotation_data, color=colors, 
+        scale="row", breaks=breaks, show_rownames = T, 
         main="Top 100 DE Genes - padj <= 0.1 & LFC >|< 2 - RLD", fontsize_row=4, 
         fontsize_col=5)
-      pheatmap(matrix, annotation_col=annotation_data, col=colors, scale="row", 
-        breaks=breaks, show_rownames = T, 
+      pheatmap(matrix, annotation_col=annotation_data, color=colors, 
+        scale="row", breaks=breaks, show_rownames = T, 
         main="Top 100 DE Genes - padj <= 0.1 & LFC >|< 2 - RLD", cluster_cols=F, 
         fontsize_row=4, fontsize_col=5)
 
@@ -66,11 +81,11 @@ PlotHeatmaps <- function(dds, res, rld, level, g1, g2, plot.annos = NULL) {
         x <- assay(rld)
         x.sub <- x[, colData(rld)[,level] %in% c(g1, g2)]
         matrix <- x.sub[resDEG,]
-        pheatmap(matrix, annotation_col=annotation_data, col=colors, 
+        pheatmap(matrix, annotation_col=annotation_data, color=colors, 
           scale="row", breaks=breaks, show_rownames = F, 
           main="ALL DE Genes - padj <= 0.1 & LFC >|< 2 - RLD", fontsize_row=3, 
           fontsize_col=5)
-        pheatmap(matrix, annotation_col=annotation_data, col=colors, 
+        pheatmap(matrix, annotation_col=annotation_data, color=colors, 
           scale="row", breaks=breaks, show_rownames = F, 
           main="ALL DE Genes - padj <= 0.1 & LFC >|< 2 - RLD", cluster_cols=F, 
           fontsize_row=3, fontsize_col=5)
@@ -79,7 +94,7 @@ PlotHeatmaps <- function(dds, res, rld, level, g1, g2, plot.annos = NULL) {
   }
 }
 
-#'
+#' Plot gene counts as box plots
 #'
 #'
 #'
@@ -110,7 +125,7 @@ PlotBoxplots <- function(res.list, dds, outpath, padj.thresh, fc.thresh) {
     "#f4cae4", "#f1e2cc", "#b3e2cd")
   line = c("#1F78B4", "#33A02C", "#FF7F00", "#6A3D9A", 
     "#e7298a", "#a6761d", "#1b9e77")
-  if (nrow(resSig) > 5) {
+  if (nrow(resSig) > 1) {
     for (i in 1:nrow(resSig)) {
       if (!file.exists(paste0(base, "/GeneBoxPlots/", 
         gsub('/','-',resSig$Gene[i]),".BoxPlot.pdf"))) {
@@ -134,5 +149,7 @@ PlotBoxplots <- function(res.list, dds, outpath, padj.thresh, fc.thresh) {
         dev.off()
       }
     }
+  } else {
+    message("No DEGs, skipping boxplots.")
   }
 }

@@ -4,8 +4,32 @@
 \alias{PlotHeatmaps}
 \title{Generate gene count heatmaps}
 \usage{
-PlotHeatmaps(dds, res, rld, level, g1, g2, plot.annos = NULL)
+PlotHeatmaps(dds, res, rld, vsd, level, g1, g2, padj.thresh, fc.thresh,
+  outpath, plot.annos = NULL)
+}
+\arguments{
+\item{level}{String defining variable of interest.}
+
+\item{padj.thresh}{Number or numeric scalar indicating the adjusted p-value 
+cutoff(s) to be used for determining "significant" differential expression.
+If multiple are given, multiple tables/plots will be generated using all 
+combinations of \code{padj.thresh} and \code{fc.thresh}.}
+
+\item{fc.thresh}{Number or numeric scalar indicating the log2 fold-change 
+cutoff(s) to be used for determining "significant" differential expression.
+If multiple are given, multiple tables/plots will be generated using all 
+combinations of \code{padj.thresh} and \code{fc.thresh}.}
+
+\item{outpath}{Path to directory to be used for output.}
+
+\item{plot.annos}{String or character vector defining the column(s) to use to 
+annotate figures.}
+
+\item{outpath}{Path to directory to be used for output.}
 }
 \description{
 Generate gene count heatmaps
+}
+\author{
+Jared Andrews
 }

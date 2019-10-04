@@ -6,10 +6,11 @@
 #' @importFrom dplyr bind_rows as_data_frame mutate
 #' @importFrom vsn meanSdPlot
 #' @importFrom SummarizedExperiment assay
+#' @importClassesFrom SummarizedExperiment SummarizedExperiment
 #'
 #' @author Jared Andrews
 #'
-ApplyVarianceTransformations <- function (dds, outpath) {
+GetVarianceTransformations <- function (dds, outpath) {
   message("This may take a while if you have many samples.")
   rld <- rlog(dds, blind = FALSE)
   vsd <- vst(dds, blind = FALSE)
@@ -58,10 +59,13 @@ ApplyVarianceTransformations <- function (dds, outpath) {
 #' @importFrom stats dist
 #' @importFrom pheatmap pheatmap
 #' @importFrom SummarizedExperiment assay
+#' @importClassesFrom SummarizedExperiment SummarizedExperiment
+#' @importFrom grDevices colorRampPalette
+#' @importFrom RColorBrewer brewer.pal
 #'
 #' @author Jared Andrews
 #'
-RunSampleDistances <- function(rld, vsd, outpath, level, plot.annos) {
+GetSampleDistances <- function(rld, vsd, outpath, level, plot.annos) {
 
   pdf(outpath)
   i <- 1
@@ -83,7 +87,7 @@ RunSampleDistances <- function(rld, vsd, outpath, level, plot.annos) {
     p <- pheatmap(sampleDistMatrix,
       clustering_distance_rows = sampleDists,
       clustering_distance_cols = sampleDists,
-      col = colors, main = labs[i], annotation_col = annotation.data)
+      color = colors, main = labs[i], annotation_col = annotation.data)
     print(p)
 
     i <- i + 1
@@ -99,7 +103,7 @@ RunSampleDistances <- function(rld, vsd, outpath, level, plot.annos) {
 #' @importFrom ggplot2 ggtitle
 #' @importFrom utils combn
 #'
-RunPCA <- function(rld, vsd, outpath, level, plot.annos) {
+GetPCAs <- function(rld, vsd, outpath, level, plot.annos) {
 
   pdf(outpath)
   i <- 1
