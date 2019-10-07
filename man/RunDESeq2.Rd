@@ -51,7 +51,8 @@ Named List containing a \linkS4class{DESeqDataSet} object from
   object from running \code{\link[DESeq2]{vst}}.
 }
 \description{
-This function performs a high-level differential gene expression analysis
+This function performs a high-level differential gene expression analysis 
+with \code{DESeq2}.
 }
 \seealso{
 \code{\link[DESeq2]{DESeq}}, for more about differential expression analysis.

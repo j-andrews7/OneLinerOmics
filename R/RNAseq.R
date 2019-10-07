@@ -1,7 +1,7 @@
 #' Run DESeq2 analyses
 #'
 #' This function performs a high-level differential gene expression analysis 
-#' 
+#' with \code{DESeq2}.
 #'
 #'
 #'
