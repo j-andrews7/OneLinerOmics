@@ -4,7 +4,8 @@
 \alias{PlotBoxplots}
 \title{Plot gene counts as box plots}
 \usage{
-PlotBoxplots(res.list, dds, outpath, padj.thresh, fc.thresh)
+PlotBoxplots(res.list, dds, rld, outpath, padj.thresh, fc.thresh, top.n,
+  level)
 }
 \description{
 Plot gene counts as box plots

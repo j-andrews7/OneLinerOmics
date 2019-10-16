@@ -23,6 +23,12 @@
 #'   combinations of \code{padj.thresh} and \code{fc.thresh}.
 #' @param plot.annos String or character vector defining the column(s) in 
 #'   \code{samplesheet} to use to annotate figures.
+#' @param plot.box Boolean indicating whether box plots for DEGs should be 
+#'   created for each comparison. If so, the \code{top.n} genes will be plotted.
+#' @param top.n Number of differentially expressed genes to create boxplots for, 
+#'   ranked by adj. p-value after applying \code{padj.thresh} and 
+#'   \code{fc.thresh} thresholds. If multiple thresholds are provided, the 
+#'   lowest fold-change and highest adj. p-value thresholds will be used. 
 #' @param block String or character vector defining the column(s) in 
 #'   \code{samplesheet} to use to block for unwanted variance, e.g. batch or 
 #'   technical effects.
@@ -50,8 +56,8 @@
 #' \code{\link{ProcessDEGs}}, for analyzing and visualizing the results.
 #'
 RunDESeq2 <- function(outpath, quants.path, samplesheet, tx2gene, level,  
-  padj.thresh = 0.05, fc.thresh = 2, plot.annos = NULL, block = NULL, 
-  read.filt = 10) {
+  padj.thresh = 0.05, fc.thresh = 2, plot.annos = NULL, plot.box = TRUE, 
+  block = NULL, read.filt = 10) {
     
   message("### EXPLORATORY DATA ANALYSIS ###\n")
   message("# SET DIRECTORY STRUCTURE AND MODEL DESIGN #\n")
@@ -88,24 +94,23 @@ RunDESeq2 <- function(outpath, quants.path, samplesheet, tx2gene, level,
 
   ### VARIANCE STABILIZATION COMPARISONS ###
   message("\n# VARIANCE STABILIZATION COMPARISONS #\n")
-  vst.out <- paste0(base,"/GenericFigures/VarianceTransformations.pdf")
+  vst.out <- paste0(base,"/EDAFigures/VarianceTransformations.pdf")
   message(vst.out)
-  trans <- GetVarianceTransformations(dds, vst.out)
+  trans <- PlotVarianceTransformations(dds, vst.out)
   rld <- trans$rld
   vsd <- trans$vsd
 
   ### SAMPLE DISTANCES ###
   message("\n# PLOTTING SAMPLE DISTANCES #\n")
-  dists.out <- paste0(base, "/GenericFigures/SampleDistances.pdf")
+  dists.out <- paste0(base, "/EDAFigures/SampleDistances.pdf")
   message(dists.out)
-  GetSampleDistances(rld, vsd, dists.out, level, plot.annos)
+  PlotSampleDistances(rld, vsd, dists.out, level, plot.annos)
 
   ### PCA PLOTS ###
   message("\n# PCA PLOTS #\n")
-  pca.out <- paste0(base, "/GenericFigures/pca.pdf")
+  pca.out <- paste0(base, "/EDAFigures/pca.pdf")
   message(pca.out)
-
-  GetPCAs(rld, vsd, pca.out, level, plot.annos)
+  PlotEDAPCAs(rld, vsd, pca.out, level, plot.annos)
   
   #======================================#
   ### DIFFERENTIAL EXPRESSION ANALYSIS ###
@@ -147,23 +152,21 @@ RunDESeq2 <- function(outpath, quants.path, samplesheet, tx2gene, level,
 #'   cutoff(s) to be used for determining "significant" differential expression.
 #'   If multiple are given, multiple tables/plots will be generated using all 
 #'   combinations of \code{padj.thresh} and \code{fc.thresh}.
+#' @param plot.box Boolean indicating whether box plots for DEGs should be 
+#'   created for each comparison. If so, the \code{top.n} genes will be plotted.
 #' @param top.n Number of differentially expressed genes to create boxplots for, 
 #'   ranked by adj. p-value after applying \code{padj.thresh} and 
 #'   \code{fc.thresh} thresholds. If multiple thresholds are provided, the 
 #'   lowest fold-change and highest adj. p-value thresholds will be used. 
 #'
-#'   Plots will be created for each comparison. 
-#'
 #' @importFrom DESeq2 lfcShrink counts plotCounts
 #' @importFrom magrittr %>%
 #' @importFrom htmlwidgets saveWidget
 #'
-#' @export
-#'
 #' @author Jared Andrews
 #'
 ProcessDEGs <- function(dds, rld, vsd, outpath, level, padj.thresh = 0.05, 
-  fc.thresh = 2, top.n = 100) {
+  fc.thresh = 2, plot.box = TRUE, top.n = 100) {
 
   # Get all possible sample comparisons.
   combs <- combn(colData(rld)[,level], 2)
@@ -174,49 +177,16 @@ ProcessDEGs <- function(dds, rld, vsd, outpath, level, padj.thresh = 0.05,
     g1 <- combs[samp]
     g2 <- combs[samp + 1]
     res <- lfcShrink(dds, contrast=c(level, g1, g2), type='ashr')
-    res.list[[paste0(g1, "v", g2)]] <- res
+    res.list[[paste0(g1, ".v.", g2)]] <- res
   }
   
-  ### PLOTTING THE RESULTS ###
-  # This gets all the normalized counts for all genes/samples.
-  resdata <- merge(as.data.frame(res), 
-    as.data.frame(counts(dds, normalized=TRUE)), by="row.names", sort=FALSE)
-  names(resdata)[1] <- "Gene"
-
-  # Make table for just DEGs.
-  resSig <- subset(resdata, padj <= 0.1)
+  ##### PLOTTING THE RESULTS #####
 
   ### DEG BOXPLOTS ###
   message("\n# DEG BOXPLOTS #\n")
-  message("Creating boxplots for all genes with padj <= 0.1")
-  # If you have >7 levels for your contrast, you need to add colors here.
-  fill = c("#A6CEE3", "#B2DF8A", "#FDBF6F", "#CAB2D6", 
-    "#f4cae4", "#f1e2cc", "#b3e2cd")
-  line = c("#1F78B4", "#33A02C", "#FF7F00", "#6A3D9A", 
-    "#e7298a", "#a6761d", "#1b9e77")
-  if (nrow(resSig) > 5) {
-    for (i in 1:nrow(resSig)) {
-      if (!file.exists(paste0(base, "/GeneBoxPlots/", 
-        gsub('/','-',resSig$Gene[i]),".BoxPlot.pdf"))) {
-        pdf(paste0(base, "/GeneBoxPlots/", gsub('/','-',resSig$Gene[i]), 
-          ".BoxPlot.pdf"))
-        d <- plotCounts(dds, gene = resSig$Gene[i], intgroup = level, 
-          returnData = T)
-        p <- ggplot(d, aes(x = d[,level], y = count)) + 
-          geom_boxplot(fill = fill[1:length(levels(colData(rld)[,level]))], 
-            colour = line[1:length(levels(colData(rld)[,level]))]) + 
-          ggtitle(resSig$Gene[i]) + coord_trans(y = "log10")
-        print(p)
-
-        d <- plotCounts(dds, gene = resSig$Gene[i], intgroup = level, 
-          returnData = T)
-        e <- subset(d, (get(level) == g1 | get(level) == g2))
-        p <- ggplot(e, aes(x = e[,level], y = count)) + 
-          geom_boxplot(fill=fill[1:2],colour=line[1:2]) + 
-          ggtitle(resSig$Gene[i]) + coord_trans(y = "log10")
-        print(p)
-        dev.off()
-      }
+  for (p in paj.thresh) {
+    for (fc in fc.thresh) {
+      PlotBoxplots(res.list, dds, rld, outpath, p, fc, top.n, level)
     }
   }
   
@@ -280,8 +250,8 @@ ProcessDEGs <- function(dds, rld, vsd, outpath, level, padj.thresh = 0.05,
   dev.off()
   
   ### MA PLOT ###
-  message(paste0("\n# MA PLOT #\n", base, "/MA_plot.pdf\n"))
-  pdf(paste0(base,"/MA_plot.pdf"))
+  message(paste0("\n# MA PLOT #\n", outpath, "/MAPlots/MA_plot.pdf\n"))
+  pdf(paste0(outpath,"/MAPlots/MA_plot.pdf"))
   plotMA(res, ylim = c(-5, 5))
   dev.off()
   

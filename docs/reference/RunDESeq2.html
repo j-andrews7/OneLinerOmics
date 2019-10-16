@@ -130,7 +130,7 @@ with <code>DESeq2</code>.</p>
 
     <pre class="usage"><span class='fu'>RunDESeq2</span>(<span class='no'>outpath</span>, <span class='no'>quants.path</span>, <span class='no'>samplesheet</span>, <span class='no'>tx2gene</span>, <span class='no'>level</span>,
   <span class='kw'>padj.thresh</span> <span class='kw'>=</span> <span class='fl'>0.05</span>, <span class='kw'>fc.thresh</span> <span class='kw'>=</span> <span class='fl'>2</span>, <span class='kw'>plot.annos</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>block</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>read.filt</span> <span class='kw'>=</span> <span class='fl'>10</span>)</pre>
+  <span class='kw'>plot.box</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>block</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>read.filt</span> <span class='kw'>=</span> <span class='fl'>10</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -178,6 +178,11 @@ combinations of <code>padj.thresh</code> and <code>fc.thresh</code>.</p></td>
 <code>samplesheet</code> to use to annotate figures.</p></td>
     </tr>
     <tr>
+      <th>plot.box</th>
+      <td><p>Boolean indicating whether box plots for DEGs should be 
+created for each comparison. If so, the <code>top.n</code> genes will be plotted.</p></td>
+    </tr>
+    <tr>
       <th>block</th>
       <td><p>String or character vector defining the column(s) in 
 <code>samplesheet</code> to use to block for unwanted variance, e.g. batch or 
@@ -188,6 +193,13 @@ technical effects.</p></td>
       <td><p>Number indicating read threshold. Genes with fewer counts 
 than this number summed across all samples will be removed from the
 analysis.</p></td>
+    </tr>
+    <tr>
+      <th>top.n</th>
+      <td><p>Number of differentially expressed genes to create boxplots for, 
+ranked by adj. p-value after applying <code>padj.thresh</code> and 
+<code>fc.thresh</code> thresholds. If multiple thresholds are provided, the 
+lowest fold-change and highest adj. p-value thresholds will be used.</p></td>
     </tr>
     </table>
 

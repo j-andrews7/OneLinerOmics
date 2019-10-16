@@ -127,7 +127,7 @@
     </div>
 
     <pre class="usage"><span class='fu'>ProcessDEGs</span>(<span class='no'>dds</span>, <span class='no'>rld</span>, <span class='no'>vsd</span>, <span class='no'>outpath</span>, <span class='no'>level</span>, <span class='kw'>padj.thresh</span> <span class='kw'>=</span> <span class='fl'>0.05</span>,
-  <span class='kw'>fc.thresh</span> <span class='kw'>=</span> <span class='fl'>2</span>, <span class='kw'>top.n</span> <span class='kw'>=</span> <span class='fl'>100</span>)</pre>
+  <span class='kw'>fc.thresh</span> <span class='kw'>=</span> <span class='fl'>2</span>, <span class='kw'>plot.box</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>top.n</span> <span class='kw'>=</span> <span class='fl'>100</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -172,12 +172,16 @@ If multiple are given, multiple tables/plots will be generated using all
 combinations of <code>padj.thresh</code> and <code>fc.thresh</code>.</p></td>
     </tr>
     <tr>
+      <th>plot.box</th>
+      <td><p>Boolean indicating whether box plots for DEGs should be 
+created for each comparison. If so, the <code>top.n</code> genes will be plotted.</p></td>
+    </tr>
+    <tr>
       <th>top.n</th>
       <td><p>Number of differentially expressed genes to create boxplots for, 
-  ranked by adj. p-value after applying <code>padj.thresh</code> and 
-  <code>fc.thresh</code> thresholds. If multiple thresholds are provided, the 
-  lowest fold-change and highest adj. p-value thresholds will be used.</p>
-<p>Plots will be created for each comparison.</p></td>
+ranked by adj. p-value after applying <code>padj.thresh</code> and 
+<code>fc.thresh</code> thresholds. If multiple thresholds are provided, the 
+lowest fold-change and highest adj. p-value thresholds will be used.</p></td>
     </tr>
     </table>
 

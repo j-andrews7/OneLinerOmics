@@ -5,7 +5,7 @@
 \title{Extract, visualize, and save DEG lists}
 \usage{
 ProcessDEGs(dds, rld, vsd, outpath, level, padj.thresh = 0.05,
-  fc.thresh = 2, top.n = 100)
+  fc.thresh = 2, plot.box = TRUE, top.n = 100)
 }
 \arguments{
 \item{dds}{A \linkS4class{DESeqDataSet} object as returned by 
@@ -33,12 +33,13 @@ cutoff(s) to be used for determining "significant" differential expression.
 If multiple are given, multiple tables/plots will be generated using all 
 combinations of \code{padj.thresh} and \code{fc.thresh}.}
 
-\item{top.n}{Number of differentially expressed genes to create boxplots for, 
-  ranked by adj. p-value after applying \code{padj.thresh} and 
-  \code{fc.thresh} thresholds. If multiple thresholds are provided, the 
-  lowest fold-change and highest adj. p-value thresholds will be used. 
+\item{plot.box}{Boolean indicating whether box plots for DEGs should be 
+created for each comparison. If so, the \code{top.n} genes will be plotted.}
 
-  Plots will be created for each comparison.}
+\item{top.n}{Number of differentially expressed genes to create boxplots for, 
+ranked by adj. p-value after applying \code{padj.thresh} and 
+\code{fc.thresh} thresholds. If multiple thresholds are provided, the 
+lowest fold-change and highest adj. p-value thresholds will be used.}
 }
 \description{
 Extract, visualize, and save DEG lists

@@ -4,7 +4,7 @@ author:
 - name: Jared Andrews
   email: jared.andrews07@gmail.com
   affiliation: Washington University School of Medicine, Department of Laboratory and Genomic Medicine
-date: "Revised: Ocotober 7th, 2019"
+date: "Revised: Ocotober 16th, 2019"
 output:
   BiocStyle::html_document:
     toc_float: true

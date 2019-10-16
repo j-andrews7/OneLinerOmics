@@ -96,60 +96,63 @@ PlotHeatmaps <- function(dds, res, rld, vsd, level, g1, g2, padj.thresh,
 
 #' Plot gene counts as box plots
 #'
-#'
-#'
-#'
-#'
-#'
-#'
-#'
-#'
-#'
 #' @import ggplot2
 #' @importFrom DESeq2 counts plotCounts
 #'
 #' @author Jared Andrews
 #'
-PlotBoxplots <- function(res.list, dds, outpath, padj.thresh, fc.thresh) {
+PlotBoxplots <- function(res.list, dds, rld, outpath, padj.thresh, fc.thresh, 
+  top.n, level) {
 
-  resdata <- merge(as.data.frame(res), 
-    as.data.frame(counts(dds, normalized=TRUE)), by="row.names", sort=FALSE)
-  names(resdata)[1] <- "Gene"
+  for (i in seq_along(res.list)) {
+    res <- res.list[i]
+    comp <- names(res.list[i])
+    message(comp)
+    g1 <- unlist(strsplit(comp, ".v."))[1]
+    g2 <- unlist(strsplit(comp, ".v."))[2]
 
-  # Make table for just DEGs.
-  resSig <- subset(resdata, padj <= 0.1)
+    resdata <- merge(as.data.frame(res), 
+      as.data.frame(counts(dds, normalized=TRUE)), by="row.names", sort=FALSE)
+    names(resdata)[1] <- "Gene"
 
-  message("Creating boxplots for all genes with padj <= 0.1")
-  # If you have >7 levels for your contrast, you need to add colors here.
-  fill = c("#A6CEE3", "#B2DF8A", "#FDBF6F", "#CAB2D6", 
-    "#f4cae4", "#f1e2cc", "#b3e2cd")
-  line = c("#1F78B4", "#33A02C", "#FF7F00", "#6A3D9A", 
-    "#e7298a", "#a6761d", "#1b9e77")
-  if (nrow(resSig) > 1) {
-    for (i in 1:nrow(resSig)) {
-      if (!file.exists(paste0(base, "/GeneBoxPlots/", 
-        gsub('/','-',resSig$Gene[i]),".BoxPlot.pdf"))) {
-        pdf(paste0(base, "/GeneBoxPlots/", gsub('/','-',resSig$Gene[i]), 
-          ".BoxPlot.pdf"))
-        d <- plotCounts(dds, gene = resSig$Gene[i], intgroup = level, 
+    # Make table for just DEGs, order by padj and subset by top.n.
+    ressig <- subset(resdata, padj <= padj.thresh, abs(log2FoldChange) >= 
+      fc.thresh)
+    ressig <- ressig[order(ressig$padj),]
+    if(nrow(ressig) >= top.n) {
+      ressig <- ressig[1:top.n,]
+    }
+
+    message(paste0("Creating boxplots for top ", top.n, " genes with padj <= ", 
+      padj.thresh, " and abs(log2FoldChange) >= ", fc.thresh))
+    # If you have >7 levels for your contrast, you need to add colors here.
+    fill = c("#A6CEE3", "#B2DF8A", "#FDBF6F", "#CAB2D6", 
+      "#f4cae4", "#f1e2cc", "#b3e2cd")
+    line = c("#1F78B4", "#33A02C", "#FF7F00", "#6A3D9A", 
+      "#e7298a", "#a6761d", "#1b9e77")
+    if (nrow(ressig) > 1) {
+      for (i in 1:nrow(ressig)) {
+        pdf(paste0(outpath, "/GeneBoxPlots/", gsub('/','-',ressig$Gene[i]), 
+          ".padj.", padj.thresh, ".log2fc.", fc.thresh, ".BoxPlot.pdf"))
+        d <- plotCounts(dds, gene = ressig$Gene[i], intgroup = level, 
           returnData = T)
         p <- ggplot(d, aes(x = d[,level], y = count)) + 
           geom_boxplot(fill = fill[1:length(levels(colData(rld)[,level]))], 
             colour = line[1:length(levels(colData(rld)[,level]))]) + 
-          ggtitle(resSig$Gene[i]) + coord_trans(y = "log10")
+          ggtitle(ressig$Gene[i]) + coord_trans(y = "log10")
         print(p)
 
-        d <- plotCounts(dds, gene = resSig$Gene[i], intgroup = level, 
+        d <- plotCounts(dds, gene = ressig$Gene[i], intgroup = level, 
           returnData = T)
         e <- subset(d, (get(level) == g1 | get(level) == g2))
         p <- ggplot(e, aes(x = e[,level], y = count)) + 
           geom_boxplot(fill=fill[1:2],colour=line[1:2]) + 
-          ggtitle(resSig$Gene[i]) + coord_trans(y = "log10")
+          ggtitle(ressig$Gene[i]) + coord_trans(y = "log10")
         print(p)
         dev.off()
       }
+    } else {
+      message("No DEGs, skipping boxplots.")
     }
-  } else {
-    message("No DEGs, skipping boxplots.")
   }
 }

@@ -24,8 +24,8 @@ CreateOutputStructure <- function(block, level, base) {
     if (!dir.exists(file.path(base, paste0(block, ".Block")))) {
       dir.create(file.path(base, paste0(block, ".Block")))
     }
-    if (!dir.exists(file.path(base, paste0(block, ".Block/GenericFigures")))) {
-      dir.create(file.path(base, paste0(block, ".Block/GenericFigures")))
+    if (!dir.exists(file.path(base, paste0(block, ".Block/EDAFigures")))) {
+      dir.create(file.path(base, paste0(block, ".Block/EDAFigures")))
     }
     if (!dir.exists(file.path(base, paste0(block, ".Block/Robjects")))) {
       dir.create(file.path(base, paste0(block, ".Block/Robjects")))
@@ -33,20 +33,32 @@ CreateOutputStructure <- function(block, level, base) {
     if (!dir.exists(file.path(base, paste0(block, ".Block/GeneBoxPlots")))) {
       dir.create(file.path(base, paste0(block, ".Block/GeneBoxPlots")))
     }
+    if (!dir.exists(file.path(base, paste0(block, ".Block/MAPlots")))) {
+      dir.create(file.path(base, paste0(block, ".Block/MAPlots")))
+    }
+    if (!dir.exists(file.path(base, paste0(block, ".Block/Heatmaps")))) {
+      dir.create(file.path(base, paste0(block, ".Block/Heatmaps")))
+    }
     base <- file.path(base, paste0(block,".Block"))
   } else {
     design <- formula(paste("~", level))
     if (!dir.exists(file.path(base, "NoBlock"))) {
       dir.create(file.path(base, "NoBlock"))
     }
-    if (!dir.exists(file.path(base, "NoBlock/GenericFigures"))) {
-      dir.create(file.path(base, "NoBlock/GenericFigures"))
+    if (!dir.exists(file.path(base, "NoBlock/EDAFigures"))) {
+      dir.create(file.path(base, "NoBlock/EDAFigures"))
     }
     if (!dir.exists(file.path(base, "NoBlock/Robjects"))) {
       dir.create(file.path(base, "NoBlock/Robjects"))
     }
     if (!dir.exists(file.path(base, "NoBlock/GeneBoxPlots"))) {
       dir.create(file.path(base, "NoBlock/GeneBoxPlots"))
+    }
+    if (!dir.exists(file.path(base, paste0(block, "NoBlock/MAPlots")))) {
+      dir.create(file.path(base, paste0(block, "NoBlock/MAPlots")))
+    }
+    if (!dir.exists(file.path(base, paste0(block, "NoBlock/Heatmaps")))) {
+      dir.create(file.path(base, paste0(block, "NoBlock/Heatmaps")))
     }
     base <- file.path(base, "NoBlock")
   }

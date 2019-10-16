@@ -10,7 +10,7 @@
 #'
 #' @author Jared Andrews
 #'
-GetVarianceTransformations <- function (dds, outpath) {
+PlotVarianceTransformations <- function (dds, outpath) {
   message("This may take a while if you have many samples.")
   rld <- rlog(dds, blind = FALSE)
   vsd <- vst(dds, blind = FALSE)
@@ -65,7 +65,7 @@ GetVarianceTransformations <- function (dds, outpath) {
 #'
 #' @author Jared Andrews
 #'
-GetSampleDistances <- function(rld, vsd, outpath, level, plot.annos) {
+PlotSampleDistances <- function(rld, vsd, outpath, level, plot.annos) {
 
   pdf(outpath)
   i <- 1
@@ -103,7 +103,9 @@ GetSampleDistances <- function(rld, vsd, outpath, level, plot.annos) {
 #' @importFrom ggplot2 ggtitle
 #' @importFrom utils combn
 #'
-GetPCAs <- function(rld, vsd, outpath, level, plot.annos) {
+#' @author Jared Andrews
+#'
+PlotEDAPCAs <- function(rld, vsd, outpath, level, plot.annos) {
 
   pdf(outpath)
   i <- 1
@@ -144,7 +146,5 @@ GetPCAs <- function(rld, vsd, outpath, level, plot.annos) {
 
     i <- i + 1
   }
-
-
   dev.off()
 }
