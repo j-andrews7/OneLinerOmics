@@ -16,8 +16,8 @@
 #'
 #' @author Jared Andrews
 #'
-PlotHeatmaps <- function(res.list, dds, rld, vsd, level, outpath, 
-  padj.thresh, fc.thresh, plot.annos = NULL) {
+PlotHeatmaps <- function(res.list, rld, vsd, level, outpath, 
+  padj.thresh, fc.thresh, plot.annos) {
   
   # Set color breaks and palette.
   breaks <- c(seq(-3, -1.251, length=250), seq(-1.25, -0.1001, length=250), 
@@ -35,20 +35,20 @@ PlotHeatmaps <- function(res.list, dds, rld, vsd, level, outpath,
     g1 <- unlist(strsplit(comp, "-v-"))[1]
     g2 <- unlist(strsplit(comp, "-v-"))[2]
   
-    ressig <- subset(res, padj <= padj.thresh)
-    ressig <- subset(ressig, abs(log2FoldChange) >= fc.thresh)
+    ressig <- subset(res, padj <= padj.thresh & 
+      abs(log2FoldChange) >= fc.thresh)
 
     # Assay index holder.
     ind <- 1
     labs <- c("rlog", "vst")
 
     pdf(paste0(outpath, "/Heatmaps/", comp, ".padj.", padj.thresh, ".log2fc.", 
-      fc.thresh, ".Heatmaps.pdf"), height = 9, width = 6)
+      fc.thresh, ".Heatmaps.pdf"), height = 7, width = 5)
 
     if (nrow(ressig) > 1) {
       for (x in c(rld, vsd)) {
         # Set which columns we want to use for annotating samples.
-        annotation_data <- as.data.frame(colData(x)[plot.annos])
+        annotation_data <- as.data.frame(colData(x)[,plot.annos])
 
         resdeg <- row.names(ressig)
         counts <- assay(x)
@@ -89,6 +89,70 @@ PlotHeatmaps <- function(res.list, dds, rld, vsd, level, outpath,
   }
 }
 
+
+#' Generate gene heatmaps for all DEGs from a list of DESeq2 results
+#'
+#' @param level String defining variable of interest.
+#' @param outpath Path to directory to be used for output. 
+#' @param padj.thresh Number or numeric scalar indicating the adjusted p-value 
+#'   cutoff(s) to be used for determining "significant" differential expression.
+#' @param fc.thresh Number or numeric scalar indicating the log2 fold-change 
+#'   cutoff(s) to be used for determining "significant" differential expression.
+#' @param plot.annos String or character vector defining the column(s) to use to 
+#'   annotate figures.
+#'
+#' @importFrom pheatmap pheatmap
+#' @importFrom grDevices colorRampPalette pdf dev.off
+#' @importFrom SummarizedExperiment assay colData
+#' @importClassesFrom SummarizedExperiment SummarizedExperiment
+#'
+#' @author Jared Andrews
+#'
+PlotCombinedHeatmaps <- function(res.list, rld, vsd, outpath, 
+  padj.thresh, fc.thresh, plot.annos) {
+
+  # Set color breaks and palette.
+  mycol <- colorRampPalette(c("darkblue", "snow", "darkred"))(1000)
+  colors <- c(seq(-3, -.11, length=500), seq(-.1, .1, length=1),
+    seq(.11, 3, length=500))
+
+  # Get all DEGs from all comparisons.
+  siggy <- unique(unlist(sapply(res.list, 
+    function(x, qval, logfc) {
+      rownames(subset(x, padj <= qval & abs(log2FoldChange) >= logfc))
+    }, qval = padj.thresh, logfc = fc.thresh)))
+
+  # Assay index holder.
+  ind <- 1
+  labs <- c("rlog", "vst")
+
+  pdf(paste0("/Heatmaps/AllComparisons.padj.", padj.thresh, ".log2fc.", 
+      fc.thresh, ".Heatmaps.pdf"), height = 7, width = 5)
+
+  # Actual plotting.
+  for (x in c(rld, vsd)) {
+    heat <- assay(x)[siggy,]
+    df <- as.data.frame(colData(rld)[, plot.annos])
+    p <- pheatmap(heat, cluster_rows = TRUE, show_rownames=  FALSE,
+      cluster_cols = FALSE, annotation_col = df, fontsize_col = 6, 
+      fontsize = 6, scale = "row", color = mycol, breaks = colors,
+      main = paste0("All Comparisons - DE Genes - p.adj <= ", padj.thresh, 
+            " & abs(log2FC) >= ", fc.thresh, " - ", labs[ind]))
+    print(p)
+    
+    p <- pheatmap(heat, cluster_rows = TRUE, show_rownames=  FALSE,
+      cluster_cols = TRUE, annotation_col = df, fontsize_col = 6, 
+      fontsize = 6, scale = "row", color = mycol, breaks = colors,
+      main = paste0("All Comparisons - DE Genes - p.adj <= ", padj.thresh, 
+            " & abs(log2FC) >= ", fc.thresh, " - ", labs[ind])))
+    print(p)
+
+    ind <- ind + 1
+  }
+  dev.off()
+}
+
+
 #' Plot gene counts as box plots
 #'
 #' @import ggplot2
@@ -112,7 +176,7 @@ PlotBoxplots <- function(res.list, dds, rld, outpath, padj.thresh, fc.thresh,
     names(resdata)[1] <- "Gene"
 
     # Make table for just DEGs, order by padj and subset by top.n.
-    ressig <- subset(resdata, padj <= padj.thresh, abs(log2FoldChange) >= 
+    ressig <- subset(resdata, padj <= padj.thresh & abs(log2FoldChange) >= 
       fc.thresh)
     ressig <- ressig[order(ressig$padj),]
     if (nrow(ressig) >= top.n) {
@@ -205,7 +269,7 @@ PlotDEGPCAs <- function(res.list, rld, vsd, outpath, level, plot.annos,
       names(resdata)[1] <- "Gene"
 
       # Get DEGs.
-      ressig <- subset(resdata, padj <= padj.thresh, abs(log2FoldChange) >= 
+      ressig <- subset(resdata, padj <= padj.thresh & abs(log2FoldChange) >= 
         fc.thresh)
 
 

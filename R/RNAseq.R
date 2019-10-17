@@ -25,6 +25,7 @@
 #'   \code{samplesheet} to use to annotate figures.
 #' @param plot.box Boolean indicating whether box plots for DEGs should be 
 #'   created for each comparison. If so, the \code{top.n} genes will be plotted.
+#'   This step is quite time-consuming with many genes.
 #' @param top.n Number of differentially expressed genes to create boxplots for, 
 #'   ranked by adj. p-value after applying \code{padj.thresh} and 
 #'   \code{fc.thresh} thresholds. If multiple thresholds are provided, the 
@@ -45,7 +46,7 @@
 #' @import ggplot2
 #' @importFrom pheatmap pheatmap
 #' @importFrom tximport tximport
-#' @importFrom utils read.table write.csv
+#' @importFrom utils read.table write.table
 #'
 #' @export
 #'
@@ -194,7 +195,8 @@ ProcessDEGs <- function(dds, rld, vsd, outpath, level, plot.annos,
       }
       PlotDEGPCAs(res.list, rld, vsd, outpath, level, plot.annos, p, fc)
       PlotVolcanoes(res.list, dds, outpath, p, fc)
-      PlotHeatmaps(res.list, dds, rld, vsd, level, outpath, plot.annos, p, fc)
+      PlotHeatmaps(res.list, rld, vsd, outpath, p, fc, plot.annos)
+      PlotCombinedHeatmaps(res.list, rld, vsd, outpath, p, fc, plot.annos)
     }
   }
   
@@ -211,19 +213,23 @@ ProcessDEGs <- function(dds, rld, vsd, outpath, level, plot.annos,
     }
   }
 
+  ### ENRICHMENTS ###
+  message("\n# RUNNING ENRICHMENT ANALYSES #\n")
+
+
   ### SAVING TABLES ###
   message("\n# SAVING RESULTS TABLES #\n")
 
-  write.csv(res, file=paste0(outpath, "/", g1, "-v-", g2, ".ALL.csv"), 
-    row.names = F)
+  write.table(res, file=paste0(outpath, "/", g1, "-v-", g2, ".ALL.csv"), 
+    row.names = FALSE, sep = "\t")
 
   # Make table for just DEGs too.
   write.csv(res, file=paste0(outpath, "/", g1, "-v-", g2, ".DEGs.padj0.1.csv"), 
-    row.names = F)
+    row.names = FALSE, sep = "\t")
   
   # This fpm version allows for accurate intergene comparisons of counts.
   write.csv(fpm(dds), file=paste0(outpath, "/", g1, "-v-", g2,".ALL.fpm.csv"), 
-    row.names = F)
+    row.names = FALSE, sep = "\t")
 
   return(list(res.list = res.list, dds = dds, rld = rld, vsd = vsd))
 }

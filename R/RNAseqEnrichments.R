@@ -15,7 +15,7 @@
 #'
 #' @author Jared Andrews
 #'
-DoEnrichments <- function(samp1, samp2, results, baseout, padj.thresh = 0.01, 
+PlotEnrichments <- function(samp1, samp2, results, baseout, padj.thresh = 0.01, 
   lfc.thresh = 2, top.n = NULL) {
 
   base <- paste0(baseout, samp1, "v", samp2, "/padj.01.lfc2.read100/")
