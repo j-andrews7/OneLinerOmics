@@ -192,8 +192,8 @@ ProcessDEGs <- function(dds, rld, vsd, outpath, level, padj.thresh = 0.05,
   
   ### DEG PCA PLOTS ###
   # TODO - Make this a generic function.
-  message(paste0("\n# DEG PCA PLOTS #\n", base, "/DEG_pca.pdf\n"))
-  pdf(paste0(base, "/DEG_pca.pdf"))
+  message(paste0("\n# DEG PCA PLOTS #\n", outpath, "/DEG_pca.pdf\n"))
+  pdf(paste0(outpath, "/DEGFigures/DEG_pca.pdf"))
   resdata <- merge(as.data.frame(res), as.data.frame(assay(rld)), 
     by = "row.names", sort = FALSE)
   names(resdata)[1] <- "Gene"

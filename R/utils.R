@@ -39,6 +39,9 @@ CreateOutputStructure <- function(block, level, base) {
     if (!dir.exists(file.path(base, paste0(block, ".Block/Heatmaps")))) {
       dir.create(file.path(base, paste0(block, ".Block/Heatmaps")))
     }
+    if (!dir.exists(file.path(base, paste0(block, ".Block/DEGFigures")))) {
+      dir.create(file.path(base, paste0(block, ".Block/DEGFigures")))
+    }
     base <- file.path(base, paste0(block,".Block"))
   } else {
     design <- formula(paste("~", level))
@@ -59,6 +62,9 @@ CreateOutputStructure <- function(block, level, base) {
     }
     if (!dir.exists(file.path(base, paste0(block, "NoBlock/Heatmaps")))) {
       dir.create(file.path(base, paste0(block, "NoBlock/Heatmaps")))
+    }
+    if (!dir.exists(file.path(base, "NoBlock/DEGFigures"))) {
+      dir.create(file.path(base, "NoBlock/DEGFigures"))
     }
     base <- file.path(base, "NoBlock")
   }
