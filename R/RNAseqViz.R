@@ -119,7 +119,7 @@ PlotBoxplots <- function(res.list, dds, rld, outpath, padj.thresh, fc.thresh,
     ressig <- subset(resdata, padj <= padj.thresh, abs(log2FoldChange) >= 
       fc.thresh)
     ressig <- ressig[order(ressig$padj),]
-    if(nrow(ressig) >= top.n) {
+    if (nrow(ressig) >= top.n) {
       ressig <- ressig[1:top.n,]
     }
 
@@ -155,4 +155,57 @@ PlotBoxplots <- function(res.list, dds, rld, outpath, padj.thresh, fc.thresh,
       message("No DEGs, skipping boxplots.")
     }
   }
+}
+
+
+#' Plot PCAs from variance stabilized counts
+#'
+#' @importFrom grDevices pdf dev.off
+#' @importFrom ggplot2 ggtitle
+#' @importFrom utils combn
+#'
+#' @author Jared Andrews
+#'
+PlotDEGPCAs <- function(rld, vsd, outpath, level, plot.annos) {
+
+  pdf(outpath)
+  i <- 1
+
+  labs <- c("All Genes (rlog)",
+    "All Genes (vst)")
+
+  # Get all possible comparisons.
+  combs <- combn(colData(rld)[,level], 2)
+  combs.seq <- seq(1, length(combs), by = 2)
+
+
+  for (x in c(rld, vsd)) {
+    p <- DESeq2::plotPCA(x, intgroup = level) +
+      ggtitle(labs[i])
+    print(p)
+
+    if (!plot.annos == level) {
+      p <- DESeq2::plotPCA(x, intgroup = plot.annos) +
+        ggtitle(labs[i])
+      print(p)
+    }
+
+    # PCA for all possible sample comparisons.
+    for (samp in combs.seq) {
+      x.sub <- x[, colData(x)[, level] %in% c(combs[samp], combs[samp + 1])]
+
+      p <- DESeq2::plotPCA(x, intgroup = level) +
+        ggtitle(paste0(labs[i], " - ", combs[samp], " v ", combs[samp + 1]))
+      print(p)
+
+      if (!plot.annos == level) {
+        p <- DESeq2::plotPCA(x, intgroup = plot.annos) +
+          ggtitle(paste0(labs[i], " - ", combs[samp], " v ", combs[samp + 1]))
+        print(p)
+      }
+    }
+
+    i <- i + 1
+  }
+  dev.off()
 }

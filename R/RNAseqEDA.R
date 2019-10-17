@@ -97,7 +97,7 @@ PlotSampleDistances <- function(rld, vsd, outpath, level, plot.annos) {
 }
 
 
-#' Plot PCAs from variance stabilized counts
+#' Plot PCAs from variance stabilized counts for EDA
 #'
 #' @importFrom grDevices pdf dev.off
 #' @importFrom ggplot2 ggtitle
