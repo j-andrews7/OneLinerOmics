@@ -2,33 +2,33 @@
 % Please edit documentation in R/RNAseqViz.R
 \name{PlotHeatmaps}
 \alias{PlotHeatmaps}
-\title{Generate gene count heatmaps}
+\title{Generate gene heatmaps for a list of DESeq2 results}
 \usage{
-PlotHeatmaps(dds, res, rld, vsd, level, g1, g2, padj.thresh, fc.thresh,
-  outpath, plot.annos = NULL)
+PlotHeatmaps(res.list, dds, rld, vsd, level, outpath, padj.thresh,
+  fc.thresh, plot.annos = NULL)
 }
 \arguments{
 \item{level}{String defining variable of interest.}
 
+\item{outpath}{Path to directory to be used for output.}
+
 \item{padj.thresh}{Number or numeric scalar indicating the adjusted p-value 
-cutoff(s) to be used for determining "significant" differential expression.
-If multiple are given, multiple tables/plots will be generated using all 
-combinations of \code{padj.thresh} and \code{fc.thresh}.}
+cutoff(s) to be used for determining "significant" differential expression.}
 
 \item{fc.thresh}{Number or numeric scalar indicating the log2 fold-change 
-cutoff(s) to be used for determining "significant" differential expression.
-If multiple are given, multiple tables/plots will be generated using all 
-combinations of \code{padj.thresh} and \code{fc.thresh}.}
-
-\item{outpath}{Path to directory to be used for output.}
+cutoff(s) to be used for determining "significant" differential expression.}
 
 \item{plot.annos}{String or character vector defining the column(s) to use to 
 annotate figures.}
 
-\item{outpath}{Path to directory to be used for output.}
+\item{padj.thresh}{Number or numeric scalar indicating the adjusted p-value 
+cutoff(s) to be used for determining "significant" differential expression.}
+
+\item{fc.thresh}{Number or numeric scalar indicating the log2 fold-change 
+cutoff(s) to be used for determining "significant" differential expression.}
 }
 \description{
-Generate gene count heatmaps
+Generate gene heatmaps for a list of DESeq2 results
 }
 \author{
 Jared Andrews

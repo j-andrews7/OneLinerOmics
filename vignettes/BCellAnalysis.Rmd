@@ -4,7 +4,7 @@ author:
 - name: Jared Andrews
   email: jared.andrews07@gmail.com
   affiliation: Washington University School of Medicine, Department of Laboratory and Genomic Medicine
-date: "Revised: Ocotober 16th, 2019"
+date: "Revised: Ocotober 17th, 2019"
 output:
   BiocStyle::html_document:
     toc_float: true
@@ -15,8 +15,8 @@ vignette: >
 ---
 
 ```{r, echo=FALSE, results="hide", message=FALSE}
-knitr::opts_chunk$set(error=FALSE, message=FALSE, warning=FALSE, eval=FALSE)
 library(BiocStyle)
+knitr::opts_chunk$set(error=FALSE, message=FALSE, warning=FALSE, eval=FALSE)
 ```
 
 # Introduction
@@ -41,7 +41,7 @@ We'll take care of the RNA-seq data first.
 
 ## Generating gene counts
 
-Going the `salmon` -> `DESeq2` route. Obviously requires R, [salmon v0.14.1](https://combine-lab.github.io/salmon/), and DESeq2 (along with a few other packages). Using hg19, cause forget re-aligning all the ChIP-seq and making new tracks. `salmon` needs `mashmap` and `bedtools` as well if generating "decoy-aware" transcriptomes. The Google can show you how to install those.
+Going the `salmon` -> `r Biocpkg("DESeq2")` route. Obviously requires R, [salmon v0.14.1](https://combine-lab.github.io/salmon/), and `r Biocpkg("DESeq2")` (along with a few other packages). Using hg19, cause forget re-aligning all the ChIP-seq and making new tracks. `salmon` needs `mashmap` and `bedtools` as well if generating "decoy-aware" transcriptomes. The Google can show you how to install those.
 
 ### Create decoy reference transcriptome
 

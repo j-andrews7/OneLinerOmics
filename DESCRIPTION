@@ -1,6 +1,6 @@
 Package: AndrewsBCellLymphoma
 Title: B Cell Lymphoma Analysis for Andrews et al (2019)
-Date: 2019-10-16
+Date: 2019-10-17
 Version: 0.0.0.9000
 Authors@R: 
     person(given = "Jared",
@@ -40,8 +40,10 @@ Imports:
     dplyr,
     SummarizedExperiment,
     magrittr,
-    htmlwidgets
+    htmlwidgets,
+    EnhancedVolcano
 Suggests:
+    BiocStyle,
     knitr,
     rmarkdown
 Remotes:

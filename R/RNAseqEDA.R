@@ -2,7 +2,7 @@
 #'
 #' @importFrom grDevices pdf dev.off
 #' @importFrom DESeq2 rlog vst estimateSizeFactors normTransform
-#' @importFrom ggplot2 ggplot aes geom_hex facet_grid coord_fixed ggtitle
+#' @importFrom ggplot2 ggplot aes_string geom_hex facet_grid coord_fixed ggtitle
 #' @importFrom dplyr bind_rows as_data_frame mutate
 #' @importFrom vsn meanSdPlot
 #' @importFrom SummarizedExperiment assay
@@ -27,7 +27,7 @@ PlotVarianceTransformations <- function (dds, outpath) {
 
   colnames(df)[1:2] <- c("x", "y")
 
-  p <- ggplot(df, aes(x = x, y = y)) + geom_hex(bins = 80) +
+  p <- ggplot(df, aes_string(x = "x", y = "y")) + geom_hex(bins = 80) +
     coord_fixed() + facet_grid( . ~ transformation)
   print(p)
 
@@ -58,7 +58,7 @@ PlotVarianceTransformations <- function (dds, outpath) {
 #' @importFrom grDevices pdf dev.off
 #' @importFrom stats dist
 #' @importFrom pheatmap pheatmap
-#' @importFrom SummarizedExperiment assay
+#' @importFrom SummarizedExperiment assay colData
 #' @importClassesFrom SummarizedExperiment SummarizedExperiment
 #' @importFrom grDevices colorRampPalette
 #' @importFrom RColorBrewer brewer.pal
@@ -102,12 +102,13 @@ PlotSampleDistances <- function(rld, vsd, outpath, level, plot.annos) {
 #' @importFrom grDevices pdf dev.off
 #' @importFrom ggplot2 ggtitle
 #' @importFrom utils combn
+#' @importFrom SummarizedExperiment colData
 #'
 #' @author Jared Andrews
 #'
 PlotEDAPCAs <- function(rld, vsd, outpath, level, plot.annos) {
 
-  pdf(outpath)
+  pdf(outpath, height = 5, width = 5)
   i <- 1
 
   labs <- c("All Genes (rlog)",
@@ -119,13 +120,13 @@ PlotEDAPCAs <- function(rld, vsd, outpath, level, plot.annos) {
 
 
   for (x in c(rld, vsd)) {
-    p <- DESeq2::plotPCA(x, intgroup = level) +
-      ggtitle(labs[i])
+    p <- DESeq2::plotPCA(x, intgroup = level) + ggtitle(labs[i]) +
+      theme_classic()
     print(p)
 
-    if (!plot.annos == level) {
-      p <- DESeq2::plotPCA(x, intgroup = plot.annos) +
-        ggtitle(labs[i])
+    if (plot.annos != level) {
+      p <- DESeq2::plotPCA(x, intgroup = plot.annos) + ggtitle(labs[i]) +
+        theme_classic()
       print(p)
     }
 
@@ -134,12 +135,14 @@ PlotEDAPCAs <- function(rld, vsd, outpath, level, plot.annos) {
       x.sub <- x[, colData(x)[, level] %in% c(combs[samp], combs[samp + 1])]
 
       p <- DESeq2::plotPCA(x, intgroup = level) +
-        ggtitle(paste0(labs[i], " - ", combs[samp], " v ", combs[samp + 1]))
+        ggtitle(paste0(labs[i], " - ", combs[samp], " v ", combs[samp + 1])) +
+        theme_classic()
       print(p)
 
-      if (!plot.annos == level) {
+      if (plot.annos != level) {
         p <- DESeq2::plotPCA(x, intgroup = plot.annos) +
-          ggtitle(paste0(labs[i], " - ", combs[samp], " v ", combs[samp + 1]))
+          ggtitle(paste0(labs[i], " - ", combs[samp], " v ", combs[samp + 1])) +
+          theme_classic()
         print(p)
       }
     }

@@ -42,6 +42,9 @@ CreateOutputStructure <- function(block, level, base) {
     if (!dir.exists(file.path(base, paste0(block, ".Block/DEGFigures")))) {
       dir.create(file.path(base, paste0(block, ".Block/DEGFigures")))
     }
+    if (!dir.exists(file.path(base, paste0(block, ".Block/ResultsTables")))) {
+      dir.create(file.path(base, paste0(block, ".Block/ResultsTables")))
+    }
     base <- file.path(base, paste0(block,".Block"))
   } else {
     design <- formula(paste("~", level))
@@ -65,6 +68,9 @@ CreateOutputStructure <- function(block, level, base) {
     }
     if (!dir.exists(file.path(base, "NoBlock/DEGFigures"))) {
       dir.create(file.path(base, "NoBlock/DEGFigures"))
+    }
+    if (!dir.exists(file.path(base, "NoBlock/ResultsTables"))) {
+      dir.create(file.path(base, "NoBlock/ResultsTables"))
     }
     base <- file.path(base, "NoBlock")
   }

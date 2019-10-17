@@ -2,12 +2,12 @@
 % Please edit documentation in R/RNAseqEDA.R
 \name{PlotEDAPCAs}
 \alias{PlotEDAPCAs}
-\title{Plot PCAs from variance stabilized counts}
+\title{Plot PCAs from variance stabilized counts for EDA}
 \usage{
 PlotEDAPCAs(rld, vsd, outpath, level, plot.annos)
 }
 \description{
-Plot PCAs from variance stabilized counts
+Plot PCAs from variance stabilized counts for EDA
 }
 \author{
 Jared Andrews

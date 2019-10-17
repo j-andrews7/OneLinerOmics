@@ -126,8 +126,8 @@
     <p>Extract, visualize, and save DEG lists</p>
     </div>
 
-    <pre class="usage"><span class='fu'>ProcessDEGs</span>(<span class='no'>dds</span>, <span class='no'>rld</span>, <span class='no'>vsd</span>, <span class='no'>outpath</span>, <span class='no'>level</span>, <span class='kw'>padj.thresh</span> <span class='kw'>=</span> <span class='fl'>0.05</span>,
-  <span class='kw'>fc.thresh</span> <span class='kw'>=</span> <span class='fl'>2</span>, <span class='kw'>plot.box</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>top.n</span> <span class='kw'>=</span> <span class='fl'>100</span>)</pre>
+    <pre class="usage"><span class='fu'>ProcessDEGs</span>(<span class='no'>dds</span>, <span class='no'>rld</span>, <span class='no'>vsd</span>, <span class='no'>outpath</span>, <span class='no'>level</span>, <span class='no'>plot.annos</span>,
+  <span class='kw'>padj.thresh</span> <span class='kw'>=</span> <span class='fl'>0.05</span>, <span class='kw'>fc.thresh</span> <span class='kw'>=</span> <span class='fl'>2</span>, <span class='kw'>plot.box</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>top.n</span> <span class='kw'>=</span> <span class='fl'>100</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -156,6 +156,11 @@
     <tr>
       <th>level</th>
       <td><p>String defining variable of interest.</p></td>
+    </tr>
+    <tr>
+      <th>plot.annos</th>
+      <td><p>String or character vector defining the column(s) in 
+<code>samplesheet</code> to use to annotate figures.</p></td>
     </tr>
     <tr>
       <th>padj.thresh</th>

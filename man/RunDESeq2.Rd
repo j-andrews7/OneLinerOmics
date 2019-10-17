@@ -6,7 +6,7 @@
 \usage{
 RunDESeq2(outpath, quants.path, samplesheet, tx2gene, level,
   padj.thresh = 0.05, fc.thresh = 2, plot.annos = NULL,
-  plot.box = TRUE, block = NULL, read.filt = 10)
+  plot.box = TRUE, top.n = 100, block = NULL, count.filt = 10)
 }
 \arguments{
 \item{outpath}{Path to directory to be used for output. Additional 
@@ -38,18 +38,18 @@ combinations of \code{padj.thresh} and \code{fc.thresh}.}
 \item{plot.box}{Boolean indicating whether box plots for DEGs should be 
 created for each comparison. If so, the \code{top.n} genes will be plotted.}
 
-\item{block}{String or character vector defining the column(s) in 
-\code{samplesheet} to use to block for unwanted variance, e.g. batch or 
-technical effects.}
-
-\item{read.filt}{Number indicating read threshold. Genes with fewer counts 
-than this number summed across all samples will be removed from the
-analysis.}
-
 \item{top.n}{Number of differentially expressed genes to create boxplots for, 
 ranked by adj. p-value after applying \code{padj.thresh} and 
 \code{fc.thresh} thresholds. If multiple thresholds are provided, the 
 lowest fold-change and highest adj. p-value thresholds will be used.}
+
+\item{block}{String or character vector defining the column(s) in 
+\code{samplesheet} to use to block for unwanted variance, e.g. batch or 
+technical effects.}
+
+\item{count.filt}{Number indicating read threshold. Genes with fewer counts 
+than this number summed across all samples will be removed from the
+analysis.}
 }
 \value{
 Named List containing a \linkS4class{DESeqDataSet} object from 

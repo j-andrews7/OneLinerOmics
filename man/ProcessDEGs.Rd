@@ -4,8 +4,8 @@
 \alias{ProcessDEGs}
 \title{Extract, visualize, and save DEG lists}
 \usage{
-ProcessDEGs(dds, rld, vsd, outpath, level, padj.thresh = 0.05,
-  fc.thresh = 2, plot.box = TRUE, top.n = 100)
+ProcessDEGs(dds, rld, vsd, outpath, level, plot.annos,
+  padj.thresh = 0.05, fc.thresh = 2, plot.box = TRUE, top.n = 100)
 }
 \arguments{
 \item{dds}{A \linkS4class{DESeqDataSet} object as returned by 
@@ -22,6 +22,9 @@ ProcessDEGs(dds, rld, vsd, outpath, level, padj.thresh = 0.05,
 \item{outpath}{Path to directory to be used for output.}
 
 \item{level}{String defining variable of interest.}
+
+\item{plot.annos}{String or character vector defining the column(s) in 
+\code{samplesheet} to use to annotate figures.}
 
 \item{padj.thresh}{Number or numeric scalar indicating the adjusted p-value 
 cutoff(s) to be used for determining "significant" differential expression.

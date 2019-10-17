@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Generate gene count heatmaps — PlotHeatmaps • AndrewsBCellLymphoma</title>
+<title>Generate gene heatmaps for a list of DESeq2 results — PlotHeatmaps • AndrewsBCellLymphoma</title>
 
 
 <!-- jquery -->
@@ -35,8 +35,8 @@
 
 
 
-<meta property="og:title" content="Generate gene count heatmaps — PlotHeatmaps" />
-<meta property="og:description" content="Generate gene count heatmaps" />
+<meta property="og:title" content="Generate gene heatmaps for a list of DESeq2 results — PlotHeatmaps" />
+<meta property="og:description" content="Generate gene heatmaps for a list of DESeq2 results" />
 <meta name="twitter:card" content="summary" />
 
 
@@ -117,17 +117,17 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Generate gene count heatmaps</h1>
+    <h1>Generate gene heatmaps for a list of DESeq2 results</h1>
     <small class="dont-index">Source: <a href='https://github.com/j-andrews7/AndrewsBCellLymphoma/blob/master/R/RNAseqViz.R'><code>R/RNAseqViz.R</code></a></small>
     <div class="hidden name"><code>PlotHeatmaps.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Generate gene count heatmaps</p>
+    <p>Generate gene heatmaps for a list of DESeq2 results</p>
     </div>
 
-    <pre class="usage"><span class='fu'>PlotHeatmaps</span>(<span class='no'>dds</span>, <span class='no'>res</span>, <span class='no'>rld</span>, <span class='no'>vsd</span>, <span class='no'>level</span>, <span class='no'>g1</span>, <span class='no'>g2</span>, <span class='no'>padj.thresh</span>, <span class='no'>fc.thresh</span>,
-  <span class='no'>outpath</span>, <span class='kw'>plot.annos</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)</pre>
+    <pre class="usage"><span class='fu'>PlotHeatmaps</span>(<span class='no'>res.list</span>, <span class='no'>dds</span>, <span class='no'>rld</span>, <span class='no'>vsd</span>, <span class='no'>level</span>, <span class='no'>outpath</span>, <span class='no'>padj.thresh</span>,
+  <span class='no'>fc.thresh</span>, <span class='kw'>plot.annos</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -137,22 +137,18 @@
       <td><p>String defining variable of interest.</p></td>
     </tr>
     <tr>
+      <th>outpath</th>
+      <td><p>Path to directory to be used for output.</p></td>
+    </tr>
+    <tr>
       <th>padj.thresh</th>
       <td><p>Number or numeric scalar indicating the adjusted p-value 
-cutoff(s) to be used for determining "significant" differential expression.
-If multiple are given, multiple tables/plots will be generated using all 
-combinations of <code>padj.thresh</code> and <code>fc.thresh</code>.</p></td>
+cutoff(s) to be used for determining "significant" differential expression.</p></td>
     </tr>
     <tr>
       <th>fc.thresh</th>
       <td><p>Number or numeric scalar indicating the log2 fold-change 
-cutoff(s) to be used for determining "significant" differential expression.
-If multiple are given, multiple tables/plots will be generated using all 
-combinations of <code>padj.thresh</code> and <code>fc.thresh</code>.</p></td>
-    </tr>
-    <tr>
-      <th>outpath</th>
-      <td><p>Path to directory to be used for output.</p></td>
+cutoff(s) to be used for determining "significant" differential expression.</p></td>
     </tr>
     <tr>
       <th>plot.annos</th>
@@ -160,8 +156,14 @@ combinations of <code>padj.thresh</code> and <code>fc.thresh</code>.</p></td>
 annotate figures.</p></td>
     </tr>
     <tr>
-      <th>outpath</th>
-      <td><p>Path to directory to be used for output.</p></td>
+      <th>padj.thresh</th>
+      <td><p>Number or numeric scalar indicating the adjusted p-value 
+cutoff(s) to be used for determining "significant" differential expression.</p></td>
+    </tr>
+    <tr>
+      <th>fc.thresh</th>
+      <td><p>Number or numeric scalar indicating the log2 fold-change 
+cutoff(s) to be used for determining "significant" differential expression.</p></td>
     </tr>
     </table>
 

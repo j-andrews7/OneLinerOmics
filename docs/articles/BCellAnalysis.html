@@ -85,7 +85,7 @@
       Washington University School of Medicine, Department of Laboratory and Genomic Medicine<br><a class="author_email" href="mailto:#"></a><a href="mailto:jared.andrews07@gmail.com" class="email">jared.andrews07@gmail.com</a>
       </address>
                   
-            <h4 class="date">Revised: Ocotober 16th, 2019</h4>
+            <h4 class="date">Revised: Ocotober 17th, 2019</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/j-andrews7/AndrewsBCellLymphoma/blob/master/vignettes/BCellAnalysis.Rmd"><code>vignettes/BCellAnalysis.Rmd</code></a></small>
       <div class="hidden name"><code>BCellAnalysis.Rmd</code></div>
@@ -117,7 +117,7 @@
 <div id="generating-gene-counts" class="section level2">
 <h2 class="hasAnchor">
 <a href="#generating-gene-counts" class="anchor"></a>Generating gene counts</h2>
-<p>Going the <code>salmon</code> -&gt; <code>DESeq2</code> route. Obviously requires R, <a href="https://combine-lab.github.io/salmon/">salmon v0.14.1</a>, and DESeq2 (along with a few other packages). Using hg19, cause forget re-aligning all the ChIP-seq and making new tracks. <code>salmon</code> needs <code>mashmap</code> and <code>bedtools</code> as well if generating “decoy-aware” transcriptomes. The Google can show you how to install those.</p>
+<p>Going the <code>salmon</code> -&gt; <em><a href="https://bioconductor.org/packages/3.10/DESeq2">DESeq2</a></em> route. Obviously requires R, <a href="https://combine-lab.github.io/salmon/">salmon v0.14.1</a>, and <em><a href="https://bioconductor.org/packages/3.10/DESeq2">DESeq2</a></em> (along with a few other packages). Using hg19, cause forget re-aligning all the ChIP-seq and making new tracks. <code>salmon</code> needs <code>mashmap</code> and <code>bedtools</code> as well if generating “decoy-aware” transcriptomes. The Google can show you how to install those.</p>
 <div id="create-decoy-reference-transcriptome" class="section level3">
 <h3 class="hasAnchor">
 <a href="#create-decoy-reference-transcriptome" class="anchor"></a>Create decoy reference transcriptome</h3>

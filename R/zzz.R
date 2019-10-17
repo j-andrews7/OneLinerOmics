@@ -1,0 +1,1 @@
+globalVariables(c("count", "padj", "log2FoldChange"))
