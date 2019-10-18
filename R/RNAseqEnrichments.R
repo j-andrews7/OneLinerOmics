@@ -5,11 +5,12 @@
 #' 
 #'
 #'
-#'
-#' 
-#'
-#'
-#'
+#' @param outpath Path to directory to be used for output. Additional 
+#'   directories will be generated within this folder.
+#' @param padj.thresh Number or numeric scalar indicating the adjusted p-value 
+#'   cutoff(s) to be used for determining "significant" differential expression.
+#' @param fc.thresh Number or numeric scalar indicating the log2 fold-change 
+#'   cutoff(s) to be used for determining "significant" differential expression.
 #' 
 #' @importFrom EZscRNA RunEnrichr VizEnrichments
 #'

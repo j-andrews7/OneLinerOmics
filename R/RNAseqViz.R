@@ -147,7 +147,7 @@ PlotCombinedHeatmaps <- function(res.list, rld, vsd, outpath,
       cluster_cols = TRUE, annotation_col = df, fontsize_col = 6, 
       fontsize = 6, scale = "row", color = mycol, breaks = colors,
       main = paste0("All Comparisons - DE Genes - p.adj <= ", padj.thresh, 
-            " & abs(log2FC) >= ", fc.thresh, " - ", labs[ind])))
+            " & abs(log2FC) >= ", fc.thresh, " - ", labs[ind]))
     print(p)
 
     ind <- ind + 1

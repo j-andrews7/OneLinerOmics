@@ -118,6 +118,10 @@ RunDESeq2 <- function(outpath, quants.path, samplesheet, tx2gene, level,
   message("\n### DIFFERENTIAL EXPRESSION ANALYSIS ###\n")
   dds <- DESeq(dds)
 
+  # All the actual processing occurs here.
+  full <- ProcessDEGs(dds, rld, vsd, outpath, level, plot.annos, padj.thresh,
+    fc.thresh, plot.box, top.n)
+
   message("\n# SAVING ROBJECTS #\n")
   message(paste0("DESeq2: ", paste0(base, "/Robjects/dds.rds")))
   message(paste0("Regularized log transformation: ", 
@@ -128,7 +132,7 @@ RunDESeq2 <- function(outpath, quants.path, samplesheet, tx2gene, level,
   saveRDS(rld, file=paste0(base, "/Robjects/rld.rds"))
   saveRDS(vsd, file=paste0(base, "/Robjects/vsd.rds"))
 
-  return(list(dds = dds, rld = rld, vsd = vsd))
+  return(full)
 }
 
 

@@ -6,6 +6,22 @@
 \usage{
 PlotEDAPCAs(rld, vsd, outpath, level, plot.annos)
 }
+\arguments{
+\item{rld}{A \linkS4class{RangedSummarizedExperiment} object of 
+\code{\link[DESeq2]{rlog}} transformed counts as returned by
+\link{PlotVarianceTransformations}.}
+
+\item{vsd}{A \linkS4class{RangedSummarizedExperiment} object of 
+\code{\link[DESeq2]{vst}} transformed counts as returned by
+\link{PlotVarianceTransformations}.}
+
+\item{outpath}{Path to directory to be used for output.}
+
+\item{level}{String defining variable of interest.}
+
+\item{plot.annos}{String or character vector defining the column(s) in 
+\code{samplesheet} to use to annotate figures.}
+}
 \description{
 Plot PCAs from variance stabilized counts for EDA
 }

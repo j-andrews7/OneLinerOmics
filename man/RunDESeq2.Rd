@@ -36,7 +36,8 @@ combinations of \code{padj.thresh} and \code{fc.thresh}.}
 \code{samplesheet} to use to annotate figures.}
 
 \item{plot.box}{Boolean indicating whether box plots for DEGs should be 
-created for each comparison. If so, the \code{top.n} genes will be plotted.}
+created for each comparison. If so, the \code{top.n} genes will be plotted.
+This step is quite time-consuming with many genes.}
 
 \item{top.n}{Number of differentially expressed genes to create boxplots for, 
 ranked by adj. p-value after applying \code{padj.thresh} and 
