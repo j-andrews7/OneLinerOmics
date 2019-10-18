@@ -111,6 +111,9 @@ PlotHeatmaps <- function(res.list, rld, vsd, level, outpath,
 PlotCombinedHeatmaps <- function(res.list, rld, vsd, outpath, 
   padj.thresh, fc.thresh, plot.annos) {
 
+  message("Generating combined DEG heatmap using genes with p.adj <= ", 
+      padj.thresh, " and abs(log2FoldChange) >= ", fc.thresh)
+
   # Set color breaks and palette.
   mycol <- colorRampPalette(c("darkblue", "snow", "darkred"))(1000)
   colors <- c(seq(-3, -.11, length=500), seq(-.1, .1, length=1),
@@ -320,6 +323,9 @@ PlotVolcanoes <- function(res.list, dds, outpath, padj.thresh, fc.thresh) {
     g1 <- unlist(strsplit(comp, "-v-"))[1]
     g2 <- unlist(strsplit(comp, "-v-"))[2]
     message("Comparison set: ", comp)
+    message("Generating volcano plots with p.adj <= ", 
+      padj.thresh, " and abs(log2FoldChange) >= ", fc.thresh)
+
     # Set up results table.
     res <- res[order(res$padj),]
     resdata <- merge(as.data.frame(res), 

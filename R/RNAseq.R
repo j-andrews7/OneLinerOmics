@@ -197,6 +197,7 @@ ProcessDEGs <- function(dds, rld, vsd, outpath, level, plot.annos,
       PlotVolcanoes(res.list, dds, outpath, p, fc)
       PlotHeatmaps(res.list, rld, vsd, outpath, p, fc, plot.annos)
       PlotCombinedHeatmaps(res.list, rld, vsd, outpath, p, fc, plot.annos)
+      PlotEnrichments(res.list, outpath, p, fc)
     }
   }
   
@@ -212,10 +213,6 @@ ProcessDEGs <- function(dds, rld, vsd, outpath, level, plot.annos,
       dev.off()
     }
   }
-
-  ### ENRICHMENTS ###
-  message("\n# RUNNING ENRICHMENT ANALYSES #\n")
-
 
   ### SAVING TABLES ###
   message("\n# SAVING RESULTS TABLES #\n")
