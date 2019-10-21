@@ -11,6 +11,8 @@
 #' @importFrom SummarizedExperiment assay
 #' @importClassesFrom SummarizedExperiment SummarizedExperiment
 #'
+#' @export
+#'
 #' @author Jared Andrews
 #'
 PlotVarianceTransformations <- function (dds, outpath) {
@@ -77,6 +79,8 @@ PlotVarianceTransformations <- function (dds, outpath) {
 #' @importFrom grDevices colorRampPalette
 #' @importFrom RColorBrewer brewer.pal
 #'
+#' @export
+#'
 #' @author Jared Andrews
 #'
 PlotSampleDistances <- function(rld, vsd, outpath, level, plot.annos) {
@@ -128,6 +132,8 @@ PlotSampleDistances <- function(rld, vsd, outpath, level, plot.annos) {
 #' @importFrom ggplot2 ggtitle
 #' @importFrom utils combn
 #' @importFrom SummarizedExperiment colData
+#'
+#' @export
 #'
 #' @author Jared Andrews
 #'
