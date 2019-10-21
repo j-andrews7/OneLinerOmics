@@ -129,28 +129,42 @@
     <tbody>
       <tr>
         <th colspan="2">
-          <h2 id="section-all-functions" class="hasAnchor"><a href="#section-all-functions" class="anchor"></a>All functions</h2>
-          <p class="section-desc"></p>
+          <h2 id="section-rna-seq-analysis" class="hasAnchor"><a href="#section-rna-seq-analysis" class="anchor"></a>RNA-seq analysis</h2>
+          <p class="section-desc"><p>Functions that perform DESeq2 analyses, utilizing the utility and plotting functions to generate output tables and figures.</p></p>
         </th>
       </tr>
       <tr>
         
         <td>
-          <p><code><a href="CreateOutputStructure.html">CreateOutputStructure()</a></code> </p>
+          <p><code><a href="RunDESeq2.html">RunDESeq2()</a></code> </p>
         </td>
-        <td><p>Create output directory structure</p></td>
+        <td><p>Run DESeq2 analyses</p></td>
       </tr><tr>
         
         <td>
-          <p><code><a href="DoEnrichments.html">DoEnrichments()</a></code> </p>
+          <p><code><a href="ProcessDEGs.html">ProcessDEGs()</a></code> </p>
         </td>
-        <td><p>Perform GO/Pathway enrichment for DEGs via enrichR</p></td>
-      </tr><tr>
+        <td><p>Extract, visualize, and save DEG lists</p></td>
+      </tr>
+    </tbody><tbody>
+      <tr>
+        <th colspan="2">
+          <h2 id="section-plotting" class="hasAnchor"><a href="#section-plotting" class="anchor"></a>Plotting</h2>
+          <p class="section-desc"><p>Functions that generate plots. Calling these individually can sometimes be useful.</p></p>
+        </th>
+      </tr>
+      <tr>
         
         <td>
           <p><code><a href="PlotBoxplots.html">PlotBoxplots()</a></code> </p>
         </td>
         <td><p>Plot gene counts as box plots</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="PlotCombinedHeatmaps.html">PlotCombinedHeatmaps()</a></code> </p>
+        </td>
+        <td><p>Generate gene heatmaps for all DEGs from a list of DESeq2 results</p></td>
       </tr><tr>
         
         <td>
@@ -166,9 +180,15 @@
       </tr><tr>
         
         <td>
+          <p><code><a href="PlotEnrichments.html">PlotEnrichments()</a></code> </p>
+        </td>
+        <td><p>Perform GO/Pathway enrichment for DEGs via enrichR</p></td>
+      </tr><tr>
+        
+        <td>
           <p><code><a href="PlotHeatmaps.html">PlotHeatmaps()</a></code> </p>
         </td>
-        <td><p>Generate gene heatmaps for a list of DESeq2 results</p></td>
+        <td><p>Generate per comparison DEG heatmaps for a list of DESeq2 results</p></td>
       </tr><tr>
         
         <td>
@@ -186,19 +206,27 @@
         <td>
           <p><code><a href="PlotVolcanoes.html">PlotVolcanoes()</a></code> </p>
         </td>
-        <td><p>Create volcano plots from results lists for all genes</p></td>
+        <td><p>Create volcano plots from a list of DESeq2 Results objects</p></td>
+      </tr>
+    </tbody><tbody>
+      <tr>
+        <th colspan="2">
+          <h2 id="section-internal-utilities" class="hasAnchor"><a href="#section-internal-utilities" class="anchor"></a>Internal utilities</h2>
+          <p class="section-desc"><p>Functions used to create directory structure and save output. Users shouldn’t need to call these explicitely.</p></p>
+        </th>
+      </tr>
+      <tr>
+        
+        <td>
+          <p><code><a href="CreateOutputStructure.html">CreateOutputStructure()</a></code> </p>
+        </td>
+        <td><p>Create output directory structure</p></td>
       </tr><tr>
         
         <td>
-          <p><code><a href="ProcessDEGs.html">ProcessDEGs()</a></code> </p>
+          <p><code><a href="SaveResults.html">SaveResults()</a></code> </p>
         </td>
-        <td><p>Extract, visualize, and save DEG lists</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="RunDESeq2.html">RunDESeq2()</a></code> </p>
-        </td>
-        <td><p>Run DESeq2 analyses</p></td>
+        <td><p>Save comparison results</p></td>
       </tr>
     </tbody>
     </table>
@@ -207,7 +235,9 @@
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
     <ul class="nav nav-pills nav-stacked">
-      <li><a href="#section-all-functions">All functions</a></li>
+      <li><a href="#section-rna-seq-analysis">RNA-seq analysis</a></li>
+      <li><a href="#section-plotting">Plotting</a></li>
+      <li><a href="#section-internal-utilities">Internal utilities</a></li>
     </ul>
   </div>
 </div>

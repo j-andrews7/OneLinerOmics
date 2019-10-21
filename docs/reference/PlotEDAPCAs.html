@@ -128,12 +128,42 @@
 
     <pre class="usage"><span class='fu'>PlotEDAPCAs</span>(<span class='no'>rld</span>, <span class='no'>vsd</span>, <span class='no'>outpath</span>, <span class='no'>level</span>, <span class='no'>plot.annos</span>)</pre>
 
+    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
+    <table class="ref-arguments">
+    <colgroup><col class="name" /><col class="desc" /></colgroup>
+    <tr>
+      <th>rld</th>
+      <td><p>A RangedSummarizedExperiment object of 
+<code><a href='https://rdrr.io/pkg/DESeq2/man/rlog.html'>rlog</a></code> transformed counts as returned by
+<a href='PlotVarianceTransformations.html'>PlotVarianceTransformations</a>.</p></td>
+    </tr>
+    <tr>
+      <th>vsd</th>
+      <td><p>A RangedSummarizedExperiment object of 
+<code><a href='https://rdrr.io/pkg/DESeq2/man/vst.html'>vst</a></code> transformed counts as returned by
+<a href='PlotVarianceTransformations.html'>PlotVarianceTransformations</a>.</p></td>
+    </tr>
+    <tr>
+      <th>outpath</th>
+      <td><p>Path to directory to be used for output.</p></td>
+    </tr>
+    <tr>
+      <th>level</th>
+      <td><p>String defining variable of interest.</p></td>
+    </tr>
+    <tr>
+      <th>plot.annos</th>
+      <td><p>String or character vector defining the column(s) in 
+<code>samplesheet</code> to use to annotate figures.</p></td>
+    </tr>
+    </table>
 
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
     <ul class="nav nav-pills nav-stacked">
+      <li><a href="#arguments">Arguments</a></li>
     </ul>
 
     <h2>Author</h2>

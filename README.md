@@ -16,3 +16,7 @@ devtools::install_github("j-andrews7/AndrewsBCellLymphoma")
 
 Please see the [docs](https://j-andrews7.github.io/AndrewsBCellLymphoma) for a full reference and vignettes with examples (including steps like gene count quantification). 
 The [salmon](https://combine-lab.github.io/salmon/getting_started/), [DESeq2](https://bioconductor.org/packages/release/bioc/html/DESeq2.html), and [DiffBind](https://bioconductor.org/packages/release/bioc/html/DiffBind.html) manuals and vignettes may also be helpful for understanding what's going on under the hood and interpreting the output.
+
+## Issues
+
+Please direct all complaints to [management](https://github.com/j-andrews7/AndrewsBCellLymphoma/issues). 

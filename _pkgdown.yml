@@ -2,3 +2,21 @@ destination: docs
 template:
   params:
     bootswatch: sandstone
+
+reference:
+  - title: "RNA-seq analysis"
+    desc: >
+      Functions that perform DESeq2 analyses, utilizing the utility and plotting functions to generate output tables and figures. 
+    contents:
+      - RunDESeq2
+      - ProcessDEGs
+  - title: "Plotting"
+    desc: >
+      Functions that generate plots. Calling these individually can sometimes be useful.
+    contents:
+      - starts_with("Plot")
+  - title: "Internal utilities"
+    desc: Functions used to create directory structure and save output. Users shouldn't need to call these explicitely.
+    contents: 
+      - CreateOutputStructure
+      - SaveResults
