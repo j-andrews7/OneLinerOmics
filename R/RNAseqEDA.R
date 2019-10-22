@@ -18,8 +18,8 @@
 #'
 PlotVarianceTransformations <- function (dds, outpath) {
   message("This may take a while if you have many samples.")
-  rld <- rlog(dds, blind = FALSE)
-  vsd <- vst(dds, blind = FALSE)
+  rld <- suppressMessages(rlog(dds, blind = FALSE))
+  vsd <- suppressMessages(vst(dds, blind = FALSE))
 
   pdf(outpath)
 
@@ -129,7 +129,7 @@ PlotSampleDistances <- function(rld, vsd, outpath, level, plot.annos) {
 #'   \code{samplesheet} to use to annotate figures.
 #'
 #' @importFrom grDevices pdf dev.off
-#' @importFrom ggplot2 ggtitle theme_classic
+#' @importFrom ggplot2 ggtitle theme_classic theme
 #' @importFrom utils combn
 #' @importFrom SummarizedExperiment colData
 #'
@@ -151,12 +151,12 @@ PlotEDAPCAs <- function(rld, vsd, outpath, level, plot.annos) {
 
   for (x in list(rld, vsd)) {
     p <- DESeq2::plotPCA(x, intgroup = level) + ggtitle(labs[i]) +
-      theme_classic()
+      theme_classic() + theme(aspect.ratio=1)
     print(p)
 
     if (plot.annos != level) {
       p <- DESeq2::plotPCA(x, intgroup = plot.annos) + ggtitle(labs[i]) +
-        theme_classic()
+        theme_classic() + theme(aspect.ratio=1)
       print(p)
     }
 
@@ -166,13 +166,13 @@ PlotEDAPCAs <- function(rld, vsd, outpath, level, plot.annos) {
 
       p <- DESeq2::plotPCA(x.sub, intgroup = level) +
         ggtitle(paste0(labs[i], " - ", combs[samp], " v ", combs[samp + 1])) +
-        theme_classic()
+        theme_classic() + theme(aspect.ratio=1)
       print(p)
 
       if (plot.annos != level) {
         p <- DESeq2::plotPCA(x.sub, intgroup = plot.annos) +
           ggtitle(paste0(labs[i], " - ", combs[samp], " v ", combs[samp + 1])) +
-          theme_classic()
+          theme_classic() + theme(aspect.ratio=1)
         print(p)
       }
     }

@@ -237,14 +237,14 @@ PlotBoxplots <- function(res.list, dds, rld, outpath, padj.thresh, fc.thresh,
           geom_boxplot(fill = fill[1:length(levels(colData(rld)[,level]))], 
           colour = "#000000") + ggtitle(ressig$Gene[i]) + 
           coord_trans(y = "log10") + theme_classic() +
-          xlab("Group") + ylab("Normalized Counts")
+          xlab("Group") + ylab("Normalized Counts") + theme(aspect.ratio=1)
         print(p)
 
         e <- subset(d, (get(level) == g1 | get(level) == g2))
         p <- ggplot(e, aes(x = e[,level], y = count)) + 
           geom_boxplot(fill = fill[1:2], colour = "#000000") + 
           ggtitle(ressig$Gene[i]) + coord_trans(y = "log10") + theme_classic() +
-          xlab("Group") + ylab("Normalized Counts")
+          xlab("Group") + ylab("Normalized Counts") + theme(aspect.ratio=1)
         print(p)
 
         # Make them for log2 counts as well.
@@ -252,14 +252,16 @@ PlotBoxplots <- function(res.list, dds, rld, outpath, padj.thresh, fc.thresh,
         p <- ggplot(d, aes(x = d[,level], y = count)) + 
           geom_boxplot(fill = fill[1:length(levels(colData(rld)[,level]))], 
             colour = "#000000") + ggtitle(ressig$Gene[i]) + theme_classic() +
-          xlab("Group") + ylab("log2(Normalized Counts)")
+          xlab("Group") + ylab("log2(Normalized Counts)") + 
+          theme(aspect.ratio=1)
         print(p)
 
         e <- subset(d, (get(level) == g1 | get(level) == g2))
         p <- ggplot(e, aes(x = e[,level], y = count)) + 
           geom_boxplot(fill = fill[1:2], colour = "#000000") + 
           ggtitle(ressig$Gene[i]) + theme_classic() +
-          xlab("Group") + ylab("log2(Normalized Counts)")
+          xlab("Group") + ylab("log2(Normalized Counts)") + 
+          theme(aspect.ratio=1)
         print(p)
         dev.off()
       }
@@ -290,7 +292,7 @@ PlotBoxplots <- function(res.list, dds, rld, outpath, padj.thresh, fc.thresh,
 #'   cutoff to be used for determining "significant" differential expression.
 #'
 #' @importFrom grDevices pdf dev.off
-#' @importFrom ggplot2 ggtitle theme_classic
+#' @importFrom ggplot2 ggtitle theme_classic theme
 #' @importFrom utils combn
 #' @importFrom SummarizedExperiment colData
 #'
@@ -327,20 +329,24 @@ PlotDEGPCAs <- function(res.list, rld, vsd, outpath, level, plot.annos,
 
       x.sub <- x[ressig$Gene, colData(x)[,level] %in% c(g1, g2)]
       p <- DESeq2::plotPCA(x, intgroup = level) +
-        ggtitle(paste0("DEGs - ", labs[ind], " - ", comp)) + theme_classic()
+        ggtitle(paste0("DEGs - ", labs[ind], " - ", comp)) + theme_classic() +
+        theme(aspect.ratio=1)
       print(p)
 
       p <- DESeq2::plotPCA(x.sub, intgroup = level) +
-        ggtitle(paste0("DEGs - ", labs[ind], " - ", comp)) + theme_classic()
+        ggtitle(paste0("DEGs - ", labs[ind], " - ", comp)) + theme_classic() +
+        theme(aspect.ratio=1)
       print(p)
 
       if (!identical(plot.annos, level)) {
         p <- DESeq2::plotPCA(x, intgroup = plot.annos) +
-          ggtitle(paste0("DEGs - ", labs[ind], " - ", comp)) + theme_classic()
+          ggtitle(paste0("DEGs - ", labs[ind], " - ", comp)) + theme_classic() +
+          theme(aspect.ratio=1)
         print(p)
 
         p <- DESeq2::plotPCA(x.sub, intgroup = plot.annos) +
-          ggtitle(paste0("DEGs - ", labs[ind], " - ", comp)) + theme_classic()
+          ggtitle(paste0("DEGs - ", labs[ind], " - ", comp)) + theme_classic() +
+          theme(aspect.ratio=1)
         print(p)
       }
 
@@ -449,9 +455,10 @@ PlotVolcanoes <- function(res.list, dds, outpath, padj.thresh, fc.thresh,
       FCcutoff = fc.thresh,
       selectLab = labels,
       transcriptLabSize = 2.0,
-      transcriptPointSize = 1,
+      transcriptPointSize = 0.5,
       col = c("#8C8C8C", "#D55E00", "#0072B2", "#009E73"),
-      legendLabSize = 10,
+      legendLabSize = 8,
+      legendIconSize = 2,
       legendLabels = c("NS", "Log2 FC", "adj. P", 
         "Log2 FC & adj. P"), 
       colAlpha = 1,

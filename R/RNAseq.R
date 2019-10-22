@@ -52,8 +52,6 @@
 #'   object from running \code{\link[DESeq2]{vst}} named 'vsd'.
 #'   
 #' @import DESeq2
-#' @import ggplot2
-#' @importFrom pheatmap pheatmap
 #' @importFrom tximport tximport
 #' @importFrom utils read.table write.table
 #'
@@ -209,7 +207,8 @@ ProcessDEGs <- function(dds, rld, vsd, outpath, level, plot.annos,
   for (samp in combs.seq) {
     g1 <- combs[samp]
     g2 <- combs[samp + 1]
-    res <- lfcShrink(dds, contrast=c(level, g1, g2), type='ashr')
+    res <- suppressMessages(lfcShrink(dds, 
+      contrast=c(level, g1, g2), type='ashr'))
     res.list[[paste0(g1, "-v-", g2)]] <- res
   }
   
