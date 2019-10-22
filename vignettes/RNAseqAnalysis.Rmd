@@ -41,7 +41,6 @@ That is, if you ask me a question and haven't read these first, I'm going to tel
 
 * The [DESeq2 vignette](https://bioconductor.org/packages/release/bioc/vignettes/DESeq2/inst/doc/DESeq2.html#standard-workflow)
 * The [rnaseqGene](http://master.bioconductor.org/packages/release/workflows/vignettes/rnaseqGene/inst/doc/rnaseqGene.html) workflow, which walks through a DESeq2 analysis in great detail.
-* 
 
 ## Generating gene counts
 
