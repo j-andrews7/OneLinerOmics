@@ -54,7 +54,7 @@
   </a>
   <ul class="dropdown-menu" role="menu">
 <li>
-      <a href="../articles/BCellAnalysis.html">Analyzing RNA-seq data</a>
+      <a href="../articles/RNAseqAnalysis.html">Analyzing RNA-seq data</a>
     </li>
   </ul>
 </li>
@@ -85,10 +85,10 @@
       Washington University School of Medicine, Department of Laboratory and Genomic Medicine<br><a class="author_email" href="mailto:#"></a><a href="mailto:jared.andrews07@gmail.com" class="email">jared.andrews07@gmail.com</a>
       </address>
                   
-            <h4 class="date">Revised: Ocotober 21st, 2019</h4>
+            <h4 class="date">Revised: Ocotober 22nd, 2019</h4>
       
-      <small class="dont-index">Source: <a href="https://github.com/j-andrews7/AndrewsBCellLymphoma/blob/master/vignettes/BCellAnalysis.Rmd"><code>vignettes/BCellAnalysis.Rmd</code></a></small>
-      <div class="hidden name"><code>BCellAnalysis.Rmd</code></div>
+      <small class="dont-index">Source: <a href="https://github.com/j-andrews7/AndrewsBCellLymphoma/blob/master/vignettes/RNAseqAnalysis.Rmd"><code>vignettes/RNAseqAnalysis.Rmd</code></a></small>
+      <div class="hidden name"><code>RNAseqAnalysis.Rmd</code></div>
 
     </div>
 
@@ -118,6 +118,7 @@
 <li>The <a href="https://bioconductor.org/packages/release/bioc/vignettes/DESeq2/inst/doc/DESeq2.html#standard-workflow">DESeq2 vignette</a>
 </li>
 <li>The <a href="http://master.bioconductor.org/packages/release/workflows/vignettes/rnaseqGene/inst/doc/rnaseqGene.html">rnaseqGene</a> workflow, which walks through a DESeq2 analysis in great detail.</li>
+<li>
 </ul>
 <div id="generating-gene-counts" class="section level2">
 <h2 class="hasAnchor">
@@ -217,7 +218,7 @@
 <p>DESeq2 is a very popular R package for performing differential expression analysis. Raw RNA-seq counts follow a negative binomial distribution, which is how DESeq2 models the data. It is quick, flexible, and generally works quite well with little to no parameter tweaking. It can also help to mitigate the technical or batch effects on the analysis, a feature which we’ll take advantage of here.</p>
 <p>Most of these samples are 150 bp, paired-end sequencing (as shown in the ‘lib’ column of the sample sheet). A handful are 50 bp, single-end sequencing, which introduces a significant confounding factor to the analysis. In our model design, we’ll specify that we want to ignore effects due to this technical difference (by setting <code>block = "lib"</code>). The model isn’t magic, so we may very well still see evidence of the library-prep differences regardless, as they are quite strong.</p>
 <div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb9-1" title="1"><span class="co"># R</span></a>
-<a class="sourceLine" id="cb9-2" title="2"><span class="kw"><a href="../reference/RunDESeq2.html">RunDESeq2</a></span>(<span class="dt">outpath =</span> <span class="st">"./RNA_Seq/Final_Analyses"</span>, <span class="dt">quants.path =</span> <span class="st">"./RNA_Seq/quants"</span>, </a>
+<a class="sourceLine" id="cb9-2" title="2">mydata &lt;-<span class="st"> </span><span class="kw"><a href="../reference/RunDESeq2.html">RunDESeq2</a></span>(<span class="dt">outpath =</span> <span class="st">"./RNA_Seq/Final_Analyses/allCLL"</span>, <span class="dt">quants.path =</span> <span class="st">"./RNA_Seq/quants"</span>, </a>
 <a class="sourceLine" id="cb9-3" title="3">          <span class="dt">samplesheet =</span> <span class="st">"./RNA_Seq/Samples.allCLL.txt"</span>, <span class="dt">tx2gene =</span> <span class="st">"./RNA_Seq/ref/tx2gene.txt"</span>,</a>
 <a class="sourceLine" id="cb9-4" title="4">          <span class="dt">level =</span> <span class="st">"disease"</span>, <span class="dt">block =</span> <span class="st">"lib"</span>, <span class="dt">padj.thresh =</span> <span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">0.05</span>, <span class="fl">0.01</span>, <span class="fl">0.001</span>), </a>
 <a class="sourceLine" id="cb9-5" title="5">          <span class="dt">plot.annos =</span> <span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"disease"</span>, <span class="st">"disease.sub"</span>), <span class="dt">count.filt =</span> <span class="dv">50</span>)</a></code></pre></div>

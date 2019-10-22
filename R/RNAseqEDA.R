@@ -10,6 +10,7 @@
 #' @importFrom vsn meanSdPlot
 #' @importFrom SummarizedExperiment assay
 #' @importClassesFrom SummarizedExperiment SummarizedExperiment
+#' @importFrom magrittr %>%
 #'
 #' @export
 #'

@@ -228,7 +228,7 @@ PlotBoxplots <- function(res.list, dds, rld, outpath, padj.thresh, fc.thresh,
 
     if (nrow(ressig) > 1) {
       for (i in 1:nrow(ressig)) {
-        pdf(paste0(outpath, "/GeneBoxPlots/", gsub('/','-',ressig$Gene[i]), 
+        pdf(paste0(outpath, "/GeneBoxPlots/", gsub('/','-',ressig$Gene[i]), ".",
           comp, ".padj.", padj.thresh, ".log2fc.", fc.thresh, ".BoxPlot.pdf"), 
           height = 5)
         d <- plotCounts(dds, gene = ressig$Gene[i], intgroup = level, 
@@ -442,19 +442,22 @@ PlotVolcanoes <- function(res.list, dds, outpath, padj.thresh, fc.thresh,
       y = "padj",
       xlim = c(-min.lim, min.lim),
       title = paste0(g1, " versus ", g2),
+      subtitle = "",
       xlab = bquote(~Log[2]~ 'fold change'),
       ylab = bquote(~-Log[10]~adjusted~italic(P)),
       pCutoff = padj.thresh,
       FCcutoff = fc.thresh,
       selectLab = labels,
       transcriptLabSize = 2.0,
-      transcriptPointSize = 1.5,
+      transcriptPointSize = 1,
       col = c("#8C8C8C", "#D55E00", "#0072B2", "#009E73"),
       legendLabSize = 10,
-      legend = c("NS", "Log2 FC", "adj. P", 
+      legendLabels = c("NS", "Log2 FC", "adj. P", 
         "Log2 FC & adj. P"), 
       colAlpha = 1,
-      legendPosition = "bottom")
+      legendPosition = "bottom",
+      gridlines.major = FALSE,
+      gridlines.minor = FALSE)
     print(p)
     dev.off()
   }

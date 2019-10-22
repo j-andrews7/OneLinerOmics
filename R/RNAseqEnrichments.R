@@ -45,7 +45,8 @@ PlotEnrichments <- function(res.list, outpath, padj.thresh,
     g2 <- unlist(strsplit(comp, "-v-"))[2]
 
     # Create directories.
-    base <- paste0(outpath, "/Enrichments/", comp)
+    base <- paste0(outpath, "/Enrichments/", comp, "/padj.", padj.thresh, 
+      ".log2fc.", fc.thresh)
     dir.create(file.path(base, "AllGenes"), showWarnings = FALSE, 
       recursive = TRUE)
     dir.create(file.path(base, paste0(g1, "up")), showWarnings = FALSE, 
@@ -61,15 +62,15 @@ PlotEnrichments <- function(res.list, outpath, padj.thresh,
       padj <= padj.thresh & log2FoldChange <= -fc.thresh)
     
     one.two.terms <- RunEnrichr(rownames(one.two), libraries = libraries,
-      outdir = paste0(base, "AllGenes"))
-    VizEnrichments(one.two.terms, outdir = paste0(base, "AllGenes"))
+      outdir = paste0(base, "/AllGenes"))
+    VizEnrichments(one.two.terms, outdir = paste0(base, "/AllGenes"))
 
     one.up.terms <- RunEnrichr(rownames(one.up), 
-      outdir = paste0(base, g1, "up"))
-    VizEnrichments(one.up.terms, outdir = paste0(base, g1, "up"))
+      outdir = paste0(base, "/", g1, "up"))
+    VizEnrichments(one.up.terms, outdir = paste0(base, "/", g1, "up"))
 
     two.up.terms <- RunEnrichr(rownames(two.up), 
-      outdir = paste0(base, g2, "up"))
-    VizEnrichments(two.up.terms, outdir = paste0(base, g2, "up"))
+      outdir = paste0(base, "/", g2, "up"))
+    VizEnrichments(two.up.terms, outdir = paste0(base, "/", g2, "up"))
   }
 }

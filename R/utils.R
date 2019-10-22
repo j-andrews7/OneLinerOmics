@@ -105,12 +105,12 @@ SaveResults <- function (res.list, dds, outpath) {
   out <- paste0(outpath, "/ResultsTables/")
 
   write.table(counts(dds, normalized = TRUE), file = paste0(out, 
-    "NormalizedGeneCounts.csv"), sep = "\t", quote = FALSE)
+    "NormalizedGeneCounts.txt"), sep = "\t", quote = FALSE)
 
   write.table(assay(normTransform(dds)), file = paste0(out, 
-    "NormalizedGeneCounts.log2.csv"), sep = "\t", quote = FALSE)
+    "NormalizedGeneCounts.log2.txt"), sep = "\t", quote = FALSE)
 
-  write.table(fpm(dds), file = paste0(out, "GeneCounts.fpm.csv"), 
+  write.table(fpm(dds), file = paste0(out, "GeneCounts.fpm.txt"), 
     sep = "\t", quote = FALSE)
 
   for (r in seq_along(res.list)) {
@@ -122,7 +122,7 @@ SaveResults <- function (res.list, dds, outpath) {
 
 
     write.table(resdata, file = paste0(out, comp, 
-      ".Results.NormalizedGeneCounts.csv"), row.names = FALSE, 
+      ".Results.NormalizedGeneCounts.txt"), row.names = FALSE, 
       sep = "\t", quote = FALSE)
   }
 }

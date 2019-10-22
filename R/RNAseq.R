@@ -113,13 +113,13 @@ RunDESeq2 <- function(outpath, quants.path, samplesheet, tx2gene, level,
   ### SAMPLE DISTANCES ###
   message("\n# PLOTTING SAMPLE DISTANCES #\n")
   dists.out <- paste0(base, "/EDAFigures/SampleDistances.pdf")
-  message(dists.out)
+  message(paste0("Output: ", dists.out))
   PlotSampleDistances(rld, vsd, dists.out, level, plot.annos)
 
   ### PCA PLOTS ###
   message("\n# PCA PLOTS #\n")
   pca.out <- paste0(base, "/EDAFigures/PCA.pdf")
-  message(pca.out)
+  message(paste0("Output: ", pca.out))
   PlotEDAPCAs(rld, vsd, pca.out, level, plot.annos)
   
   #======================================#
@@ -235,7 +235,7 @@ ProcessDEGs <- function(dds, rld, vsd, outpath, level, plot.annos,
   
   ### MA PLOTs ###
   for (r in seq_along(res.list)) {
-    res <- res.list[r]
+    res <- res.list[[r]]
     comp <- names(res.list[r])
     message("Comparison set: ", comp)
     for (p in padj.thresh) {

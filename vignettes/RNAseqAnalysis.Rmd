@@ -4,7 +4,7 @@ author:
 - name: Jared Andrews
   email: jared.andrews07@gmail.com
   affiliation: Washington University School of Medicine, Department of Laboratory and Genomic Medicine
-date: "Revised: Ocotober 21st, 2019"
+date: "Revised: Ocotober 22nd, 2019"
 output:
   BiocStyle::html_document:
     toc_float: true
@@ -15,7 +15,7 @@ vignette: >
 ---
 
 ```{r, echo=FALSE, results="hide", message=FALSE}
-knitr::opts_chunk$set(error=FALSE, message=FALSE, warning=FALSE, eval=FALSE)
+knitr::opts_chunk$set(error=FALSE, message=TRUE, warning=TRUE, eval=FALSE)
 library(BiocStyle)
 ```
 
@@ -41,6 +41,7 @@ That is, if you ask me a question and haven't read these first, I'm going to tel
 
 * The [DESeq2 vignette](https://bioconductor.org/packages/release/bioc/vignettes/DESeq2/inst/doc/DESeq2.html#standard-workflow)
 * The [rnaseqGene](http://master.bioconductor.org/packages/release/workflows/vignettes/rnaseqGene/inst/doc/rnaseqGene.html) workflow, which walks through a DESeq2 analysis in great detail.
+* 
 
 ## Generating gene counts
 
@@ -162,7 +163,7 @@ Most of these samples are 150 bp, paired-end sequencing (as shown in the 'lib' c
 
 ```{r run-deseq2, EVAL=FALSE}
 # R
-RunDESeq2(outpath = "./RNA_Seq/Final_Analyses", quants.path = "./RNA_Seq/quants", 
+mydata <- RunDESeq2(outpath = "./RNA_Seq/Final_Analyses/allCLL", quants.path = "./RNA_Seq/quants", 
           samplesheet = "./RNA_Seq/Samples.allCLL.txt", tx2gene = "./RNA_Seq/ref/tx2gene.txt",
           level = "disease", block = "lib", padj.thresh = c(0.05, 0.01, 0.001), 
           plot.annos = c("disease", "disease.sub"), count.filt = 50)
@@ -171,7 +172,6 @@ RunDESeq2(outpath = "./RNA_Seq/Final_Analyses", quants.path = "./RNA_Seq/quants"
 ### Next Steps
 
 Yes, that's it. Explore the plots, tables, enrichments, etc. Re-run if necessary, tweaking parameters as you see fit. 
-
 
 # Session Information
 
