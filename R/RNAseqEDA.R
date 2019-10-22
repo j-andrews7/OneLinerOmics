@@ -39,9 +39,9 @@ PlotVarianceTransformations <- function (dds, outpath) {
   # Plots to compare variance and counts.
   ntd <- normTransform(dds)
 
-  ntd.p <- meanSdPlot(assay(ntd))
-  rld.p <- meanSdPlot(assay(rld))
-  vsd.p <- meanSdPlot(assay(vsd))
+  ntd.p <- meanSdPlot(assay(ntd), plot = FALSE)
+  rld.p <- meanSdPlot(assay(rld), plot = FALSE)
+  vsd.p <- meanSdPlot(assay(vsd), plot = FALSE)
 
   ntd.p$gg <- ntd.p$gg + ggtitle("Transformation: log2(x + 1)")
   rld.p$gg <- rld.p$gg + ggtitle("Transformation: regularized log (rlog)")
@@ -91,21 +91,20 @@ PlotSampleDistances <- function(rld, vsd, outpath, level, plot.annos) {
   labs <- c("Sample Distances (rlog)",
     "Sample Distances (vst)")
 
-  for (x in c(rld, vsd)) {
+  for (x in list(rld, vsd)) {
     sampleDists <- dist(t(assay(x)))
     sampleDistMatrix <- as.matrix(sampleDists)
-    rownames(sampleDistMatrix) <- paste(colData(x)[,level], x$name,
-      sep = " - ")
+    rownames(sampleDistMatrix) <- x$name
     colnames(sampleDistMatrix) <- NULL
     colors <- colorRampPalette(rev(brewer.pal(9, "Blues")))(255)
 
     # Get annotation data.
-    annotation.data <- as.data.frame(colData(x)[plot.annos])
+    annotation.data <- as.data.frame(colData(x)[ ,plot.annos])
 
     p <- pheatmap(sampleDistMatrix,
       clustering_distance_rows = sampleDists,
       clustering_distance_cols = sampleDists,
-      color = colors, main = labs[i], annotation_col = annotation.data)
+      color = colors, main = labs[i], annotation_row = annotation.data)
     print(p)
 
     i <- i + 1
@@ -129,7 +128,7 @@ PlotSampleDistances <- function(rld, vsd, outpath, level, plot.annos) {
 #'   \code{samplesheet} to use to annotate figures.
 #'
 #' @importFrom grDevices pdf dev.off
-#' @importFrom ggplot2 ggtitle
+#' @importFrom ggplot2 ggtitle theme_classic
 #' @importFrom utils combn
 #' @importFrom SummarizedExperiment colData
 #'
@@ -146,11 +145,10 @@ PlotEDAPCAs <- function(rld, vsd, outpath, level, plot.annos) {
     "All Genes (vst)")
 
   # Get all possible comparisons.
-  combs <- combn(colData(rld)[,level], 2)
+  combs <- combn(levels(colData(rld)[,level]), 2)
   combs.seq <- seq(1, length(combs), by = 2)
 
-
-  for (x in c(rld, vsd)) {
+  for (x in list(rld, vsd)) {
     p <- DESeq2::plotPCA(x, intgroup = level) + ggtitle(labs[i]) +
       theme_classic()
     print(p)
@@ -165,13 +163,13 @@ PlotEDAPCAs <- function(rld, vsd, outpath, level, plot.annos) {
     for (samp in combs.seq) {
       x.sub <- x[, colData(x)[, level] %in% c(combs[samp], combs[samp + 1])]
 
-      p <- DESeq2::plotPCA(x, intgroup = level) +
+      p <- DESeq2::plotPCA(x.sub, intgroup = level) +
         ggtitle(paste0(labs[i], " - ", combs[samp], " v ", combs[samp + 1])) +
         theme_classic()
       print(p)
 
       if (plot.annos != level) {
-        p <- DESeq2::plotPCA(x, intgroup = plot.annos) +
+        p <- DESeq2::plotPCA(x.sub, intgroup = plot.annos) +
           ggtitle(paste0(labs[i], " - ", combs[samp], " v ", combs[samp + 1])) +
           theme_classic()
         print(p)

@@ -5,12 +5,12 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Analyzing B cell lymphoma RNA-seq data • AndrewsBCellLymphoma</title>
+<title>Analyzing RNA-seq data • AndrewsBCellLymphoma</title>
 <!-- jquery --><script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script><!-- Bootstrap --><link href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/3.3.7/sandstone/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha256-U5ZEeKfGNOja007MMD3YBI0A3OSZOQbeG6z2f2Y0hu8=" crossorigin="anonymous"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/all.min.css" integrity="sha256-nAmazAk6vS34Xqo0BSrTb+abbtFlgsFK7NKSi6o7Y78=" crossorigin="anonymous">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/v4-shims.min.css" integrity="sha256-6qHlizsOWFskGlwVOKuns+D1nB6ssZrHQrNj1wGplHc=" crossorigin="anonymous">
 <!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.4/clipboard.min.js" integrity="sha256-FiZwavyI2V6+EXO1U+xzLG3IKldpiTFf3153ea9zikQ=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/headroom.min.js" integrity="sha256-DJFC1kqIhelURkuza0AvYal5RxMtpzLjFhsnVIeuk+U=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- pkgdown --><link href="../pkgdown.css" rel="stylesheet">
-<script src="../pkgdown.js"></script><meta property="og:title" content="Analyzing B cell lymphoma RNA-seq data">
+<script src="../pkgdown.js"></script><meta property="og:title" content="Analyzing RNA-seq data">
 <meta property="og:description" content="">
 <meta name="twitter:card" content="summary">
 <!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js" integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/config/TeX-AMS-MML_HTMLorMML.js" integrity="sha256-84DKXVJXs0/F8OTMzX4UR909+jtl4G7SPypPavF+GfA=" crossorigin="anonymous"></script><!--[if lt IE 9]>
@@ -54,7 +54,7 @@
   </a>
   <ul class="dropdown-menu" role="menu">
 <li>
-      <a href="../articles/BCellAnalysis.html">Analyzing B cell lymphoma RNA-seq data</a>
+      <a href="../articles/BCellAnalysis.html">Analyzing RNA-seq data</a>
     </li>
   </ul>
 </li>
@@ -79,13 +79,13 @@
       </header><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
-      <h1>Analyzing B cell lymphoma RNA-seq data</h1>
+      <h1>Analyzing RNA-seq data</h1>
                         <h4 class="author">Jared Andrews</h4>
             <address class="author_afil">
       Washington University School of Medicine, Department of Laboratory and Genomic Medicine<br><a class="author_email" href="mailto:#"></a><a href="mailto:jared.andrews07@gmail.com" class="email">jared.andrews07@gmail.com</a>
       </address>
                   
-            <h4 class="date">Revised: Ocotober 17th, 2019</h4>
+            <h4 class="date">Revised: Ocotober 21st, 2019</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/j-andrews7/AndrewsBCellLymphoma/blob/master/vignettes/BCellAnalysis.Rmd"><code>vignettes/BCellAnalysis.Rmd</code></a></small>
       <div class="hidden name"><code>BCellAnalysis.Rmd</code></div>
@@ -97,11 +97,11 @@
 <div id="introduction" class="section level1">
 <h1 class="hasAnchor">
 <a href="#introduction" class="anchor"></a>Introduction</h1>
-<p>This vignette walks through analysis of the B cell lymphoma data included in the future Andrews et al. (2019, your favorite journal with an impact factor &gt; 30) paper. It uses the convenience functions included in this <a href="https://github.com/j-andrews7/AndrewsBCellLymphoma">package</a> to streamline the process.</p>
+<p>This vignette walks through analysis of the B cell lymphoma RNA-seq data included in the future Andrews et al. (2019, your favorite journal with an impact factor &gt; 30) paper. It uses the convenience functions included in this <a href="https://github.com/j-andrews7/AndrewsBCellLymphoma">package</a> to streamline the process.</p>
 <p>Several command line tools as well as python are also utilized - each code block should indicate whether it is <code>bash</code>, <code>R</code>, or <code>python</code> code. If your system is set up properly, you can still <a href="https://bookdown.org/yihui/rmarkdown/language-engines.html">run these code chunks in Rmarkdown files within RStudio</a>, assuming you have all of the software installed.</p>
 <p>Required Software:</p>
 <ul>
-<li>R (duh)</li>
+<li>R (3.6+)</li>
 <li>python</li>
 <li><a href="https://combine-lab.github.io/salmon/">salmon (v0.14+)</a></li>
 <li>
@@ -110,18 +110,23 @@
 <a href="https://github.com/marbl/MashMap">mashmap</a> - only needed if generating salmon decoy transcriptome</li>
 </ul>
 </div>
-<div id="rna-seq" class="section level1">
+<div id="suggested-reading" class="section level1">
 <h1 class="hasAnchor">
-<a href="#rna-seq" class="anchor"></a>RNA-seq</h1>
-<p>We’ll take care of the RNA-seq data first.</p>
+<a href="#suggested-reading" class="anchor"></a>Suggested Reading</h1>
+<p>That is, if you ask me a question and haven’t read these first, I’m going to tell you to read them.</p>
+<ul>
+<li>The <a href="https://bioconductor.org/packages/release/bioc/vignettes/DESeq2/inst/doc/DESeq2.html#standard-workflow">DESeq2 vignette</a>
+</li>
+<li>The <a href="http://master.bioconductor.org/packages/release/workflows/vignettes/rnaseqGene/inst/doc/rnaseqGene.html">rnaseqGene</a> workflow, which walks through a DESeq2 analysis in great detail.</li>
+</ul>
 <div id="generating-gene-counts" class="section level2">
 <h2 class="hasAnchor">
 <a href="#generating-gene-counts" class="anchor"></a>Generating gene counts</h2>
-<p>Going the <code>salmon</code> -&gt; <em><a href="https://bioconductor.org/packages/3.10/DESeq2">DESeq2</a></em> route. Obviously requires R, <a href="https://combine-lab.github.io/salmon/">salmon v0.14.1</a>, and <em><a href="https://bioconductor.org/packages/3.10/DESeq2">DESeq2</a></em> (along with a few other packages). Using hg19, cause forget re-aligning all the ChIP-seq and making new tracks. <code>salmon</code> needs <code>mashmap</code> and <code>bedtools</code> as well if generating “decoy-aware” transcriptomes. The Google can show you how to install those.</p>
+<p>Going the <code>salmon</code> -&gt; <code>DESeq2</code> route. This requires R, salmon v0.14, and DESeq2 (along with a few other packages). Using hg19, cause forget re-aligning all the ChIP-seq and making new tracks. <code>salmon</code> needs <code>mashmap</code> and <code>bedtools</code> as well if generating “decoy-aware” transcriptomes. The Google can show you how to install those.</p>
 <div id="create-decoy-reference-transcriptome" class="section level3">
 <h3 class="hasAnchor">
 <a href="#create-decoy-reference-transcriptome" class="anchor"></a>Create decoy reference transcriptome</h3>
-<p>Newer versions of salmon recommend using a <em>decoy-aware</em> transcriptome to generate the index file to be used for selective alignment. This process is a bit annoying, so the authors have pre-computed some <a href="https://drive.google.com/drive/folders/14VqSdZAKH82QwDWhMXNLFqMoskoqv3fS">decoy transcriptomes</a> for hg19 and hg38 with different annotations. In this case, I wanted to use the <a href="ftp://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_31/GRCh37_mapping/">GENCODE v31 annotations</a> that had been lifted over to hg19, so I had to generate them myself.</p>
+<p>Newer versions of salmon recommend using a <em>decoy-aware</em> transcriptome to generate the index file to be used for selective alignment. This process is a bit annoying, so the authors have pre-computed some <a href="https://drive.google.com/drive/folders/14VqSdZAKH82QwDWhMXNLFqMoskoqv3fS">decoy transcriptomes</a> for hg19 and hg38 with different annotations. In this case, I used the <a href="ftp://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_31/GRCh37_mapping/">GENCODE v31 annotations</a> that had been lifted over to hg19, so I had to generate them myself.</p>
 <blockquote>
 <p><strong>This had to be run on a cluster with 128 GB RAM. If you can avoid this step by using their pre-generated decoys, I recommend doing so.</strong></p>
 </blockquote>
@@ -147,7 +152,7 @@
 <div class="sourceCode" id="cb2"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb2-1" title="1"><span class="co"># bash</span></a>
 <a class="sourceLine" id="cb2-2" title="2"><span class="co"># Script for generating decoy genome.</span></a>
 <a class="sourceLine" id="cb2-3" title="3"><span class="fu">wget</span> https://raw.githubusercontent.com/COMBINE-lab/SalmonTools/master/scripts/generateDecoyTranscriptome.sh</a></code></pre></div>
-<p>This script crashed a lot for me, so I ended up editing it to just snag the last 10 commands or so (those with the step comments) and removing the variable parsing at the beginning, as it uses some deprecated linux commands (<code>readpath</code>) that I couldn’t install on the cluster.</p>
+<p>This script crashed a lot for me, so I ended up editing it to just snag the last 10 commands or so (those with the step comments) and removing the variable parsing at the beginning, as it uses some deprecated linux commands (<code>readpath</code>) that I couldn’t install on our computing cluster.</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb3-1" title="1"><span class="co"># bash</span></a>
 <a class="sourceLine" id="cb3-2" title="2"><span class="fu">bash</span> generateDecoyTranscriptome.sh -j 2 -a ./RNA_Seq/ref/gencode.v31lift37.annotation.gtf -g ./RNA_Seq/ref/GRCh37.primary_assembly.genome.fa -t ./RNA_Seq/ref/gencode.v31lift37.transcripts.fa -o ./RNA_Seq/ref/decoys/</a></code></pre></div>
 </div>
@@ -162,7 +167,7 @@
 <div id="quantify" class="section level3">
 <h3 class="hasAnchor">
 <a href="#quantify" class="anchor"></a>Quantify</h3>
-<p>Actually generate the gene counts now. Pretty easy.</p>
+<p>Actually generate the gene counts now.</p>
 <div class="sourceCode" id="cb5"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb5-1" title="1"><span class="co"># bash</span></a>
 <a class="sourceLine" id="cb5-2" title="2"><span class="kw"><a href="https://rdrr.io/r/base/Control.html">for</a></span> <span class="ex">f</span> in ./RNA_Seq/FASTQs/*<span class="kw">;</span> <span class="kw">do</span></a>
 <a class="sourceLine" id="cb5-3" title="3">    <span class="va">samp=</span><span class="st">"</span><span class="va">${f##</span>*/<span class="va">}</span><span class="st">"</span></a>
@@ -179,7 +184,7 @@
 <div id="make-transcript-to-gene-mappings" class="section level3">
 <h3 class="hasAnchor">
 <a href="#make-transcript-to-gene-mappings" class="anchor"></a>Make Transcript-to-Gene Mappings</h3>
-<p>For gene-level summarization.</p>
+<p>For gene-level summarization and readability.</p>
 <div class="sourceCode" id="cb6"><pre class="sourceCode python"><code class="sourceCode python"><a class="sourceLine" id="cb6-1" title="1"><span class="co"># python</span></a>
 <a class="sourceLine" id="cb6-2" title="2">outter <span class="op">=</span> <span class="bu">open</span>(<span class="st">"./RNA_Seq/ref/tx2gene.txt"</span>, <span class="st">"w"</span>)</a>
 <a class="sourceLine" id="cb6-3" title="3"><span class="cf">with</span> <span class="bu">open</span>(<span class="st">"./RNA_Seq/ref/gencode.v31lift37.transcripts.fa"</span>) <span class="im">as</span> f:</a>
@@ -188,428 +193,149 @@
 <a class="sourceLine" id="cb6-6" title="6">            <span class="cf">continue</span></a>
 <a class="sourceLine" id="cb6-7" title="7">        line <span class="op">=</span> line.strip().strip(<span class="st">"&gt;"</span>).split(<span class="st">"|"</span>)</a>
 <a class="sourceLine" id="cb6-8" title="8">        tx <span class="op">=</span> line[<span class="dv">0</span>]</a>
-<a class="sourceLine" id="cb6-9" title="9">        gene <span class="op">=</span> line[<span class="dv">1</span>]</a>
-<a class="sourceLine" id="cb6-10" title="10">        symb <span class="op">=</span> line[<span class="dv">5</span>]</a>
-<a class="sourceLine" id="cb6-11" title="11">        out <span class="op">=</span> <span class="st">"</span><span class="ch">\t</span><span class="st">"</span>.join([tx, gene, symb])</a>
-<a class="sourceLine" id="cb6-12" title="12">        <span class="bu">print</span>(out, <span class="bu">file</span> <span class="op">=</span> outter)</a>
-<a class="sourceLine" id="cb6-13" title="13"></a>
-<a class="sourceLine" id="cb6-14" title="14">outter.close()</a></code></pre></div>
+<a class="sourceLine" id="cb6-9" title="9">        symb <span class="op">=</span> line[<span class="dv">5</span>]</a>
+<a class="sourceLine" id="cb6-10" title="10">        out <span class="op">=</span> <span class="st">"</span><span class="ch">\t</span><span class="st">"</span>.join([tx, symb])</a>
+<a class="sourceLine" id="cb6-11" title="11">        <span class="bu">print</span>(out, <span class="bu">file</span> <span class="op">=</span> outter)</a>
+<a class="sourceLine" id="cb6-12" title="12"></a>
+<a class="sourceLine" id="cb6-13" title="13">outter.close()</a></code></pre></div>
 </div>
 </div>
 <div id="analysis-with-r" class="section level2">
 <h2 class="hasAnchor">
 <a href="#analysis-with-r" class="anchor"></a>Analysis with R</h2>
-<p>Need these. Install any missing as you usually would (via <code>install.packages</code> and <code><a href="https://rdrr.io/pkg/BiocManager/man/install.html">BiocManager::install()</a></code>).</p>
+<p>Install this package if you haven’t already with <code><a href="https://rdrr.io/pkg/devtools/man/remote-reexports.html">devtools::install_github("j-andrews7/AndrewsBCellLymphoma")</a></code>. If you don’t have <code>devtools</code>, it can be installed with <code><a href="https://rdrr.io/r/utils/install.packages.html">install.packages("devtools")</a></code>.</p>
 <div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb7-1" title="1"><span class="co"># R</span></a>
-<a class="sourceLine" id="cb7-2" title="2"><span class="kw"><a href="https://rdrr.io/r/base/message.html">suppressPackageStartupMessages</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span>(DESeq2))</a>
-<a class="sourceLine" id="cb7-3" title="3"><span class="kw"><a href="https://rdrr.io/r/base/message.html">suppressPackageStartupMessages</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span>(tximport))</a>
-<a class="sourceLine" id="cb7-4" title="4"><span class="kw"><a href="https://rdrr.io/r/base/message.html">suppressPackageStartupMessages</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span>(dplyr))</a>
-<a class="sourceLine" id="cb7-5" title="5"><span class="kw"><a href="https://rdrr.io/r/base/message.html">suppressPackageStartupMessages</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span>(ggplot2))</a>
-<a class="sourceLine" id="cb7-6" title="6"><span class="kw"><a href="https://rdrr.io/r/base/message.html">suppressPackageStartupMessages</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span>(pheatmap))</a>
-<a class="sourceLine" id="cb7-7" title="7"><span class="kw"><a href="https://rdrr.io/r/base/message.html">suppressPackageStartupMessages</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span>(RColorBrewer))</a>
-<a class="sourceLine" id="cb7-8" title="8"><span class="kw"><a href="https://rdrr.io/r/base/message.html">suppressPackageStartupMessages</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span>(repr))</a>
-<a class="sourceLine" id="cb7-9" title="9"><span class="kw"><a href="https://rdrr.io/r/base/message.html">suppressPackageStartupMessages</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span>(enrichR))</a>
-<a class="sourceLine" id="cb7-10" title="10"><span class="kw"><a href="https://rdrr.io/r/base/message.html">suppressPackageStartupMessages</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span>(cowplot))</a>
-<a class="sourceLine" id="cb7-11" title="11"><span class="kw"><a href="https://rdrr.io/r/base/message.html">suppressPackageStartupMessages</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span>(scales))</a></code></pre></div>
-<div id="read-in-samples" class="section level3">
-<h3 class="hasAnchor">
-<a href="#read-in-samples" class="anchor"></a>Read in Samples</h3>
-<p>I use a sample sheet here, which is just a table with sample names and metadata columns. This creates a DESeq dataset from our gene counts.</p>
+<a class="sourceLine" id="cb7-2" title="2"><span class="kw"><a href="https://rdrr.io/r/base/message.html">suppressPackageStartupMessages</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span>(AndrewsBCellLymphoma))</a></code></pre></div>
+<p>The only thing you need now is a sample sheet, which is just a table with sample names and metadata columns. We can take a peek at the sample sheet I’m using so he can see how they’re constructed. It can include as many metadata columns as you’d like.</p>
 <div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb8-1" title="1"><span class="co"># R</span></a>
 <a class="sourceLine" id="cb8-2" title="2"><span class="co"># Basic sample sheet.</span></a>
-<a class="sourceLine" id="cb8-3" title="3">samples &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/utils/read.table.html">read.table</a></span>(<span class="st">"./RNA_Seq/Samples.txt"</span>, <span class="dt">header=</span><span class="ot">TRUE</span>, <span class="dt">sep =</span> <span class="st">"</span><span class="ch">\t</span><span class="st">"</span>)</a>
-<a class="sourceLine" id="cb8-4" title="4"><span class="kw"><a href="https://rdrr.io/r/base/colnames.html">rownames</a></span>(samples) &lt;-<span class="st"> </span>samples<span class="op">$</span>name</a>
-<a class="sourceLine" id="cb8-5" title="5">files &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/file.path.html">file.path</a></span>(<span class="st">"./RNA_Seq/quants"</span>, samples<span class="op">$</span>name, <span class="st">"quant.sf"</span>)</a>
-<a class="sourceLine" id="cb8-6" title="6"><span class="kw"><a href="https://rdrr.io/r/base/names.html">names</a></span>(files) &lt;-<span class="st"> </span>samples<span class="op">$</span>name</a>
-<a class="sourceLine" id="cb8-7" title="7"></a>
-<a class="sourceLine" id="cb8-8" title="8"><span class="co"># This will be used to map transcript IDs back to gene symbols and collapse to gene-level counts.</span></a>
-<a class="sourceLine" id="cb8-9" title="9">tx2gene &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/utils/read.table.html">read.table</a></span>(<span class="st">"./RNA_Seq/ref/tx2gene.txt"</span>, <span class="dt">sep =</span> <span class="st">"</span><span class="ch">\t</span><span class="st">"</span>, <span class="dt">as.is =</span> <span class="ot">TRUE</span>)</a>
-<a class="sourceLine" id="cb8-10" title="10">tx2gene &lt;-<span class="st"> </span>tx2gene[,<span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="dv">1</span>,<span class="dv">3</span>)]</a>
-<a class="sourceLine" id="cb8-11" title="11"></a>
-<a class="sourceLine" id="cb8-12" title="12"><span class="co"># Read in our actual count files now.</span></a>
-<a class="sourceLine" id="cb8-13" title="13">txi &lt;-<span class="st"> </span><span class="kw">tximport</span>(files, <span class="dt">type=</span><span class="st">"salmon"</span>, <span class="dt">tx2gene=</span>tx2gene)</a>
-<a class="sourceLine" id="cb8-14" title="14"></a>
-<a class="sourceLine" id="cb8-15" title="15"><span class="co"># Create dds object using disease and ignore effects due to paired/single-end differences.</span></a>
-<a class="sourceLine" id="cb8-16" title="16">dds &lt;-<span class="st"> </span><span class="kw">DESeqDataSetFromTximport</span>(txi,</a>
-<a class="sourceLine" id="cb8-17" title="17">                                   <span class="dt">colData =</span> samples,</a>
-<a class="sourceLine" id="cb8-18" title="18">                                   <span class="dt">design =</span> <span class="op">~</span><span class="st"> </span>disease)</a></code></pre></div>
-</div>
-<div id="exploratory-data-analysis" class="section level3">
+<a class="sourceLine" id="cb8-3" title="3">samples &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/utils/read.table.html">read.table</a></span>(<span class="st">"./RNA_Seq/Samples.allCLL.txt"</span>, <span class="dt">header=</span><span class="ot">TRUE</span>, <span class="dt">sep =</span> <span class="st">"</span><span class="ch">\t</span><span class="st">"</span>)</a>
+<a class="sourceLine" id="cb8-4" title="4"><span class="kw"><a href="https://rdrr.io/r/utils/head.html">head</a></span>(samples, <span class="dv">10</span>)</a></code></pre></div>
+<div id="run-deseq2" class="section level3">
 <h3 class="hasAnchor">
-<a href="#exploratory-data-analysis" class="anchor"></a>Exploratory Data Analysis</h3>
-<p>See which variance stabilization method will work best for this. Make a few plots.</p>
+<a href="#run-deseq2" class="anchor"></a>Run DESeq2</h3>
+<p>DESeq2 is a very popular R package for performing differential expression analysis. Raw RNA-seq counts follow a negative binomial distribution, which is how DESeq2 models the data. It is quick, flexible, and generally works quite well with little to no parameter tweaking. It can also help to mitigate the technical or batch effects on the analysis, a feature which we’ll take advantage of here.</p>
+<p>Most of these samples are 150 bp, paired-end sequencing (as shown in the ‘lib’ column of the sample sheet). A handful are 50 bp, single-end sequencing, which introduces a significant confounding factor to the analysis. In our model design, we’ll specify that we want to ignore effects due to this technical difference (by setting <code>block = "lib"</code>). The model isn’t magic, so we may very well still see evidence of the library-prep differences regardless, as they are quite strong.</p>
 <div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb9-1" title="1"><span class="co"># R</span></a>
-<a class="sourceLine" id="cb9-2" title="2"><span class="co"># Compare variance stabilization methods.</span></a>
-<a class="sourceLine" id="cb9-3" title="3">vsd &lt;-<span class="st"> </span><span class="kw">vst</span>(dds, <span class="dt">blind =</span> <span class="ot">FALSE</span>)</a>
-<a class="sourceLine" id="cb9-4" title="4">rld &lt;-<span class="st"> </span><span class="kw">rlog</span>(dds, <span class="dt">blind =</span> <span class="ot">FALSE</span>)</a>
-<a class="sourceLine" id="cb9-5" title="5"></a>
-<a class="sourceLine" id="cb9-6" title="6"><span class="kw"><a href="https://rdrr.io/r/base/message.html">suppressPackageStartupMessages</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="st">"dplyr"</span>))</a>
-<a class="sourceLine" id="cb9-7" title="7"><span class="kw"><a href="https://rdrr.io/r/base/message.html">suppressPackageStartupMessages</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="st">"ggplot2"</span>))</a>
-<a class="sourceLine" id="cb9-8" title="8"></a>
-<a class="sourceLine" id="cb9-9" title="9">dds &lt;-<span class="st"> </span><span class="kw">estimateSizeFactors</span>(dds)</a>
-<a class="sourceLine" id="cb9-10" title="10"></a>
-<a class="sourceLine" id="cb9-11" title="11">df &lt;-<span class="st"> </span><span class="kw">bind_rows</span>(</a>
-<a class="sourceLine" id="cb9-12" title="12">  <span class="kw">as_data_frame</span>(<span class="kw"><a href="https://rdrr.io/r/base/Log.html">log2</a></span>(<span class="kw">counts</span>(dds, <span class="dt">normalized=</span><span class="ot">TRUE</span>)[, <span class="dv">1</span><span class="op">:</span><span class="dv">2</span>]<span class="op">+</span><span class="dv">1</span>)) <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb9-13" title="13"><span class="st">         </span><span class="kw">mutate</span>(<span class="dt">transformation =</span> <span class="st">"log2(x + 1)"</span>),</a>
-<a class="sourceLine" id="cb9-14" title="14">  <span class="kw">as_data_frame</span>(<span class="kw">assay</span>(vsd)[, <span class="dv">1</span><span class="op">:</span><span class="dv">2</span>]) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">mutate</span>(<span class="dt">transformation =</span> <span class="st">"vst"</span>),</a>
-<a class="sourceLine" id="cb9-15" title="15">  <span class="kw">as_data_frame</span>(<span class="kw">assay</span>(rld)[, <span class="dv">1</span><span class="op">:</span><span class="dv">2</span>]) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">mutate</span>(<span class="dt">transformation =</span> <span class="st">"rlog"</span>))</a>
-<a class="sourceLine" id="cb9-16" title="16">  </a>
-<a class="sourceLine" id="cb9-17" title="17"><span class="kw"><a href="https://rdrr.io/r/base/colnames.html">colnames</a></span>(df)[<span class="dv">1</span><span class="op">:</span><span class="dv">2</span>] &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"x"</span>, <span class="st">"y"</span>)  </a>
-<a class="sourceLine" id="cb9-18" title="18"></a>
-<a class="sourceLine" id="cb9-19" title="19"><span class="kw"><a href="https://rdrr.io/r/base/options.html">options</a></span>(<span class="dt">repr.plot.width=</span><span class="dv">9</span>, <span class="dt">repr.plot.height=</span><span class="dv">7</span>)</a>
-<a class="sourceLine" id="cb9-20" title="20">df &lt;-<span class="st"> </span><span class="kw">bind_rows</span>(</a>
-<a class="sourceLine" id="cb9-21" title="21">  <span class="kw">as_data_frame</span>(<span class="kw"><a href="https://rdrr.io/r/base/Log.html">log2</a></span>(<span class="kw">counts</span>(dds, <span class="dt">normalized=</span><span class="ot">TRUE</span>)[, <span class="dv">1</span><span class="op">:</span><span class="dv">2</span>]<span class="op">+</span><span class="dv">1</span>)) <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb9-22" title="22"><span class="st">         </span><span class="kw">mutate</span>(<span class="dt">transformation =</span> <span class="st">"log2(x + 1)"</span>),</a>
-<a class="sourceLine" id="cb9-23" title="23">  <span class="kw">as_data_frame</span>(<span class="kw">assay</span>(vsd)[, <span class="dv">1</span><span class="op">:</span><span class="dv">2</span>]) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">mutate</span>(<span class="dt">transformation =</span> <span class="st">"vst"</span>),</a>
-<a class="sourceLine" id="cb9-24" title="24">  <span class="kw">as_data_frame</span>(<span class="kw">assay</span>(rld)[, <span class="dv">1</span><span class="op">:</span><span class="dv">2</span>]) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">mutate</span>(<span class="dt">transformation =</span> <span class="st">"rlog"</span>))</a>
-<a class="sourceLine" id="cb9-25" title="25">  </a>
-<a class="sourceLine" id="cb9-26" title="26"><span class="kw"><a href="https://rdrr.io/r/base/colnames.html">colnames</a></span>(df)[<span class="dv">1</span><span class="op">:</span><span class="dv">2</span>] &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"x"</span>, <span class="st">"y"</span>) </a>
-<a class="sourceLine" id="cb9-27" title="27"><span class="kw">ggplot</span>(df, <span class="kw">aes</span>(<span class="dt">x =</span> x, <span class="dt">y =</span> y)) <span class="op">+</span><span class="st"> </span><span class="kw">geom_hex</span>(<span class="dt">bins =</span> <span class="dv">80</span>) <span class="op">+</span></a>
-<a class="sourceLine" id="cb9-28" title="28"><span class="st">  </span><span class="kw">coord_fixed</span>() <span class="op">+</span><span class="st"> </span><span class="kw">facet_grid</span>( . <span class="op">~</span><span class="st"> </span>transformation)  </a></code></pre></div>
-<p>These plots show the impact of the variances stabilizing methods. I found <code>rlog</code> looked best for this data, but I save and visualize the <code>vst</code> normalized counts as well.</p>
-<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb10-1" title="1"><span class="co"># R</span></a>
-<a class="sourceLine" id="cb10-2" title="2"><span class="co"># Sample distances heatmap</span></a>
-<a class="sourceLine" id="cb10-3" title="3"><span class="kw"><a href="https://rdrr.io/r/base/message.html">suppressPackageStartupMessages</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="st">"pheatmap"</span>))</a>
-<a class="sourceLine" id="cb10-4" title="4"><span class="kw"><a href="https://rdrr.io/r/base/message.html">suppressPackageStartupMessages</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="st">"RColorBrewer"</span>))</a>
-<a class="sourceLine" id="cb10-5" title="5"><span class="kw"><a href="https://rdrr.io/r/base/message.html">suppressPackageStartupMessages</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="st">"repr"</span>))</a>
-<a class="sourceLine" id="cb10-6" title="6"><span class="kw"><a href="https://rdrr.io/r/base/options.html">options</a></span>(<span class="dt">repr.plot.width=</span><span class="dv">5</span>, <span class="dt">repr.plot.height=</span><span class="dv">6</span>)</a>
-<a class="sourceLine" id="cb10-7" title="7"></a>
-<a class="sourceLine" id="cb10-8" title="8">sampleDists &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/stats/dist.html">dist</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/t.html">t</a></span>(<span class="kw">assay</span>(rld)))</a>
-<a class="sourceLine" id="cb10-9" title="9">sampleDistMatrix &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/matrix.html">as.matrix</a></span>(sampleDists)</a>
-<a class="sourceLine" id="cb10-10" title="10"><span class="kw"><a href="https://rdrr.io/r/base/colnames.html">rownames</a></span>(sampleDistMatrix) &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/paste.html">paste</a></span>(rld<span class="op">$</span>name, rld<span class="op">$</span>disease.sub, <span class="dt">sep =</span> <span class="st">" - "</span> )</a>
-<a class="sourceLine" id="cb10-11" title="11"><span class="kw"><a href="https://rdrr.io/r/base/colnames.html">colnames</a></span>(sampleDistMatrix) &lt;-<span class="st"> </span><span class="ot">NULL</span></a>
-<a class="sourceLine" id="cb10-12" title="12">colors &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/grDevices/colorRamp.html">colorRampPalette</a></span>( <span class="kw"><a href="https://rdrr.io/r/base/rev.html">rev</a></span>(<span class="kw">brewer.pal</span>(<span class="dv">9</span>, <span class="st">"Blues"</span>)) )(<span class="dv">255</span>)</a>
-<a class="sourceLine" id="cb10-13" title="13"><span class="kw">pheatmap</span>(sampleDistMatrix,</a>
-<a class="sourceLine" id="cb10-14" title="14">         <span class="dt">clustering_distance_rows =</span> sampleDists,</a>
-<a class="sourceLine" id="cb10-15" title="15">         <span class="dt">clustering_distance_cols =</span> sampleDists,</a>
-<a class="sourceLine" id="cb10-16" title="16">         <span class="dt">col =</span> colors)</a></code></pre></div>
-<p>Take a peak at the PCA as well. This is for all genes.</p>
-<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb11-1" title="1"><span class="co"># R</span></a>
-<a class="sourceLine" id="cb11-2" title="2"><span class="co"># PCA</span></a>
-<a class="sourceLine" id="cb11-3" title="3"><span class="kw">plotPCA</span>(vsd, <span class="dt">intgroup=</span><span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"disease"</span>))</a></code></pre></div>
+<a class="sourceLine" id="cb9-2" title="2"><span class="kw"><a href="../reference/RunDESeq2.html">RunDESeq2</a></span>(<span class="dt">outpath =</span> <span class="st">"./RNA_Seq/Final_Analyses"</span>, <span class="dt">quants.path =</span> <span class="st">"./RNA_Seq/quants"</span>, </a>
+<a class="sourceLine" id="cb9-3" title="3">          <span class="dt">samplesheet =</span> <span class="st">"./RNA_Seq/Samples.allCLL.txt"</span>, <span class="dt">tx2gene =</span> <span class="st">"./RNA_Seq/ref/tx2gene.txt"</span>,</a>
+<a class="sourceLine" id="cb9-4" title="4">          <span class="dt">level =</span> <span class="st">"disease"</span>, <span class="dt">block =</span> <span class="st">"lib"</span>, <span class="dt">padj.thresh =</span> <span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">0.05</span>, <span class="fl">0.01</span>, <span class="fl">0.001</span>), </a>
+<a class="sourceLine" id="cb9-5" title="5">          <span class="dt">plot.annos =</span> <span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"disease"</span>, <span class="st">"disease.sub"</span>), <span class="dt">count.filt =</span> <span class="dv">50</span>)</a></code></pre></div>
 </div>
-<div id="pre-filtering" class="section level3">
+<div id="next-steps" class="section level3">
 <h3 class="hasAnchor">
-<a href="#pre-filtering" class="anchor"></a>Pre-filtering</h3>
-<p>Remove super low counts genes (&lt; 100 reads across all samples).</p>
-<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb12-1" title="1"><span class="co"># R</span></a>
-<a class="sourceLine" id="cb12-2" title="2"><span class="kw"><a href="https://rdrr.io/r/base/dim.html">dim</a></span>(dds)</a>
-<a class="sourceLine" id="cb12-3" title="3">keep &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/colSums.html">rowSums</a></span>(<span class="kw">counts</span>(dds)) <span class="op">&gt;=</span><span class="st"> </span><span class="dv">100</span></a>
-<a class="sourceLine" id="cb12-4" title="4">dds &lt;-<span class="st"> </span>dds[keep,]</a>
-<a class="sourceLine" id="cb12-5" title="5"></a>
-<a class="sourceLine" id="cb12-6" title="6"><span class="co"># See how many were removed.</span></a>
-<a class="sourceLine" id="cb12-7" title="7"><span class="kw"><a href="https://rdrr.io/r/base/dim.html">dim</a></span>(dds)</a></code></pre></div>
+<a href="#next-steps" class="anchor"></a>Next Steps</h3>
+<p>Yes, that’s it. Explore the plots, tables, enrichments, etc. Re-run if necessary, tweaking parameters as you see fit.</p>
 </div>
-<div id="differential-analysis" class="section level3">
-<h3 class="hasAnchor">
-<a href="#differential-analysis" class="anchor"></a>Differential analysis</h3>
-<p>Now the real stuff.</p>
-<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb13-1" title="1"><span class="co"># R</span></a>
-<a class="sourceLine" id="cb13-2" title="2">dds &lt;-<span class="st"> </span><span class="kw">DESeq</span>(dds)</a>
-<a class="sourceLine" id="cb13-3" title="3">res &lt;-<span class="st"> </span><span class="kw">results</span>(dds)</a></code></pre></div>
-</div>
-<div id="get-all-comparison-results" class="section level3">
-<h3 class="hasAnchor">
-<a href="#get-all-comparison-results" class="anchor"></a>Get all comparison results</h3>
-<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb14-1" title="1"><span class="co"># R</span></a>
-<a class="sourceLine" id="cb14-2" title="2">CLLvNORM &lt;-<span class="st"> </span><span class="kw">results</span>(dds, <span class="dt">contrast=</span><span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"disease"</span>, <span class="st">"CLL"</span>, <span class="st">"NORMAL"</span>))</a>
-<a class="sourceLine" id="cb14-3" title="3">CLLvNORM &lt;-<span class="st"> </span><span class="kw">lfcShrink</span>(dds, <span class="dt">contrast=</span><span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"disease"</span>, <span class="st">"CLL"</span>, <span class="st">"NORMAL"</span>), <span class="dt">res =</span> CLLvNORM, <span class="dt">type =</span> <span class="st">"ashr"</span>)</a>
-<a class="sourceLine" id="cb14-4" title="4"></a>
-<a class="sourceLine" id="cb14-5" title="5">CLLvDL &lt;-<span class="st"> </span><span class="kw">results</span>(dds, <span class="dt">contrast=</span><span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"disease"</span>, <span class="st">"CLL"</span>, <span class="st">"DL"</span>))</a>
-<a class="sourceLine" id="cb14-6" title="6">CLLvDL &lt;-<span class="st"> </span><span class="kw">lfcShrink</span>(dds, <span class="dt">contrast=</span><span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"disease"</span>, <span class="st">"CLL"</span>, <span class="st">"DL"</span>), <span class="dt">res =</span> CLLvDL, <span class="dt">type =</span> <span class="st">"ashr"</span>)</a>
-<a class="sourceLine" id="cb14-7" title="7"></a>
-<a class="sourceLine" id="cb14-8" title="8">CLLvFL &lt;-<span class="st"> </span><span class="kw">results</span>(dds, <span class="dt">contrast=</span><span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"disease"</span>, <span class="st">"CLL"</span>, <span class="st">"FL"</span>))</a>
-<a class="sourceLine" id="cb14-9" title="9">CLLvFL &lt;-<span class="st"> </span><span class="kw">lfcShrink</span>(dds, <span class="dt">contrast=</span><span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"disease"</span>, <span class="st">"CLL"</span>, <span class="st">"FL"</span>), <span class="dt">res =</span> CLLvFL, <span class="dt">type =</span> <span class="st">"ashr"</span>)</a>
-<a class="sourceLine" id="cb14-10" title="10"></a>
-<a class="sourceLine" id="cb14-11" title="11">DLvFL &lt;-<span class="st"> </span><span class="kw">results</span>(dds, <span class="dt">contrast=</span><span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"disease"</span>, <span class="st">"DL"</span>, <span class="st">"FL"</span>))</a>
-<a class="sourceLine" id="cb14-12" title="12">DLvDL &lt;-<span class="st"> </span><span class="kw">lfcShrink</span>(dds, <span class="dt">contrast=</span><span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"disease"</span>, <span class="st">"DL"</span>, <span class="st">"FL"</span>), <span class="dt">res =</span> DLvFL, <span class="dt">type =</span> <span class="st">"ashr"</span>)</a>
-<a class="sourceLine" id="cb14-13" title="13"></a>
-<a class="sourceLine" id="cb14-14" title="14">DLvNORM &lt;-<span class="st"> </span><span class="kw">results</span>(dds, <span class="dt">contrast=</span><span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"disease"</span>, <span class="st">"DL"</span>, <span class="st">"NORMAL"</span>))</a>
-<a class="sourceLine" id="cb14-15" title="15">DLvNORM &lt;-<span class="st"> </span><span class="kw">lfcShrink</span>(dds, <span class="dt">contrast=</span><span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"disease"</span>, <span class="st">"DL"</span>, <span class="st">"NORMAL"</span>), <span class="dt">res =</span> DLvNORM, <span class="dt">type =</span> <span class="st">"ashr"</span>)</a>
-<a class="sourceLine" id="cb14-16" title="16"></a>
-<a class="sourceLine" id="cb14-17" title="17">FLvNORM &lt;-<span class="st"> </span><span class="kw">results</span>(dds, <span class="dt">contrast=</span><span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"disease"</span>, <span class="st">"FL"</span>, <span class="st">"NORMAL"</span>))</a>
-<a class="sourceLine" id="cb14-18" title="18">FLvNORM &lt;-<span class="st"> </span><span class="kw">lfcShrink</span>(dds, <span class="dt">contrast=</span><span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"disease"</span>, <span class="st">"FL"</span>, <span class="st">"NORMAL"</span>), <span class="dt">res =</span> FLvNORM, <span class="dt">type =</span> <span class="st">"ashr"</span>)</a></code></pre></div>
-<p>I use fairly stringent thresholds here, as I’m getting plenty of differences between the groups. This will create a heatmap for all the DEGs between all the comparisons.</p>
-<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb15-1" title="1"><span class="co"># R</span></a>
-<a class="sourceLine" id="cb15-2" title="2">log2cutoff &lt;-<span class="st"> </span><span class="dv">2</span></a>
-<a class="sourceLine" id="cb15-3" title="3">qvaluecutoff &lt;-<span class="st"> </span><span class="fl">0.01</span></a>
-<a class="sourceLine" id="cb15-4" title="4"></a>
-<a class="sourceLine" id="cb15-5" title="5">sigGenes &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/unique.html">unique</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(</a>
-<a class="sourceLine" id="cb15-6" title="6">  <span class="kw"><a href="https://rdrr.io/r/base/colnames.html">rownames</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/subset.html">subset</a></span>(CLLvNORM, padj<span class="op">&lt;=</span>qvaluecutoff <span class="op">&amp;</span><span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/MathFun.html">abs</a></span>(log2FoldChange)<span class="op">&gt;=</span>log2cutoff)),</a>
-<a class="sourceLine" id="cb15-7" title="7">  <span class="kw"><a href="https://rdrr.io/r/base/colnames.html">rownames</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/subset.html">subset</a></span>(CLLvDL, padj<span class="op">&lt;=</span>qvaluecutoff <span class="op">&amp;</span><span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/MathFun.html">abs</a></span>(log2FoldChange)<span class="op">&gt;=</span>log2cutoff)),</a>
-<a class="sourceLine" id="cb15-8" title="8">  <span class="kw"><a href="https://rdrr.io/r/base/colnames.html">rownames</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/subset.html">subset</a></span>(CLLvFL, padj<span class="op">&lt;=</span>qvaluecutoff <span class="op">&amp;</span><span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/MathFun.html">abs</a></span>(log2FoldChange)<span class="op">&gt;=</span>log2cutoff)),</a>
-<a class="sourceLine" id="cb15-9" title="9">  <span class="kw"><a href="https://rdrr.io/r/base/colnames.html">rownames</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/subset.html">subset</a></span>(DLvFL, padj<span class="op">&lt;=</span>qvaluecutoff <span class="op">&amp;</span><span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/MathFun.html">abs</a></span>(log2FoldChange)<span class="op">&gt;=</span>log2cutoff)),</a>
-<a class="sourceLine" id="cb15-10" title="10">  <span class="kw"><a href="https://rdrr.io/r/base/colnames.html">rownames</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/subset.html">subset</a></span>(DLvNORM, padj<span class="op">&lt;=</span>qvaluecutoff <span class="op">&amp;</span><span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/MathFun.html">abs</a></span>(log2FoldChange)<span class="op">&gt;=</span>log2cutoff)),</a>
-<a class="sourceLine" id="cb15-11" title="11">  <span class="kw"><a href="https://rdrr.io/r/base/colnames.html">rownames</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/subset.html">subset</a></span>(FLvNORM, padj<span class="op">&lt;=</span>qvaluecutoff <span class="op">&amp;</span><span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/MathFun.html">abs</a></span>(log2FoldChange)<span class="op">&gt;=</span>log2cutoff))</a>
-<a class="sourceLine" id="cb15-12" title="12">))</a>
-<a class="sourceLine" id="cb15-13" title="13"></a>
-<a class="sourceLine" id="cb15-14" title="14">heat &lt;-<span class="st"> </span><span class="kw">assay</span>(rld)[sigGenes,]</a>
-<a class="sourceLine" id="cb15-15" title="15"></a>
-<a class="sourceLine" id="cb15-16" title="16"><span class="kw"><a href="https://rdrr.io/r/base/options.html">options</a></span>(<span class="dt">repr.plot.width=</span><span class="dv">5</span>, <span class="dt">repr.plot.height=</span><span class="dv">7</span>)</a>
-<a class="sourceLine" id="cb15-17" title="17">myCol &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/grDevices/colorRamp.html">colorRampPalette</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"darkblue"</span>, <span class="st">"snow"</span>, <span class="st">"darkred"</span>))(<span class="dv">1000</span>)</a>
-<a class="sourceLine" id="cb15-18" title="18">colors &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/seq.html">seq</a></span>(<span class="op">-</span><span class="fl">2.5</span>,<span class="op">-</span>.<span class="dv">11</span>,<span class="dt">length=</span><span class="dv">500</span>),<span class="kw"><a href="https://rdrr.io/r/base/seq.html">seq</a></span>(<span class="op">-</span>.<span class="dv">1</span>,.<span class="dv">1</span>,<span class="dt">length=</span><span class="dv">1</span>),<span class="kw"><a href="https://rdrr.io/r/base/seq.html">seq</a></span>(.<span class="dv">11</span>,<span class="fl">2.5</span>,<span class="dt">length=</span><span class="dv">500</span>))</a>
-<a class="sourceLine" id="cb15-19" title="19">df &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/as.data.frame.html">as.data.frame</a></span>(<span class="kw">colData</span>(dds)[,<span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"disease"</span>, <span class="st">"disease.sub"</span>)])</a>
-<a class="sourceLine" id="cb15-20" title="20">df<span class="op">$</span>disease.sub &lt;-<span class="st"> </span><span class="ot">NULL</span></a>
-<a class="sourceLine" id="cb15-21" title="21">p &lt;-<span class="st"> </span><span class="kw">pheatmap</span>(heat, <span class="dt">cluster_rows=</span><span class="ot">TRUE</span>, <span class="dt">show_rownames=</span><span class="ot">FALSE</span>,</a>
-<a class="sourceLine" id="cb15-22" title="22">         <span class="dt">cluster_cols=</span><span class="ot">FALSE</span>, <span class="dt">annotation_col=</span>df, <span class="dt">fontsize_col =</span> <span class="dv">6</span>, <span class="dt">fontsize_row =</span> <span class="dv">6</span>,</a>
-<a class="sourceLine" id="cb15-23" title="23">        <span class="dt">fontsize =</span> <span class="dv">6</span>, <span class="dt">scale =</span> <span class="st">"row"</span>, <span class="dt">color=</span>myCol, <span class="dt">breaks =</span> colors)</a>
-<a class="sourceLine" id="cb15-24" title="24"></a>
-<a class="sourceLine" id="cb15-25" title="25"><span class="kw"><a href="https://rdrr.io/r/grDevices/pdf.html">pdf</a></span>(<span class="st">"./RNA_Seq/Final_Analyses/Figures/padj.05.lfc.2.AllComparisons.DEGs.pdf"</span>, <span class="dt">height =</span> <span class="dv">7</span>, <span class="dt">width =</span> <span class="dv">5</span>)</a>
-<a class="sourceLine" id="cb15-26" title="26"><span class="kw"><a href="https://rdrr.io/r/base/print.html">print</a></span>(p)</a>
-<a class="sourceLine" id="cb15-27" title="27"><span class="kw"><a href="https://rdrr.io/r/grDevices/dev.html">dev.off</a></span>()</a>
-<a class="sourceLine" id="cb15-28" title="28"></a>
-<a class="sourceLine" id="cb15-29" title="29"><span class="kw"><a href="https://rdrr.io/r/base/print.html">print</a></span>(p)</a></code></pre></div>
-<p>Now with just the top 100 genes in each comparison, as ranked by log2 fold change.</p>
-<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb16-1" title="1"><span class="co"># R</span></a>
-<a class="sourceLine" id="cb16-2" title="2"></a>
-<a class="sourceLine" id="cb16-3" title="3"><span class="co"># Quick look at number of DEGs in each comparison.</span></a>
-<a class="sourceLine" id="cb16-4" title="4"><span class="kw"><a href="https://rdrr.io/r/base/length.html">length</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/colnames.html">rownames</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/subset.html">subset</a></span>(CLLvNORM, padj<span class="op">&lt;=</span>qvaluecutoff <span class="op">&amp;</span><span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/MathFun.html">abs</a></span>(log2FoldChange)<span class="op">&gt;=</span>log2cutoff)))</a>
-<a class="sourceLine" id="cb16-5" title="5"><span class="kw"><a href="https://rdrr.io/r/base/length.html">length</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/colnames.html">rownames</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/subset.html">subset</a></span>(CLLvDL, padj<span class="op">&lt;=</span>qvaluecutoff <span class="op">&amp;</span><span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/MathFun.html">abs</a></span>(log2FoldChange)<span class="op">&gt;=</span>log2cutoff)))</a>
-<a class="sourceLine" id="cb16-6" title="6"><span class="kw"><a href="https://rdrr.io/r/base/length.html">length</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/colnames.html">rownames</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/subset.html">subset</a></span>(CLLvFL, padj<span class="op">&lt;=</span>qvaluecutoff <span class="op">&amp;</span><span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/MathFun.html">abs</a></span>(log2FoldChange)<span class="op">&gt;=</span>log2cutoff)))</a>
-<a class="sourceLine" id="cb16-7" title="7"><span class="kw"><a href="https://rdrr.io/r/base/length.html">length</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/colnames.html">rownames</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/subset.html">subset</a></span>(DLvFL, padj<span class="op">&lt;=</span>qvaluecutoff <span class="op">&amp;</span><span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/MathFun.html">abs</a></span>(log2FoldChange)<span class="op">&gt;=</span>log2cutoff)))</a>
-<a class="sourceLine" id="cb16-8" title="8"><span class="kw"><a href="https://rdrr.io/r/base/length.html">length</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/colnames.html">rownames</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/subset.html">subset</a></span>(DLvNORM, padj<span class="op">&lt;=</span>qvaluecutoff <span class="op">&amp;</span><span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/MathFun.html">abs</a></span>(log2FoldChange)<span class="op">&gt;=</span>log2cutoff)))</a>
-<a class="sourceLine" id="cb16-9" title="9"><span class="kw"><a href="https://rdrr.io/r/base/length.html">length</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/colnames.html">rownames</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/subset.html">subset</a></span>(FLvNORM, padj<span class="op">&lt;=</span>qvaluecutoff <span class="op">&amp;</span><span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/MathFun.html">abs</a></span>(log2FoldChange)<span class="op">&gt;=</span>log2cutoff)))</a></code></pre></div>
-<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb17-1" title="1"><span class="co"># R</span></a>
-<a class="sourceLine" id="cb17-2" title="2"><span class="co"># Top 100 for each category.</span></a>
-<a class="sourceLine" id="cb17-3" title="3">DLvFL<span class="fl">.100</span> &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/subset.html">subset</a></span>(DLvFL, padj <span class="op">&lt;=</span><span class="st"> </span>qvaluecutoff <span class="op">&amp;</span><span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/MathFun.html">abs</a></span>(log2FoldChange) <span class="op">&gt;=</span><span class="st"> </span>log2cutoff)</a>
-<a class="sourceLine" id="cb17-4" title="4">DLvFL<span class="fl">.100</span> &lt;-<span class="st"> </span>DLvFL<span class="fl">.100</span>[<span class="kw"><a href="https://rdrr.io/r/base/order.html">order</a></span>(<span class="op">-</span>(<span class="kw"><a href="https://rdrr.io/r/base/MathFun.html">abs</a></span>(DLvFL<span class="fl">.100</span><span class="op">$</span>log2FoldChange))),]</a>
-<a class="sourceLine" id="cb17-5" title="5">DLvFL<span class="fl">.100</span> &lt;-<span class="st"> </span>DLvFL<span class="fl">.100</span>[<span class="dv">1</span><span class="op">:</span><span class="dv">100</span>,]</a></code></pre></div>
-</div>
-<div id="gene-enrichment" class="section level3">
-<h3 class="hasAnchor">
-<a href="#gene-enrichment" class="anchor"></a>Gene enrichment</h3>
-<p>Pathway/GO, etc. Using functions from <code>EZscRNA</code>.</p>
-<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb18-1" title="1"><span class="co"># R</span></a>
-<a class="sourceLine" id="cb18-2" title="2">RunEnrichr &lt;-<span class="st"> </span><span class="cf">function</span>(genes, <span class="dt">libraries =</span> <span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"GO_Molecular_Function_2018"</span>, </a>
-<a class="sourceLine" id="cb18-3" title="3">    <span class="st">"GO_Cellular_Component_2018"</span>, <span class="st">"GO_Biological_Process_2018"</span>, <span class="st">"KEGG_2019_Human"</span>,</a>
-<a class="sourceLine" id="cb18-4" title="4">    <span class="st">"Reactome_2016"</span>, <span class="st">"BioCarta_2016"</span>, <span class="st">"Panther_2016"</span>), <span class="dt">outdir =</span> <span class="ot">NULL</span>) {</a>
-<a class="sourceLine" id="cb18-5" title="5"></a>
-<a class="sourceLine" id="cb18-6" title="6">    <span class="co"># Required or package will throw an error saying the website is not responding</span></a>
-<a class="sourceLine" id="cb18-7" title="7">    <span class="co"># due to poor checking.</span></a>
-<a class="sourceLine" id="cb18-8" title="8">    <span class="kw"><a href="https://rdrr.io/r/base/options.html">options</a></span>(<span class="dt">base_address =</span> <span class="st">"http://amp.pharm.mssm.edu/Enrichr/"</span>)</a>
-<a class="sourceLine" id="cb18-9" title="9">    <span class="kw"><a href="https://rdrr.io/r/base/options.html">options</a></span>(<span class="dt">enrichRLive =</span> <span class="ot">TRUE</span>)</a>
-<a class="sourceLine" id="cb18-10" title="10"></a>
-<a class="sourceLine" id="cb18-11" title="11">    <span class="co"># Run enrichments.</span></a>
-<a class="sourceLine" id="cb18-12" title="12">    <span class="kw"><a href="https://rdrr.io/r/base/message.html">message</a></span>(<span class="st">"Submitting sets to the Enrichr server. Please be patient, this can"</span>,</a>
-<a class="sourceLine" id="cb18-13" title="13">        <span class="st">" sometimes take a few minutes if the server is under heavy load or down."</span>)</a>
-<a class="sourceLine" id="cb18-14" title="14">    results &lt;-<span class="st"> </span><span class="kw">enrichr</span>(genes, libraries)</a>
-<a class="sourceLine" id="cb18-15" title="15">    res.names &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/names.html">names</a></span>(results)</a>
-<a class="sourceLine" id="cb18-16" title="16"></a>
-<a class="sourceLine" id="cb18-17" title="17">    <span class="cf">if</span> (<span class="op">!</span><span class="kw"><a href="https://rdrr.io/r/base/NULL.html">is.null</a></span>(outdir)) {</a>
-<a class="sourceLine" id="cb18-18" title="18">        y =<span class="st"> </span><span class="dv">1</span></a>
-<a class="sourceLine" id="cb18-19" title="19">        <span class="cf">for</span> (i <span class="cf">in</span> results) {</a>
-<a class="sourceLine" id="cb18-20" title="20">            df &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/as.data.frame.html">as.data.frame</a></span>(i, <span class="dt">sep =</span> <span class="st">"</span><span class="ch">\t</span><span class="st">"</span>)</a>
-<a class="sourceLine" id="cb18-21" title="21">            df<span class="op">$</span>Old.P.value &lt;-<span class="st"> </span><span class="ot">NULL</span></a>
-<a class="sourceLine" id="cb18-22" title="22">            df<span class="op">$</span>Old.Adjusted.P.value &lt;-<span class="st"> </span><span class="ot">NULL</span></a>
-<a class="sourceLine" id="cb18-23" title="23">            <span class="kw"><a href="https://rdrr.io/r/utils/write.table.html">write.table</a></span>(df, <span class="dt">file =</span> <span class="kw"><a href="https://rdrr.io/r/base/sprintf.html">sprintf</a></span>(<span class="st">"%s/%s.Results.txt"</span>, outdir, res.names[y]),</a>
-<a class="sourceLine" id="cb18-24" title="24">                <span class="dt">sep =</span> <span class="st">"</span><span class="ch">\t</span><span class="st">"</span>, <span class="dt">quote =</span> <span class="ot">FALSE</span>, <span class="dt">row.names =</span> <span class="ot">FALSE</span>)</a>
-<a class="sourceLine" id="cb18-25" title="25">            y &lt;-<span class="st"> </span>y <span class="op">+</span><span class="st"> </span><span class="dv">1</span></a>
-<a class="sourceLine" id="cb18-26" title="26">        }</a>
-<a class="sourceLine" id="cb18-27" title="27">    }</a>
-<a class="sourceLine" id="cb18-28" title="28"></a>
-<a class="sourceLine" id="cb18-29" title="29">    <span class="kw"><a href="https://rdrr.io/r/base/function.html">return</a></span>(results)</a>
-<a class="sourceLine" id="cb18-30" title="30">}</a></code></pre></div>
-<p>This one actually creates the plots.</p>
-<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb19-1" title="1"><span class="co"># R</span></a>
-<a class="sourceLine" id="cb19-2" title="2">VizEnrichments &lt;-<span class="st"> </span><span class="cf">function</span>(enrichments, <span class="dt">outdir =</span> <span class="ot">NULL</span>, </a>
-<a class="sourceLine" id="cb19-3" title="3">    <span class="dt">n.terms =</span> <span class="dv">10</span>, <span class="dt">remove.insig =</span> <span class="ot">TRUE</span>, <span class="dt">adj.p.thresh =</span> <span class="fl">0.05</span>, </a>
-<a class="sourceLine" id="cb19-4" title="4">    <span class="dt">colors =</span> <span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"grey"</span>, <span class="st">"darkred"</span>)) {</a>
-<a class="sourceLine" id="cb19-5" title="5"></a>
-<a class="sourceLine" id="cb19-6" title="6">    <span class="cf">if</span> (<span class="kw"><a href="https://rdrr.io/r/base/length.html">length</a></span>(colors) <span class="op">&gt;</span><span class="st"> </span><span class="dv">2</span>) {</a>
-<a class="sourceLine" id="cb19-7" title="7">        <span class="kw"><a href="https://rdrr.io/r/base/stop.html">stop</a></span>(<span class="st">"Only two colors can be provided, get that fancy stuff outta here."</span>)</a>
-<a class="sourceLine" id="cb19-8" title="8">    }</a>
-<a class="sourceLine" id="cb19-9" title="9"></a>
-<a class="sourceLine" id="cb19-10" title="10">    ind =<span class="st"> </span><span class="dv">1</span></a>
-<a class="sourceLine" id="cb19-11" title="11">    <span class="cf">for</span> (i <span class="cf">in</span> enrichments) {</a>
-<a class="sourceLine" id="cb19-12" title="12">        lib &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/names.html">names</a></span>(enrichments[ind])</a>
-<a class="sourceLine" id="cb19-13" title="13">        ind &lt;-<span class="st"> </span>ind <span class="op">+</span><span class="st"> </span><span class="dv">1</span></a>
-<a class="sourceLine" id="cb19-14" title="14">        <span class="co"># Significance filter.</span></a>
-<a class="sourceLine" id="cb19-15" title="15">        <span class="cf">if</span> (<span class="kw"><a href="https://rdrr.io/r/base/Logic.html">isTRUE</a></span>(remove.insig)) {</a>
-<a class="sourceLine" id="cb19-16" title="16">            i &lt;-<span class="st"> </span>i[<span class="kw"><a href="https://rdrr.io/r/base/which.html">which</a></span>(i<span class="op">$</span>Adjusted.P.value <span class="op">&lt;=</span><span class="st"> </span>adj.p.thresh), ]</a>
-<a class="sourceLine" id="cb19-17" title="17">            <span class="cf">if</span> (<span class="kw"><a href="https://rdrr.io/r/base/nrow.html">nrow</a></span>(i) <span class="op">==</span><span class="st"> </span><span class="dv">0</span>) {</a>
-<a class="sourceLine" id="cb19-18" title="18">                <span class="kw"><a href="https://rdrr.io/r/base/message.html">message</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/paste.html">paste0</a></span>(<span class="st">"Skipping "</span>, lib, <span class="st">" due to no terms meeting the "</span>,</a>
-<a class="sourceLine" id="cb19-19" title="19">                    <span class="st">"significance threshold."</span>))</a>
-<a class="sourceLine" id="cb19-20" title="20">                <span class="cf">next</span></a>
-<a class="sourceLine" id="cb19-21" title="21">            }</a>
-<a class="sourceLine" id="cb19-22" title="22">        }</a>
-<a class="sourceLine" id="cb19-23" title="23"></a>
-<a class="sourceLine" id="cb19-24" title="24">        <span class="kw"><a href="https://rdrr.io/r/base/message.html">message</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/paste.html">paste0</a></span>(<span class="st">"Plotting "</span>, lib))</a>
-<a class="sourceLine" id="cb19-25" title="25"></a>
-<a class="sourceLine" id="cb19-26" title="26">        i<span class="op">$</span>log.Adj.p &lt;-<span class="st"> </span><span class="op">-</span><span class="kw"><a href="https://rdrr.io/r/base/Log.html">log10</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/numeric.html">as.numeric</a></span>(i<span class="op">$</span>Adjusted.P.value))</a>
-<a class="sourceLine" id="cb19-27" title="27">        i.p &lt;-<span class="st"> </span>i[<span class="kw"><a href="https://rdrr.io/r/base/order.html">order</a></span>(<span class="op">-</span>i<span class="op">$</span>log.Adj.p),]</a>
-<a class="sourceLine" id="cb19-28" title="28">        i.s &lt;-<span class="st"> </span>i[<span class="kw"><a href="https://rdrr.io/r/base/order.html">order</a></span>(<span class="op">-</span>i<span class="op">$</span>Combined.Score),]</a>
-<a class="sourceLine" id="cb19-29" title="29"></a>
-<a class="sourceLine" id="cb19-30" title="30">        <span class="co"># Limit number of terms.</span></a>
-<a class="sourceLine" id="cb19-31" title="31">        <span class="cf">if</span> (<span class="op">!</span><span class="kw"><a href="https://rdrr.io/r/base/NULL.html">is.null</a></span>(n.terms)) {</a>
-<a class="sourceLine" id="cb19-32" title="32">            <span class="cf">if</span> (<span class="kw"><a href="https://rdrr.io/r/base/nrow.html">nrow</a></span>(i) <span class="op">&gt;</span><span class="st"> </span>n.terms) {</a>
-<a class="sourceLine" id="cb19-33" title="33">                i.p &lt;-<span class="st"> </span>i.p[<span class="dv">1</span><span class="op">:</span>n.terms, ]</a>
-<a class="sourceLine" id="cb19-34" title="34">                i.s &lt;-<span class="st"> </span>i.s[<span class="dv">1</span><span class="op">:</span>n.terms, ]</a>
-<a class="sourceLine" id="cb19-35" title="35">            }</a>
-<a class="sourceLine" id="cb19-36" title="36">        }</a>
-<a class="sourceLine" id="cb19-37" title="37">        </a>
-<a class="sourceLine" id="cb19-38" title="38">        p1 &lt;-<span class="st"> </span><span class="kw">ggplot</span>(i.p, <span class="kw">aes</span>(<span class="dt">x =</span> <span class="kw"><a href="https://rdrr.io/r/stats/reorder.factor.html">reorder</a></span>(Term, log.Adj.p),</a>
-<a class="sourceLine" id="cb19-39" title="39">            log.Adj.p, <span class="dt">fill =</span> log.Adj.p)) <span class="op">+</span><span class="st"> </span><span class="kw">geom_col</span>() <span class="op">+</span><span class="st"> </span><span class="kw">coord_flip</span>() <span class="op">+</span></a>
-<a class="sourceLine" id="cb19-40" title="40"><span class="st">            </span>cowplot<span class="op">::</span><span class="kw"><a href="https://rdrr.io/pkg/cowplot/man/theme_cowplot.html">theme_cowplot</a></span>(<span class="dv">12</span>) <span class="op">+</span><span class="st"> </span><span class="kw">theme</span>(<span class="dt">axis.text.y =</span> <span class="kw">element_text</span>(<span class="dt">size =</span> <span class="dv">7</span>), </a>
-<a class="sourceLine" id="cb19-41" title="41">                <span class="dt">legend.title =</span> <span class="kw">element_text</span>(<span class="dt">size=</span><span class="dv">10</span>), </a>
-<a class="sourceLine" id="cb19-42" title="42">                <span class="dt">legend.text =</span> <span class="kw">element_text</span>(<span class="dt">size =</span> <span class="dv">10</span>)) <span class="op">+</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb19-43" title="43"><span class="st">            </span><span class="kw">scale_x_discrete</span>(<span class="dt">labels =</span> <span class="kw">wrap_format</span>(<span class="dv">40</span>)) <span class="op">+</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb19-44" title="44"><span class="st">            </span><span class="kw">scale_fill_gradient</span>(<span class="dt">low =</span> colors[<span class="dv">1</span>], <span class="dt">high =</span> colors[<span class="dv">2</span>]) <span class="op">+</span><span class="st"> </span><span class="kw">xlab</span>(<span class="st">"Term"</span>) <span class="op">+</span></a>
-<a class="sourceLine" id="cb19-45" title="45"><span class="st">            </span><span class="kw">ylab</span>(<span class="st">"-log10(Adjusted p-value)"</span>) <span class="op">+</span><span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/graphics/plot.window.html">ylim</a></span>(<span class="dv">0</span>, <span class="ot">NA</span>)</a>
-<a class="sourceLine" id="cb19-46" title="46"></a>
-<a class="sourceLine" id="cb19-47" title="47">        p2 &lt;-<span class="st"> </span><span class="kw">ggplot</span>(i.s, <span class="kw">aes</span>(<span class="dt">x =</span> <span class="kw"><a href="https://rdrr.io/r/stats/reorder.factor.html">reorder</a></span>(Term, Combined.Score), </a>
-<a class="sourceLine" id="cb19-48" title="48">            Combined.Score, <span class="dt">fill =</span> log.Adj.p)) <span class="op">+</span><span class="st"> </span><span class="kw">geom_col</span>() <span class="op">+</span><span class="st"> </span><span class="kw">coord_flip</span>() <span class="op">+</span></a>
-<a class="sourceLine" id="cb19-49" title="49"><span class="st">            </span>cowplot<span class="op">::</span><span class="kw"><a href="https://rdrr.io/pkg/cowplot/man/theme_cowplot.html">theme_cowplot</a></span>(<span class="dv">12</span>) <span class="op">+</span><span class="st"> </span><span class="kw">theme</span>(<span class="dt">axis.text.y =</span> <span class="kw">element_text</span>(<span class="dt">size =</span> <span class="dv">7</span>), </a>
-<a class="sourceLine" id="cb19-50" title="50">                <span class="dt">legend.title =</span> <span class="kw">element_text</span>(<span class="dt">size=</span><span class="dv">10</span>), </a>
-<a class="sourceLine" id="cb19-51" title="51">                <span class="dt">legend.text =</span> <span class="kw">element_text</span>(<span class="dt">size =</span> <span class="dv">10</span>)) <span class="op">+</span></a>
-<a class="sourceLine" id="cb19-52" title="52"><span class="st">            </span><span class="kw">scale_x_discrete</span>(<span class="dt">labels =</span> <span class="kw">wrap_format</span>(<span class="dv">40</span>)) <span class="op">+</span></a>
-<a class="sourceLine" id="cb19-53" title="53"><span class="st">            </span><span class="kw">scale_fill_gradient</span>(<span class="dt">low =</span> colors[<span class="dv">1</span>], <span class="dt">high =</span> colors[<span class="dv">2</span>]) <span class="op">+</span><span class="st"> </span><span class="kw">xlab</span>(<span class="st">"Term"</span>) <span class="op">+</span></a>
-<a class="sourceLine" id="cb19-54" title="54"><span class="st">            </span><span class="kw">ylab</span>(<span class="st">"Combined Score (Enrichr)"</span>)</a>
-<a class="sourceLine" id="cb19-55" title="55"></a>
-<a class="sourceLine" id="cb19-56" title="56">    c &lt;-<span class="st"> </span>cowplot<span class="op">::</span><span class="kw"><a href="https://rdrr.io/pkg/cowplot/man/plot_grid.html">plot_grid</a></span>(</a>
-<a class="sourceLine" id="cb19-57" title="57">      p1, p2, <span class="dt">rel_widths =</span> <span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="dv">1</span>, <span class="dv">1</span>),</a>
-<a class="sourceLine" id="cb19-58" title="58">      <span class="dt">nrow =</span> <span class="dv">1</span></a>
-<a class="sourceLine" id="cb19-59" title="59">    )</a>
-<a class="sourceLine" id="cb19-60" title="60"></a>
-<a class="sourceLine" id="cb19-61" title="61">        h &lt;-<span class="st"> </span><span class="fl">0.8</span> <span class="op">+</span><span class="st"> </span>(<span class="fl">0.35</span> <span class="op">*</span><span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/nrow.html">nrow</a></span>(i.p))</a>
-<a class="sourceLine" id="cb19-62" title="62"></a>
-<a class="sourceLine" id="cb19-63" title="63">    <span class="cf">if</span> (<span class="op">!</span><span class="kw"><a href="https://rdrr.io/r/base/NULL.html">is.null</a></span>(outdir)) {</a>
-<a class="sourceLine" id="cb19-64" title="64">          <span class="kw"><a href="https://rdrr.io/r/grDevices/pdf.html">pdf</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/sprintf.html">sprintf</a></span>(<span class="st">"%s/%s.Enrichments.pdf"</span>, outdir, lib), <span class="dt">height =</span> h, <span class="dt">width =</span> <span class="dv">12</span>)</a>
-<a class="sourceLine" id="cb19-65" title="65">          <span class="kw"><a href="https://rdrr.io/r/base/print.html">print</a></span>(c)</a>
-<a class="sourceLine" id="cb19-66" title="66">          <span class="kw"><a href="https://rdrr.io/r/grDevices/dev.html">dev.off</a></span>()</a>
-<a class="sourceLine" id="cb19-67" title="67">    } <span class="cf">else</span> {</a>
-<a class="sourceLine" id="cb19-68" title="68">      <span class="kw"><a href="https://rdrr.io/r/base/print.html">print</a></span>(c)</a>
-<a class="sourceLine" id="cb19-69" title="69">    }</a>
-<a class="sourceLine" id="cb19-70" title="70">    }</a>
-<a class="sourceLine" id="cb19-71" title="71">}</a></code></pre></div>
-<p>This will run both of the above on all DEGs, then those upregulated in each condition separately.</p>
-<div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb20-1" title="1"><span class="co"># R</span></a>
-<a class="sourceLine" id="cb20-2" title="2">DoEnrichments &lt;-<span class="st"> </span><span class="cf">function</span>(samp1, samp2, results, baseout, <span class="dt">padj.thresh =</span> <span class="fl">0.01</span>, <span class="dt">lfc.thresh =</span> <span class="dv">2</span>, <span class="dt">top.n =</span> <span class="ot">NULL</span>) {</a>
-<a class="sourceLine" id="cb20-3" title="3">    base &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/paste.html">paste0</a></span>(baseout, samp1, <span class="st">"v"</span>, samp2, <span class="st">"/padj.01.lfc2.read100/"</span>)</a>
-<a class="sourceLine" id="cb20-4" title="4">    <span class="kw"><a href="https://rdrr.io/r/base/files2.html">dir.create</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/file.path.html">file.path</a></span>(base, <span class="st">"AllGenes"</span>), <span class="dt">showWarnings =</span> <span class="ot">FALSE</span>, <span class="dt">recursive =</span> <span class="ot">TRUE</span>)</a>
-<a class="sourceLine" id="cb20-5" title="5">    <span class="kw"><a href="https://rdrr.io/r/base/files2.html">dir.create</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/file.path.html">file.path</a></span>(base, <span class="kw"><a href="https://rdrr.io/r/base/paste.html">paste0</a></span>(samp1, <span class="st">"up"</span>)), <span class="dt">showWarnings =</span> <span class="ot">FALSE</span>, <span class="dt">recursive =</span> <span class="ot">TRUE</span>)</a>
-<a class="sourceLine" id="cb20-6" title="6">    <span class="kw"><a href="https://rdrr.io/r/base/files2.html">dir.create</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/file.path.html">file.path</a></span>(base, <span class="kw"><a href="https://rdrr.io/r/base/paste.html">paste0</a></span>(samp2, <span class="st">"up"</span>)), <span class="dt">showWarnings =</span> <span class="ot">FALSE</span>, <span class="dt">recursive =</span> <span class="ot">TRUE</span>)</a>
-<a class="sourceLine" id="cb20-7" title="7"></a>
-<a class="sourceLine" id="cb20-8" title="8">    One.Two &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/subset.html">subset</a></span>(results, padj <span class="op">&lt;=</span><span class="st"> </span>padj.thresh <span class="op">&amp;</span><span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/MathFun.html">abs</a></span>(log2FoldChange) <span class="op">&gt;=</span><span class="st"> </span>lfc.thresh)</a>
-<a class="sourceLine" id="cb20-9" title="9">    One.up &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/subset.html">subset</a></span>(results, padj <span class="op">&lt;=</span><span class="st"> </span>padj.thresh <span class="op">&amp;</span><span class="st"> </span>log2FoldChange <span class="op">&gt;=</span><span class="st"> </span>lfc.thresh)</a>
-<a class="sourceLine" id="cb20-10" title="10">    Two.up &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/subset.html">subset</a></span>(results, padj <span class="op">&lt;=</span><span class="st"> </span>padj.thresh <span class="op">&amp;</span><span class="st"> </span>log2FoldChange <span class="op">&lt;=</span><span class="st"> </span><span class="op">-</span>lfc.thresh)</a>
-<a class="sourceLine" id="cb20-11" title="11">    </a>
-<a class="sourceLine" id="cb20-12" title="12">    One.Two.terms &lt;-<span class="st"> </span><span class="kw">RunEnrichr</span>(<span class="kw"><a href="https://rdrr.io/r/base/colnames.html">rownames</a></span>(One.Two), <span class="dt">outdir =</span> <span class="kw"><a href="https://rdrr.io/r/base/paste.html">paste0</a></span>(base, <span class="st">"AllGenes"</span>))</a>
-<a class="sourceLine" id="cb20-13" title="13">    <span class="kw">VizEnrichments</span>(One.Two.terms, <span class="dt">outdir =</span> <span class="kw"><a href="https://rdrr.io/r/base/paste.html">paste0</a></span>(base, <span class="st">"AllGenes"</span>))</a>
-<a class="sourceLine" id="cb20-14" title="14"></a>
-<a class="sourceLine" id="cb20-15" title="15">    One.up.terms &lt;-<span class="st"> </span><span class="kw">RunEnrichr</span>(<span class="kw"><a href="https://rdrr.io/r/base/colnames.html">rownames</a></span>(One.up), <span class="dt">outdir =</span> <span class="kw"><a href="https://rdrr.io/r/base/paste.html">paste0</a></span>(base, samp1, <span class="st">"up"</span>))</a>
-<a class="sourceLine" id="cb20-16" title="16">    <span class="kw">VizEnrichments</span>(One.up.terms, <span class="dt">outdir =</span> <span class="kw"><a href="https://rdrr.io/r/base/paste.html">paste0</a></span>(base, samp1, <span class="st">"up"</span>))</a>
-<a class="sourceLine" id="cb20-17" title="17"></a>
-<a class="sourceLine" id="cb20-18" title="18">    Two.up.terms &lt;-<span class="st"> </span><span class="kw">RunEnrichr</span>(<span class="kw"><a href="https://rdrr.io/r/base/colnames.html">rownames</a></span>(Two.up), <span class="dt">outdir =</span> <span class="kw"><a href="https://rdrr.io/r/base/paste.html">paste0</a></span>(base, samp2, <span class="st">"up"</span>))</a>
-<a class="sourceLine" id="cb20-19" title="19">    <span class="kw">VizEnrichments</span>(Two.up.terms, <span class="dt">outdir =</span> <span class="kw"><a href="https://rdrr.io/r/base/paste.html">paste0</a></span>(base, samp2, <span class="st">"up"</span>))</a>
-<a class="sourceLine" id="cb20-20" title="20">    </a>
-<a class="sourceLine" id="cb20-21" title="21">    <span class="co"># If top hits set, do it for them as well.</span></a>
-<a class="sourceLine" id="cb20-22" title="22">    <span class="cf">if</span> (<span class="op">!</span><span class="kw"><a href="https://rdrr.io/r/base/NULL.html">is.null</a></span>(top.n)) {</a>
-<a class="sourceLine" id="cb20-23" title="23">        <span class="kw"><a href="https://rdrr.io/r/base/files2.html">dir.create</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/file.path.html">file.path</a></span>(base, <span class="st">"AllGenes"</span>, <span class="kw"><a href="https://rdrr.io/r/base/paste.html">paste0</a></span>(<span class="st">"Top"</span>, top.n)), <span class="dt">showWarnings =</span> <span class="ot">FALSE</span>, <span class="dt">recursive =</span> <span class="ot">TRUE</span>)</a>
-<a class="sourceLine" id="cb20-24" title="24">        <span class="kw"><a href="https://rdrr.io/r/base/files2.html">dir.create</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/file.path.html">file.path</a></span>(base, <span class="kw"><a href="https://rdrr.io/r/base/paste.html">paste0</a></span>(samp1, <span class="st">"up/"</span>, <span class="st">"Top"</span>, top.n)), <span class="dt">showWarnings =</span> <span class="ot">FALSE</span>, <span class="dt">recursive =</span> <span class="ot">TRUE</span>)</a>
-<a class="sourceLine" id="cb20-25" title="25">        <span class="kw"><a href="https://rdrr.io/r/base/files2.html">dir.create</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/file.path.html">file.path</a></span>(base, <span class="kw"><a href="https://rdrr.io/r/base/paste.html">paste0</a></span>(samp2, <span class="st">"up/"</span>, <span class="st">"Top"</span>, top.n)), <span class="dt">showWarnings =</span> <span class="ot">FALSE</span>, <span class="dt">recursive =</span> <span class="ot">TRUE</span>)</a>
-<a class="sourceLine" id="cb20-26" title="26">        </a>
-<a class="sourceLine" id="cb20-27" title="27">        <span class="co"># Top 100 for each category.</span></a>
-<a class="sourceLine" id="cb20-28" title="28">        One.Two.top.n &lt;-<span class="st"> </span>One.Two[<span class="kw"><a href="https://rdrr.io/r/base/order.html">order</a></span>(<span class="op">-</span>(<span class="kw"><a href="https://rdrr.io/r/base/MathFun.html">abs</a></span>(One.Two<span class="op">$</span>log2FoldChange))),]</a>
-<a class="sourceLine" id="cb20-29" title="29">        One.Two.top.n &lt;-<span class="st"> </span>One.Two.top.n[<span class="dv">1</span><span class="op">:</span>top.n,]</a>
-<a class="sourceLine" id="cb20-30" title="30">        </a>
-<a class="sourceLine" id="cb20-31" title="31">        One.Two.top.n.terms &lt;-<span class="st"> </span><span class="kw">RunEnrichr</span>(<span class="kw"><a href="https://rdrr.io/r/base/colnames.html">rownames</a></span>(One.Two.top.n), <span class="dt">outdir =</span> <span class="kw"><a href="https://rdrr.io/r/base/paste.html">paste0</a></span>(base, <span class="st">"AllGenes/Top"</span>, top.n))</a>
-<a class="sourceLine" id="cb20-32" title="32">        <span class="kw">VizEnrichments</span>(One.Two.top.n.terms, <span class="dt">outdir =</span> <span class="kw"><a href="https://rdrr.io/r/base/paste.html">paste0</a></span>(base, <span class="st">"AllGenes/Top"</span>, top.n))</a>
-<a class="sourceLine" id="cb20-33" title="33"></a>
-<a class="sourceLine" id="cb20-34" title="34">        One.up.top.n &lt;-<span class="st"> </span>One.Two[<span class="kw"><a href="https://rdrr.io/r/base/order.html">order</a></span>(<span class="op">-</span>One.Two<span class="op">$</span>log2FoldChange),]</a>
-<a class="sourceLine" id="cb20-35" title="35">        One.up.top.n &lt;-<span class="st"> </span>One.up.top.n[<span class="dv">1</span><span class="op">:</span>top.n,]</a>
-<a class="sourceLine" id="cb20-36" title="36">        </a>
-<a class="sourceLine" id="cb20-37" title="37">        One.up.top.n.terms &lt;-<span class="st"> </span><span class="kw">RunEnrichr</span>(<span class="kw"><a href="https://rdrr.io/r/base/colnames.html">rownames</a></span>(One.up.top.n), <span class="dt">outdir =</span> <span class="kw"><a href="https://rdrr.io/r/base/paste.html">paste0</a></span>(base, samp1, <span class="st">"up/Top"</span>, top.n))</a>
-<a class="sourceLine" id="cb20-38" title="38">        <span class="kw">VizEnrichments</span>(One.up.top.n.terms, <span class="dt">outdir =</span> <span class="kw"><a href="https://rdrr.io/r/base/paste.html">paste0</a></span>(base, samp1, <span class="st">"up/Top"</span>, top.n))</a>
-<a class="sourceLine" id="cb20-39" title="39"></a>
-<a class="sourceLine" id="cb20-40" title="40">        Two.up.top.n &lt;-<span class="st"> </span>One.Two[<span class="kw"><a href="https://rdrr.io/r/base/order.html">order</a></span>(One.Two<span class="op">$</span>log2FoldChange),]</a>
-<a class="sourceLine" id="cb20-41" title="41">        Two.up.top.n &lt;-<span class="st"> </span>Two.up.top.n[<span class="dv">1</span><span class="op">:</span>top.n,]</a>
-<a class="sourceLine" id="cb20-42" title="42">        </a>
-<a class="sourceLine" id="cb20-43" title="43">        Two.up.top.n.terms &lt;-<span class="st"> </span><span class="kw">RunEnrichr</span>(<span class="kw"><a href="https://rdrr.io/r/base/colnames.html">rownames</a></span>(Two.up.top.n), <span class="dt">outdir =</span> <span class="kw"><a href="https://rdrr.io/r/base/paste.html">paste0</a></span>(base, samp2, <span class="st">"up/Top"</span>, top.n))</a>
-<a class="sourceLine" id="cb20-44" title="44">        <span class="kw">VizEnrichments</span>(Two.up.top.n.terms, <span class="dt">outdir =</span> <span class="kw"><a href="https://rdrr.io/r/base/paste.html">paste0</a></span>(base, samp2, <span class="st">"up/Top"</span>, top.n))</a>
-<a class="sourceLine" id="cb20-45" title="45">    }</a>
-<a class="sourceLine" id="cb20-46" title="46">}</a></code></pre></div>
-<div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb21-1" title="1"><span class="co"># R</span></a>
-<a class="sourceLine" id="cb21-2" title="2"><span class="co"># Run above function for each comparison.</span></a>
-<a class="sourceLine" id="cb21-3" title="3">baseout &lt;-<span class="st"> "./RNA_Seq/Final_Analyses/EnrichmentTablesFigures/"</span></a>
-<a class="sourceLine" id="cb21-4" title="4"><span class="kw"><a href="../reference/DoEnrichments.html">DoEnrichments</a></span>(<span class="st">"CLL"</span>, <span class="st">"NORM"</span>, CLLvNORM, baseout, <span class="dt">top.n =</span> <span class="dv">500</span>)</a>
-<a class="sourceLine" id="cb21-5" title="5"><span class="kw"><a href="../reference/DoEnrichments.html">DoEnrichments</a></span>(<span class="st">"CLL"</span>, <span class="st">"DL"</span>, CLLvDL, baseout, <span class="dt">top.n =</span> <span class="dv">500</span>)</a>
-<a class="sourceLine" id="cb21-6" title="6"><span class="kw"><a href="../reference/DoEnrichments.html">DoEnrichments</a></span>(<span class="st">"CLL"</span>, <span class="st">"FL"</span>, CLLvFL, baseout, <span class="dt">top.n =</span> <span class="dv">500</span>)</a>
-<a class="sourceLine" id="cb21-7" title="7"><span class="kw"><a href="../reference/DoEnrichments.html">DoEnrichments</a></span>(<span class="st">"DL"</span>, <span class="st">"FL"</span>, DLvFL, baseout, <span class="dt">top.n =</span> <span class="dv">500</span>)</a>
-<a class="sourceLine" id="cb21-8" title="8"><span class="kw"><a href="../reference/DoEnrichments.html">DoEnrichments</a></span>(<span class="st">"DL"</span>, <span class="st">"NORM"</span>, DLvNORM, baseout, <span class="dt">top.n =</span> <span class="dv">500</span>)</a>
-<a class="sourceLine" id="cb21-9" title="9"><span class="kw"><a href="../reference/DoEnrichments.html">DoEnrichments</a></span>(<span class="st">"FL"</span>, <span class="st">"NORM"</span>, FLvNORM, baseout, <span class="dt">top.n =</span> <span class="dv">500</span>)</a></code></pre></div>
-<p>That gets a ‘yikes’ from me. Normals may have talking points, but not much poppin’ for the others. Might have to go to GSEA.</p>
-</div>
-<div id="save-counts" class="section level3">
-<h3 class="hasAnchor">
-<a href="#save-counts" class="anchor"></a>Save counts</h3>
-<div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb22-1" title="1"><span class="co"># R</span></a>
-<a class="sourceLine" id="cb22-2" title="2"><span class="kw"><a href="https://rdrr.io/r/utils/write.table.html">write.table</a></span>(<span class="kw">assay</span>(vsd), <span class="dt">file =</span> <span class="st">"./DESeq2_out/vsd.counts.txt"</span>, <span class="dt">sep =</span> <span class="st">"</span><span class="ch">\t</span><span class="st">"</span>, <span class="dt">quote =</span> <span class="ot">FALSE</span>)</a>
-<a class="sourceLine" id="cb22-3" title="3"><span class="kw"><a href="https://rdrr.io/r/utils/write.table.html">write.table</a></span>(<span class="kw">assay</span>(rld), <span class="dt">file =</span> <span class="st">"./DESeq2_out/rld.counts.txt"</span>, <span class="dt">sep =</span> <span class="st">"</span><span class="ch">\t</span><span class="st">"</span>, <span class="dt">quote =</span> <span class="ot">FALSE</span>)</a>
-<a class="sourceLine" id="cb22-4" title="4"></a>
-<a class="sourceLine" id="cb22-5" title="5"><span class="co"># Retrieve the count/size factor normalized counts.</span></a>
-<a class="sourceLine" id="cb22-6" title="6">counts &lt;-<span class="st"> </span><span class="kw">counts</span>(dds, <span class="dt">normalized =</span> <span class="ot">TRUE</span>)</a>
-<a class="sourceLine" id="cb22-7" title="7"></a>
-<a class="sourceLine" id="cb22-8" title="8"><span class="kw"><a href="https://rdrr.io/r/utils/write.table.html">write.table</a></span>(counts, <span class="dt">file =</span> <span class="st">"./DESeq2_out/normalized.counts.txt"</span>, <span class="dt">sep =</span> <span class="st">"</span><span class="ch">\t</span><span class="st">"</span>, <span class="dt">quote =</span> <span class="ot">FALSE</span>)</a>
-<a class="sourceLine" id="cb22-9" title="9"><span class="co"># And log2 transformed.</span></a>
-<a class="sourceLine" id="cb22-10" title="10"><span class="kw"><a href="https://rdrr.io/r/utils/write.table.html">write.table</a></span>(<span class="kw">assay</span>(<span class="kw">normTransform</span>(dds)), <span class="dt">file =</span> <span class="st">"./DESeq2_out/log2.normalized.counts.txt"</span>, <span class="dt">sep =</span> <span class="st">"</span><span class="ch">\t</span><span class="st">"</span>, <span class="dt">quote =</span> <span class="ot">FALSE</span>)</a></code></pre></div>
-</div>
-</div>
-</div>
-<div id="chip-seq" class="section level1">
-<h1 class="hasAnchor">
-<a href="#chip-seq" class="anchor"></a>ChIP-seq</h1>
-<p>Now for this stuff.</p>
-<div id="load-libraries" class="section level3">
-<h3 class="hasAnchor">
-<a href="#load-libraries" class="anchor"></a>Load libraries</h3>
-<p>Need these.</p>
-<div class="sourceCode" id="cb23"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb23-1" title="1"><span class="co"># R</span></a>
-<a class="sourceLine" id="cb23-2" title="2"><span class="kw"><a href="https://rdrr.io/r/base/message.html">suppressPackageStartupMessages</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span>(ChIPQC))</a>
-<a class="sourceLine" id="cb23-3" title="3"><span class="kw"><a href="https://rdrr.io/r/base/message.html">suppressPackageStartupMessages</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span>(DiffBind))</a>
-<a class="sourceLine" id="cb23-4" title="4"><span class="kw"><a href="https://rdrr.io/r/base/message.html">suppressPackageStartupMessages</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span>(BiocParallel))</a>
-<a class="sourceLine" id="cb23-5" title="5"></a>
-<a class="sourceLine" id="cb23-6" title="6"><span class="kw">register</span>(<span class="kw">SerialParam</span>())</a></code></pre></div>
-</div>
-<div id="pre-filter" class="section level3">
-<h3 class="hasAnchor">
-<a href="#pre-filter" class="anchor"></a>Pre-filter</h3>
-<p>Remove garbage chromosomes.</p>
-<div class="sourceCode" id="cb24"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb24-1" title="1"><span class="co"># bash</span></a>
-<a class="sourceLine" id="cb24-2" title="2"><span class="va">marks=(</span>FAIRE H3AC H3K27AC H3K4ME1<span class="va">)</span></a>
-<a class="sourceLine" id="cb24-3" title="3"><span class="kw"><a href="https://rdrr.io/r/base/Control.html">for</a></span> <span class="ex">m</span> in <span class="st">"</span><span class="va">${marks[@]}</span><span class="st">"</span><span class="kw">;</span> <span class="kw">do</span></a>
-<a class="sourceLine" id="cb24-4" title="4">    <span class="kw"><a href="https://rdrr.io/r/base/Control.html">for</a></span> <span class="ex">f</span> in ./ChIP_Seq/MACS2/<span class="st">"</span><span class="va">$m</span><span class="st">"</span>/PEAKS_NARROW/*.narrowPeak<span class="kw">;</span> <span class="kw">do</span></a>
-<a class="sourceLine" id="cb24-5" title="5">        <span class="fu">sed</span> <span class="st">'/_g\|chrM\|un\|rand\|chrY\|chr23/d'</span> <span class="st">"</span><span class="va">$f</span><span class="st">"</span> <span class="op">&gt;</span> <span class="st">"</span><span class="va">$f</span><span class="st">"</span>.clean</a>
-<a class="sourceLine" id="cb24-6" title="6">        <span class="ex">rename.ul</span> .narrowPeak.clean .clean.narrowPeak <span class="st">"</span><span class="va">$f</span><span class="st">"</span>.clean</a>
-<a class="sourceLine" id="cb24-7" title="7">    <span class="kw">done</span></a>
-<a class="sourceLine" id="cb24-8" title="8"><span class="kw">done</span></a></code></pre></div>
-</div>
-<div id="qc" class="section level3">
-<h3 class="hasAnchor">
-<a href="#qc" class="anchor"></a>QC</h3>
-<p>Via <code>ChIPQC</code>. This package <em>suuuuuuuucks</em>. I always have trouble with getting it to run properly. If on Windows, be sure to set <code>register(SerialParam())</code> so that it doesn’t try to do multicore analysis, as it’s stupid and won’t work. The authors are also slow to keep it up to date, so new R/Bioconductor versions break it all the time. I actually had to download it from <a href="https://github.com/shengqh/ChIPQC">another repo</a> that included a fix to get it to run this time around.</p>
-<div class="sourceCode" id="cb25"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb25-1" title="1"><span class="co"># R</span></a>
-<a class="sourceLine" id="cb25-2" title="2">h3ac.exp &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/message.html">suppressMessages</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/warning.html">suppressWarnings</a></span>(<span class="kw">ChIPQC</span>(<span class="st">"./ChIP_Seq/ChIPQC/SampleSheet_H3AC_QC_narrow.NoCTRL.csv"</span>, <span class="dt">chromosomes =</span> <span class="st">"chr14"</span>, <span class="dt">consensus =</span> <span class="ot">TRUE</span>)))</a>
-<a class="sourceLine" id="cb25-3" title="3">k27ac.exp &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/message.html">suppressMessages</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/warning.html">suppressWarnings</a></span>(<span class="kw">ChIPQC</span>(<span class="st">"./ChIP_Seq/ChIPQC/SampleSheet_H3K27AC_QC_narrow.NoCTRL.csv"</span>, <span class="dt">chromosomes =</span> <span class="st">"chr14"</span>, <span class="dt">consensus =</span> <span class="ot">TRUE</span>)))</a>
-<a class="sourceLine" id="cb25-4" title="4">k4me1.exp &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/message.html">suppressMessages</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/warning.html">suppressWarnings</a></span>(<span class="kw">ChIPQC</span>(<span class="st">"./ChIP_Seq/ChIPQC/SampleSheet_H3K4ME1_QC_narrow.NoCTRL.csv"</span>, <span class="dt">chromosomes =</span> <span class="st">"chr14"</span>, <span class="dt">consensus =</span> <span class="ot">TRUE</span>)))</a>
-<a class="sourceLine" id="cb25-5" title="5">faire.exp &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/message.html">suppressMessages</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/warning.html">suppressWarnings</a></span>(<span class="kw">ChIPQC</span>(<span class="st">"./ChIP_Seq/ChIPQC/SampleSheet_FAIRE_QC_narrow.NoCTRL.csv"</span>, <span class="dt">chromosomes =</span> <span class="st">"chr14"</span>, <span class="dt">consensus =</span> <span class="ot">TRUE</span>)))</a></code></pre></div>
-<div class="sourceCode" id="cb26"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb26-1" title="1"><span class="co"># R</span></a>
-<a class="sourceLine" id="cb26-2" title="2"><span class="co"># Save metrics.</span></a>
-<a class="sourceLine" id="cb26-3" title="3"><span class="kw"><a href="https://rdrr.io/r/utils/write.table.html">write.table</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/as.data.frame.html">as.data.frame</a></span>(<span class="kw">QCmetrics</span>(h3ac.exp)), <span class="dt">file =</span> <span class="st">"./ChIP_Seq/ChIPQC/H3AC.QCmetrics.txt"</span>, <span class="dt">quote =</span> <span class="ot">FALSE</span>, <span class="dt">sep =</span> <span class="st">"</span><span class="ch">\t</span><span class="st">"</span>)</a>
-<a class="sourceLine" id="cb26-4" title="4"><span class="kw"><a href="https://rdrr.io/r/utils/write.table.html">write.table</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/as.data.frame.html">as.data.frame</a></span>(<span class="kw">QCmetrics</span>(k27ac.exp)), <span class="dt">file =</span> <span class="st">"./ChIP_Seq/ChIPQC/H3K27AC.QCmetrics.txt"</span>, <span class="dt">quote =</span> <span class="ot">FALSE</span>, <span class="dt">sep =</span> <span class="st">"</span><span class="ch">\t</span><span class="st">"</span>)</a>
-<a class="sourceLine" id="cb26-5" title="5"><span class="kw"><a href="https://rdrr.io/r/utils/write.table.html">write.table</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/as.data.frame.html">as.data.frame</a></span>(<span class="kw">QCmetrics</span>(k4me1.exp)), <span class="dt">file =</span> <span class="st">"./ChIP_Seq/ChIPQC/H3K4ME1.QCmetrics.txt"</span>, <span class="dt">quote =</span> <span class="ot">FALSE</span>, <span class="dt">sep =</span> <span class="st">"</span><span class="ch">\t</span><span class="st">"</span>)</a>
-<a class="sourceLine" id="cb26-6" title="6"><span class="kw"><a href="https://rdrr.io/r/utils/write.table.html">write.table</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/as.data.frame.html">as.data.frame</a></span>(<span class="kw">QCmetrics</span>(faire.exp)), <span class="dt">file =</span> <span class="st">"./ChIP_Seq/ChIPQC/FAIRE.QCmetrics.txt"</span>, <span class="dt">quote =</span> <span class="ot">FALSE</span>, <span class="dt">sep =</span> <span class="st">"</span><span class="ch">\t</span><span class="st">"</span>)</a></code></pre></div>
-</div>
-<div id="remove-shite-samples" class="section level3">
-<h3 class="hasAnchor">
-<a href="#remove-shite-samples" class="anchor"></a>Remove shite samples</h3>
-<p>Kick ’em off the sample sheets. I removed samples with the following metrics: - FAIRE - &lt;4% Reads in Peaks - H3AC - &lt;12% Reads in Peaks - H3K4ME1 - &lt;10.5% Reads in Peaks - H3K27AC - &lt;7.5% Reads in Peaks</p>
-<p>Picked rather arbitrarily, but generally used 2x the typical RiP of the input samples.</p>
 </div>
 </div>
 <div id="session-information" class="section level1">
 <h1 class="hasAnchor">
 <a href="#session-information" class="anchor"></a>Session Information</h1>
-<div class="sourceCode" id="cb27"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb27-1" title="1"><span class="kw"><a href="https://rdrr.io/r/utils/sessionInfo.html">sessionInfo</a></span>()</a></code></pre></div>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb10-1" title="1"><span class="kw"><a href="https://rdrr.io/r/utils/sessionInfo.html">sessionInfo</a></span>()</a></code></pre></div>
+<pre><code>## R version 3.6.1 (2019-07-05)
+## Platform: x86_64-w64-mingw32/x64 (64-bit)
+## Running under: Windows 10 x64 (build 16299)
+## 
+## Matrix products: default
+## 
+## locale:
+## [1] LC_COLLATE=English_United States.1252 
+## [2] LC_CTYPE=English_United States.1252   
+## [3] LC_MONETARY=English_United States.1252
+## [4] LC_NUMERIC=C                          
+## [5] LC_TIME=English_United States.1252    
+## 
+## attached base packages:
+## [1] stats     graphics  grDevices utils     datasets  methods   base     
+## 
+## other attached packages:
+## [1] AndrewsBCellLymphoma_0.0.0.9000 BiocStyle_2.13.2               
+## 
+## loaded via a namespace (and not attached):
+##   [1] reticulate_1.13             R.utils_2.9.0              
+##   [3] tidyselect_0.2.5            RSQLite_2.1.2              
+##   [5] AnnotationDbi_1.47.1        htmlwidgets_1.5.1          
+##   [7] grid_3.6.1                  BiocParallel_1.19.1        
+##   [9] Rtsne_0.15                  munsell_0.5.0              
+##  [11] preprocessCore_1.47.1       codetools_0.2-16           
+##  [13] ica_1.0-2                   future_1.14.0              
+##  [15] colorspace_1.4-1            Biobase_2.45.1             
+##  [17] knitr_1.25                  rstudioapi_0.10            
+##  [19] Seurat_3.1.1                stats4_3.6.1               
+##  [21] SingleCellExperiment_1.7.11 ROCR_1.0-7                 
+##  [23] gbRd_0.4-11                 listenv_0.7.0              
+##  [25] Rdpack_0.11-0               tximport_1.13.16           
+##  [27] GenomeInfoDbData_1.2.1      bit64_0.9-7                
+##  [29] pheatmap_1.0.12             rprojroot_1.3-2            
+##  [31] vctrs_0.2.0                 xfun_0.10                  
+##  [33] R6_2.4.0                    GenomeInfoDb_1.21.2        
+##  [35] ggbeeswarm_0.6.0            rsvd_1.0.2                 
+##  [37] locfit_1.5-9.1              bitops_1.0-6               
+##  [39] DelayedArray_0.11.7         assertthat_0.2.1           
+##  [41] SDMTools_1.1-221.1          scales_1.0.0               
+##  [43] nnet_7.3-12                 beeswarm_0.2.3             
+##  [45] gtable_0.3.0                npsurv_0.4-0               
+##  [47] affy_1.63.1                 globals_0.12.4             
+##  [49] rlang_0.4.0                 zeallot_0.1.0              
+##  [51] genefilter_1.67.1           splines_3.6.1              
+##  [53] lazyeval_0.2.2              acepack_1.4.1              
+##  [55] checkmate_1.9.4             BiocManager_1.30.7         
+##  [57] yaml_2.2.0                  reshape2_1.4.3             
+##  [59] backports_1.1.5             Hmisc_4.2-0                
+##  [61] tools_3.6.1                 bookdown_0.14              
+##  [63] ggplot2_3.2.1               affyio_1.55.0              
+##  [65] gplots_3.0.1.1              RColorBrewer_1.1-2         
+##  [67] BiocGenerics_0.31.6         ggridges_0.5.1             
+##  [69] Rcpp_1.0.2                  plyr_1.8.4                 
+##  [71] base64enc_0.1-3             zlibbioc_1.31.0            
+##  [73] purrr_0.3.2                 RCurl_1.95-4.12            
+##  [75] rpart_4.1-15                pbapply_1.4-2              
+##  [77] viridis_0.5.1               cowplot_1.0.0              
+##  [79] S4Vectors_0.23.25           zoo_1.8-6                  
+##  [81] SummarizedExperiment_1.15.9 ggrepel_0.8.1              
+##  [83] cluster_2.1.0               fs_1.3.1                   
+##  [85] magrittr_1.5                data.table_1.12.4          
+##  [87] lmtest_0.9-37               RANN_2.6.1                 
+##  [89] fitdistrplus_1.0-14         matrixStats_0.55.0         
+##  [91] lsei_1.2-0                  evaluate_0.14              
+##  [93] xtable_1.8-4                XML_3.98-1.20              
+##  [95] IRanges_2.19.16             gridExtra_2.3              
+##  [97] compiler_3.6.1              scater_1.13.24             
+##  [99] tibble_2.1.3                monocle3_0.1.3.0           
+## [101] KernSmooth_2.23-15          crayon_1.3.4               
+## [103] R.oo_1.22.0                 htmltools_0.4.0            
+## [105] Formula_1.2-3               tidyr_1.0.0                
+## [107] geneplotter_1.63.0          RcppParallel_4.4.4         
+## [109] DBI_1.0.0                   MASS_7.3-51.4              
+## [111] Matrix_1.2-17               vsn_3.53.0                 
+## [113] R.methodsS3_1.7.1           gdata_2.18.0               
+## [115] parallel_3.6.1              metap_1.1                  
+## [117] igraph_1.2.4.1              GenomicRanges_1.37.16      
+## [119] pkgconfig_2.0.3             pkgdown_1.4.1              
+## [121] foreign_0.8-71              plotly_4.9.0               
+## [123] annotate_1.63.0             vipor_0.4.5                
+## [125] EnhancedVolcano_1.3.5       XVector_0.25.0             
+## [127] bibtex_0.4.2                stringr_1.4.0              
+## [129] digest_0.6.21               sctransform_0.2.0          
+## [131] RcppAnnoy_0.0.13            tsne_0.1-3                 
+## [133] rmarkdown_1.16              leiden_0.3.1               
+## [135] enrichR_2.1                 htmlTable_1.13.2           
+## [137] uwot_0.1.4                  DelayedMatrixStats_1.7.2   
+## [139] gtools_3.8.1                rjson_0.2.20               
+## [141] lifecycle_0.1.0             EZscRNA_0.1.0.9000         
+## [143] nlme_3.1-140                jsonlite_1.6               
+## [145] BiocNeighbors_1.3.5         limma_3.41.17              
+## [147] desc_1.2.0                  viridisLite_0.3.0          
+## [149] pillar_1.4.2                lattice_0.20-38            
+## [151] httr_1.4.1                  survival_2.44-1.1          
+## [153] glue_1.3.1                  png_0.1-7                  
+## [155] bit_1.1-14                  stringi_1.4.3              
+## [157] blob_1.2.0                  DESeq2_1.25.13             
+## [159] BiocSingular_1.1.7          latticeExtra_0.6-28        
+## [161] caTools_1.17.1.2            memoise_1.1.0              
+## [163] dplyr_0.8.3                 irlba_2.3.3                
+## [165] future.apply_1.3.0          ape_5.3</code></pre>
 </div>
   </div>
 
@@ -621,12 +347,11 @@
       <ul class="nav nav-pills nav-stacked">
 <li><a href="#introduction">Introduction</a></li>
       <li>
-<a href="#rna-seq">RNA-seq</a><ul class="nav nav-pills nav-stacked">
+<a href="#suggested-reading">Suggested Reading</a><ul class="nav nav-pills nav-stacked">
 <li><a href="#generating-gene-counts">Generating gene counts</a></li>
       <li><a href="#analysis-with-r">Analysis with R</a></li>
       </ul>
 </li>
-      <li><a href="#chip-seq">ChIP-seq</a></li>
       <li><a href="#session-information">Session Information</a></li>
       </ul>
 </div>
@@ -637,7 +362,7 @@
 
 
       <footer><div class="copyright">
-  <p>Developed by Jared Andrews.</p>
+  <p>Developed by <a href="http://j-andrews7.github.io">Jared Andrews</a>.</p>
 </div>
 
 <div class="pkgdown">

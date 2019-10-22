@@ -37,7 +37,7 @@ PlotHeatmaps <- function(res.list, rld, vsd, level, outpath,
     "#b2182b", "#67001f"))(n = 1000)
   
   for (i in seq_along(res.list)) {
-    res <- res.list[i]
+    res <- res.list[[i]]
     comp <- names(res.list[i])
     message("Comparison set: ", comp)
     message(paste0("Creating heatmaps for genes with padj <= ", 
@@ -56,7 +56,7 @@ PlotHeatmaps <- function(res.list, rld, vsd, level, outpath,
       fc.thresh, ".Heatmaps.pdf"), height = 7, width = 5)
 
     if (nrow(ressig) > 1) {
-      for (x in c(rld, vsd)) {
+      for (x in list(rld, vsd)) {
         # Set which columns we want to use for annotating samples.
         annotation_data <- as.data.frame(colData(x)[,plot.annos])
 
@@ -66,13 +66,11 @@ PlotHeatmaps <- function(res.list, rld, vsd, level, outpath,
 
         pheatmap(matrix, annotation_col = annotation_data, color = colors, 
           scale = "row", breaks = breaks, show_rownames = FALSE, 
-          main = paste0(comp, " - DE Genes - p.adj <= ", padj.thresh, 
-            " & abs(log2FC) >= ", fc.thresh, " - ", labs[ind]), 
+          main = paste0(comp, " - ", labs[ind]), 
           fontsize_col=5)
         pheatmap(matrix, annotation_col = annotation_data, color = colors, 
           scale = "row", breaks = breaks, show_rownames = FALSE, 
-          main = paste0(comp, " - DE Genes - p.adj <= ", padj.thresh, 
-            " & abs(log2FC) >= ", fc.thresh, " - ", labs[ind]), 
+          main = paste0(comp, " - ", labs[ind]), 
           cluster_cols = FALSE, fontsize_col = 5)
 
         counts.sub <- counts[, colData(x)[,level] %in% c(g1, g2)]
@@ -81,13 +79,11 @@ PlotHeatmaps <- function(res.list, rld, vsd, level, outpath,
         if (!(ncol(counts) == ncol(counts.sub))) {
           pheatmap(matrix, annotation_col = annotation_data, color = colors, 
             scale = "row", breaks = breaks, show_rownames = FALSE, 
-            main = paste0(comp, " - DE Genes - p.adj <= ", padj.thresh, 
-            " & abs(log2FC) >= ", fc.thresh, " - ", labs[ind]), 
+            main = paste0(comp, " - ", labs[ind]), 
             fontsize_col = 5)
           pheatmap(matrix, annotation_col = annotation_data, color = colors, 
             scale = "row", breaks = breaks, show_rownames = FALSE, 
-            main = paste0(comp, " - DE Genes - p.adj <= ", padj.thresh, 
-            " & abs(log2FC) >= ", fc.thresh, " - ", labs[ind]),  
+            main = paste0(comp, " - ", labs[ind]),  
             cluster_cols = FALSE, fontsize_col = 5)
         }
         ind <- ind + 1
@@ -148,25 +144,23 @@ PlotCombinedHeatmaps <- function(res.list, rld, vsd, outpath,
   ind <- 1
   labs <- c("rlog", "vst")
 
-  pdf(paste0("/Heatmaps/AllComparisons.padj.", padj.thresh, ".log2fc.", 
+  pdf(paste0(outpath, "/Heatmaps/AllComparisons.padj.", padj.thresh, ".log2fc.", 
       fc.thresh, ".Heatmaps.pdf"), height = 7, width = 5)
 
   # Actual plotting.
-  for (x in c(rld, vsd)) {
+  for (x in list(rld, vsd)) {
     heat <- assay(x)[siggy,]
     df <- as.data.frame(colData(rld)[, plot.annos])
     p <- pheatmap(heat, cluster_rows = TRUE, show_rownames=  FALSE,
       cluster_cols = FALSE, annotation_col = df, fontsize_col = 6, 
       fontsize = 6, scale = "row", color = mycol, breaks = colors,
-      main = paste0("All Comparisons - DE Genes - p.adj <= ", padj.thresh, 
-            " & abs(log2FC) >= ", fc.thresh, " - ", labs[ind]))
+      main = paste0("All Comparisons - ", labs[ind]))
     print(p)
     
     p <- pheatmap(heat, cluster_rows = TRUE, show_rownames=  FALSE,
       cluster_cols = TRUE, annotation_col = df, fontsize_col = 6, 
       fontsize = 6, scale = "row", color = mycol, breaks = colors,
-      main = paste0("All Comparisons - DE Genes - p.adj <= ", padj.thresh, 
-            " & abs(log2FC) >= ", fc.thresh, " - ", labs[ind]))
+      main = paste0("All Comparisons - ", labs[ind]))
     print(p)
 
     ind <- ind + 1
@@ -207,7 +201,7 @@ PlotBoxplots <- function(res.list, dds, rld, outpath, padj.thresh, fc.thresh,
   top.n, level) {
 
   for (i in seq_along(res.list)) {
-    res <- res.list[i]
+    res <- res.list[[i]]
     comp <- names(res.list[i])
     message("Comparison set: ", comp)
     g1 <- unlist(strsplit(comp, "-v-"))[1]
@@ -296,7 +290,7 @@ PlotBoxplots <- function(res.list, dds, rld, outpath, padj.thresh, fc.thresh,
 #'   cutoff to be used for determining "significant" differential expression.
 #'
 #' @importFrom grDevices pdf dev.off
-#' @importFrom ggplot2 ggtitle
+#' @importFrom ggplot2 ggtitle theme_classic
 #' @importFrom utils combn
 #' @importFrom SummarizedExperiment colData
 #'
@@ -308,7 +302,7 @@ PlotDEGPCAs <- function(res.list, rld, vsd, outpath, level, plot.annos,
   padj.thresh, fc.thresh) {
 
   for (i in seq_along(res.list)) {
-    res <- res.list[i]
+    res <- res.list[[i]]
     comp <- names(res.list[i])
     message("Comparison set: ", comp)
     message("Generating PCAs using genes with p.adj <= ", 
@@ -317,11 +311,11 @@ PlotDEGPCAs <- function(res.list, rld, vsd, outpath, level, plot.annos,
     g2 <- unlist(strsplit(comp, "-v-"))[2]
 
     pdf(paste0(outpath, "/DEGFigures/", comp, ".padj.", padj.thresh, ".log2fc.", 
-      fc.thresh, ".BoxPlot.pdf"), height = 5, width = 5)
+      fc.thresh, ".PCA.pdf"), height = 5, width = 5)
     ind <- 1
     labs <- c("rlog", "vst")
 
-    for (x in c(rld, vsd)) {
+    for (x in list(rld, vsd)) {
       resdata <- merge(as.data.frame(res), 
         as.data.frame(assay(x)), by="row.names", sort=FALSE)
       names(resdata)[1] <- "Gene"
@@ -333,24 +327,20 @@ PlotDEGPCAs <- function(res.list, rld, vsd, outpath, level, plot.annos,
 
       x.sub <- x[ressig$Gene, colData(x)[,level] %in% c(g1, g2)]
       p <- DESeq2::plotPCA(x, intgroup = level) +
-        ggtitle(paste0("DEGs - p.adj <= ", padj.thresh, " & abs(log2FC) > ", 
-          fc.thresh, " - ", labs[ind], " - ", comp))
+        ggtitle(paste0("DEGs - ", labs[ind], " - ", comp)) + theme_classic()
       print(p)
 
       p <- DESeq2::plotPCA(x.sub, intgroup = level) +
-        ggtitle(paste0("DEGs - p.adj <= ", padj.thresh, " & abs(log2FC) > ", 
-          fc.thresh, " - ", labs[ind], " - ", comp))
+        ggtitle(paste0("DEGs - ", labs[ind], " - ", comp)) + theme_classic()
       print(p)
 
-      if (plot.annos != level) {
+      if (!identical(plot.annos, level)) {
         p <- DESeq2::plotPCA(x, intgroup = plot.annos) +
-          ggtitle(paste0("DEGs - p.adj <= ", padj.thresh, " & abs(log2FC) > ", 
-          fc.thresh, " - ", labs[ind], " - ", comp))
+          ggtitle(paste0("DEGs - ", labs[ind], " - ", comp)) + theme_classic()
         print(p)
 
         p <- DESeq2::plotPCA(x.sub, intgroup = plot.annos) +
-          ggtitle(paste0("DEGs - p.adj <= ", padj.thresh, " & abs(log2FC) > ", 
-          fc.thresh, " - ", labs[ind], " - ", comp))
+          ggtitle(paste0("DEGs - ", labs[ind], " - ", comp)) + theme_classic()
         print(p)
       }
 
@@ -389,7 +379,7 @@ PlotVolcanoes <- function(res.list, dds, outpath, padj.thresh, fc.thresh,
   n.labels = 10, use.labels = TRUE) {
 
   for (i in seq_along(res.list)) {
-    res <- res.list[i]
+    res <- res.list[[i]]
     comp <- names(res.list[i])
     g1 <- unlist(strsplit(comp, "-v-"))[1]
     g2 <- unlist(strsplit(comp, "-v-"))[2]
@@ -458,7 +448,11 @@ PlotVolcanoes <- function(res.list, dds, outpath, padj.thresh, fc.thresh,
       FCcutoff = fc.thresh,
       selectLab = labels,
       transcriptLabSize = 2.0,
-      col=c("#8C8C8C", "#D55E00", "#0072B2", "#009E73"),
+      transcriptPointSize = 1.5,
+      col = c("#8C8C8C", "#D55E00", "#0072B2", "#009E73"),
+      legendLabSize = 10,
+      legend = c("NS", "Log2 FC", "adj. P", 
+        "Log2 FC & adj. P"), 
       colAlpha = 1,
       legendPosition = "bottom")
     print(p)

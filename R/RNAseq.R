@@ -73,9 +73,10 @@ RunDESeq2 <- function(outpath, quants.path, samplesheet, tx2gene, level,
   message("# SET DIRECTORY STRUCTURE AND MODEL DESIGN #\n")
   # Create directory structure and set design formula.
   base <- outpath
-  setup <- CreateOutputStructure(block, level, base)
+  setup <- CreateRNAOutputStructure(block, level, base)
   base <- setup$base
   design <- setup$design
+  message(paste0("\nDesign is: ", design, "\n"))
   
   if (is.null(plot.annos)) {
       plot.annos <- level
@@ -92,20 +93,19 @@ RunDESeq2 <- function(outpath, quants.path, samplesheet, tx2gene, level,
   # Read in our actual count files now.
   txi <- tximport(files, type = "salmon", tx2gene = tx2gene)
 
-  message(paste0("\nDesign is: ", design, "\n"))
   # Create the DESeqDataSet object.
   dds <- DESeqDataSetFromTximport(txi, colData = samples, design = design)
 
   # Pre-filter transcripts with really low read counts.
-  message(paste0("\ndds starting with", nrow(dds), "genes."))
+  message(paste0("\ndds starting with ", nrow(dds), " genes."))
   dds <- dds[rowSums(counts(dds)) >= count.filt,]
-  message(paste0("\ndds has", nrow(dds), 
-    "genes after removing genes with under ", count.filt, " counts total.\n"))
+  message(paste0("\ndds has ", nrow(dds), 
+    " genes after removing genes with under ", count.filt, " counts total.\n"))
 
   ### VARIANCE STABILIZATION COMPARISONS ###
   message("\n# VARIANCE STABILIZATION COMPARISONS #\n")
   vst.out <- paste0(base,"/EDAFigures/VarianceTransformations.pdf")
-  message(vst.out)
+  message(paste0("Output: ", vst.out))
   trans <- PlotVarianceTransformations(dds, vst.out)
   rld <- trans$rld
   vsd <- trans$vsd
@@ -118,7 +118,7 @@ RunDESeq2 <- function(outpath, quants.path, samplesheet, tx2gene, level,
 
   ### PCA PLOTS ###
   message("\n# PCA PLOTS #\n")
-  pca.out <- paste0(base, "/EDAFigures/pca.pdf")
+  pca.out <- paste0(base, "/EDAFigures/PCA.pdf")
   message(pca.out)
   PlotEDAPCAs(rld, vsd, pca.out, level, plot.annos)
   
@@ -128,7 +128,7 @@ RunDESeq2 <- function(outpath, quants.path, samplesheet, tx2gene, level,
   dds <- DESeq(dds)
 
   # All the actual processing occurs here.
-  full <- ProcessDEGs(dds, rld, vsd, outpath, level, plot.annos, padj.thresh,
+  full <- ProcessDEGs(dds, rld, vsd, base, level, plot.annos, padj.thresh,
     fc.thresh, plot.box, top.n)
 
   ### SAVING OBJECTS ###
@@ -192,8 +192,6 @@ RunDESeq2 <- function(outpath, quants.path, samplesheet, tx2gene, level,
 #'   object from running \code{\link[DESeq2]{vst}} named 'vsd'.
 #'
 #' @importFrom DESeq2 lfcShrink counts plotCounts
-#' @importFrom magrittr %>%
-#' @importFrom htmlwidgets saveWidget
 #'
 #' @export
 #'
@@ -204,7 +202,7 @@ ProcessDEGs <- function(dds, rld, vsd, outpath, level, plot.annos,
 
   message("\n# COLLECTING RESULTS #\n")
   # Get all possible sample comparisons.
-  combs <- combn(colData(rld)[,level], 2)
+  combs <- combn(levels(colData(rld)[,level]), 2)
   combs.seq <- seq(1, length(combs), by = 2)
 
   res.list <- list()
@@ -223,7 +221,7 @@ ProcessDEGs <- function(dds, rld, vsd, outpath, level, plot.annos,
     for (fc in fc.thresh) {
       PlotDEGPCAs(res.list, rld, vsd, outpath, level, plot.annos, p, fc)
       PlotVolcanoes(res.list, dds, outpath, p, fc)
-      PlotHeatmaps(res.list, rld, vsd, outpath, p, fc, plot.annos)
+      PlotHeatmaps(res.list, rld, vsd, level, outpath, p, fc, plot.annos)
       PlotCombinedHeatmaps(res.list, rld, vsd, outpath, p, fc, plot.annos)
       PlotEnrichments(res.list, outpath, p, fc)
     }

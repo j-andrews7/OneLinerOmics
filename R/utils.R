@@ -1,6 +1,6 @@
-#' Create output directory structure
+#' Create RNA-seq output directory structure
 #'
-#' \code{CreateOutputStructure} generates the output directories used by
+#' \code{CreateRNAOutputStructure} generates the output directories used by
 #' \code{\link{RunDESeq2}} and \code{\link{ProcessDEGs}}.
 #'
 #' @param block String or character vector defining the variable(s) to use to
@@ -14,7 +14,7 @@
 #'
 #' @author Jared Andrews
 #'
-CreateOutputStructure <- function(block, level, base) {
+CreateRNAOutputStructure <- function(block, level, base) {
 
   # Generate folders and craft design.
   if (!is.null(block)) {
@@ -105,10 +105,13 @@ SaveResults <- function (res.list, dds, outpath) {
   out <- paste0(outpath, "/ResultsTables/")
 
   write.table(counts(dds, normalized = TRUE), file = paste0(out, 
-    "NormalizedGeneCounts.csv"), row.names = FALSE, sep = "\t", quote = FALSE)
+    "NormalizedGeneCounts.csv"), sep = "\t", quote = FALSE)
+
+  write.table(assay(normTransform(dds)), file = paste0(out, 
+    "NormalizedGeneCounts.log2.csv"), sep = "\t", quote = FALSE)
 
   write.table(fpm(dds), file = paste0(out, "GeneCounts.fpm.csv"), 
-    row.names = FALSE, sep = "\t", quote = FALSE)
+    sep = "\t", quote = FALSE)
 
   for (r in seq_along(res.list)) {
     res <- res.list[r]

@@ -3,14 +3,19 @@ template:
   params:
     bootswatch: sandstone
 
+authors:
+  Jared Andrews: 
+    href: "http://j-andrews7.github.io"
+
 reference:
   - title: "RNA-seq analysis"
     desc: >
       Functions that perform DESeq2 analyses, utilizing the utility and plotting functions to generate output tables and figures. 
+      These are the crux of the RNA-seq portion of the package and what most users should use.
     contents:
       - RunDESeq2
       - ProcessDEGs
-  - title: "Plotting"
+  - title: "RNA-seq Plotting"
     desc: >
       Functions that generate plots. Calling these individually can sometimes be useful.
     contents:
@@ -18,5 +23,5 @@ reference:
   - title: "Internal utilities"
     desc: Functions used to create directory structure and save output. Users shouldn't need to call these explicitely.
     contents: 
-      - CreateOutputStructure
+      - CreateRNAOutputStructure
       - SaveResults
