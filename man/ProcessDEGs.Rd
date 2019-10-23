@@ -5,7 +5,8 @@
 \title{Extract, visualize, and save DEG lists}
 \usage{
 ProcessDEGs(dds, rld, vsd, outpath, level, plot.annos,
-  padj.thresh = 0.05, fc.thresh = 2, plot.box = TRUE, top.n = 100)
+  padj.thresh = 0.05, fc.thresh = 2, plot.box = TRUE,
+  plot.enrich = TRUE, top.n = 100)
 }
 \arguments{
 \item{dds}{A \linkS4class{DESeqDataSet} object as returned by 
@@ -38,6 +39,9 @@ combinations of \code{padj.thresh} and \code{fc.thresh}.}
 
 \item{plot.box}{Boolean indicating whether box plots for DEGs should be 
 created for each comparison. If so, the \code{top.n} genes will be plotted.}
+
+\item{plot.enrich}{Boolean indicating whether enrichment analyses for DEGs 
+should be run and plotted for each comparison.}
 
 \item{top.n}{Number of differentially expressed genes to create boxplots for, 
 ranked by adj. p-value after applying \code{padj.thresh} and 

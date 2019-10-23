@@ -44,9 +44,9 @@ PlotHeatmaps <- function(res.list, rld, vsd, level, outpath,
       padj.thresh, " and abs(log2FoldChange) >= ", fc.thresh))
     g1 <- unlist(strsplit(comp, "-v-"))[1]
     g2 <- unlist(strsplit(comp, "-v-"))[2]
-  
-    ressig <- subset(res, padj <= padj.thresh & 
-      abs(log2FoldChange) >= fc.thresh)
+    
+    ressig <- res[(res[, 'padj'] <= padj.thresh) %in% TRUE & 
+      abs(res[, 'log2FoldChange']) >= fc.thresh, ]
 
     # Assay index holder.
     ind <- 1
@@ -137,7 +137,8 @@ PlotCombinedHeatmaps <- function(res.list, rld, vsd, outpath,
   # Get all DEGs from all comparisons.
   siggy <- unique(unlist(sapply(res.list, 
     function(x, qval, logfc) {
-      rownames(subset(x, padj <= qval & abs(log2FoldChange) >= logfc))
+      rownames(x[(x[, 'padj'] <= qval) %in% TRUE & 
+        abs(x[, 'log2FoldChange']) >= logfc, ])
     }, qval = padj.thresh, logfc = fc.thresh)))
 
   # Assay index holder.
@@ -212,8 +213,9 @@ PlotBoxplots <- function(res.list, dds, rld, outpath, padj.thresh, fc.thresh,
     names(resdata)[1] <- "Gene"
 
     # Make table for just DEGs, order by padj and subset by top.n.
-    ressig <- subset(resdata, padj <= padj.thresh & abs(log2FoldChange) >= 
-      fc.thresh)
+    ressig <- resdata[(resdata[, 'padj'] <= padj.thresh) %in% TRUE & 
+      abs(resdata[, 'log2FoldChange']) >= fc.thresh, ]
+
     ressig <- ressig[order(ressig$padj),]
     if (nrow(ressig) >= top.n) {
       ressig <- ressig[1:top.n,]
@@ -240,7 +242,8 @@ PlotBoxplots <- function(res.list, dds, rld, outpath, padj.thresh, fc.thresh,
           xlab("Group") + ylab("Normalized Counts") + theme(aspect.ratio=1)
         print(p)
 
-        e <- subset(d, (get(level) == g1 | get(level) == g2))
+        e <- d[d[, level] == g1 | d[, level] == g2, ]
+        #e <- subset(d, (get(level) == g1 | get(level) == g2))
         p <- ggplot(e, aes(x = e[,level], y = count)) + 
           geom_boxplot(fill = fill[1:2], colour = "#000000") + 
           ggtitle(ressig$Gene[i]) + coord_trans(y = "log10") + theme_classic() +
@@ -256,7 +259,8 @@ PlotBoxplots <- function(res.list, dds, rld, outpath, padj.thresh, fc.thresh,
           theme(aspect.ratio=1)
         print(p)
 
-        e <- subset(d, (get(level) == g1 | get(level) == g2))
+        e <- d[d[, level] == g1 | d[, level] == g2, ]
+        #e <- subset(d, (get(level) == g1 | get(level) == g2))
         p <- ggplot(e, aes(x = e[,level], y = count)) + 
           geom_boxplot(fill = fill[1:2], colour = "#000000") + 
           ggtitle(ressig$Gene[i]) + theme_classic() +
@@ -323,11 +327,11 @@ PlotDEGPCAs <- function(res.list, rld, vsd, outpath, level, plot.annos,
       names(resdata)[1] <- "Gene"
 
       # Get DEGs.
-      ressig <- subset(resdata, padj <= padj.thresh & abs(log2FoldChange) >= 
-        fc.thresh)
-
+      ressig <- resdata[(resdata[, 'padj'] <= padj.thresh) %in% TRUE & 
+        abs(resdata[, 'log2FoldChange']) >= fc.thresh, ]
 
       x.sub <- x[ressig$Gene, colData(x)[,level] %in% c(g1, g2)]
+
       p <- DESeq2::plotPCA(x, intgroup = level) +
         ggtitle(paste0("DEGs - ", labs[ind], " - ", comp)) + theme_classic() +
         theme(aspect.ratio=1)

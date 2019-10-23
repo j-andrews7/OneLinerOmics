@@ -1,1 +1,1 @@
-globalVariables(c("count", "padj", "log2FoldChange"))
+globalVariables(c("count"))

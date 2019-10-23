@@ -135,7 +135,8 @@ need to generate all of the exploratory data analysis figures again.</p>
     </div>
 
     <pre class="usage"><span class='fu'>ProcessDEGs</span>(<span class='no'>dds</span>, <span class='no'>rld</span>, <span class='no'>vsd</span>, <span class='no'>outpath</span>, <span class='no'>level</span>, <span class='no'>plot.annos</span>,
-  <span class='kw'>padj.thresh</span> <span class='kw'>=</span> <span class='fl'>0.05</span>, <span class='kw'>fc.thresh</span> <span class='kw'>=</span> <span class='fl'>2</span>, <span class='kw'>plot.box</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>top.n</span> <span class='kw'>=</span> <span class='fl'>100</span>)</pre>
+  <span class='kw'>padj.thresh</span> <span class='kw'>=</span> <span class='fl'>0.05</span>, <span class='kw'>fc.thresh</span> <span class='kw'>=</span> <span class='fl'>2</span>, <span class='kw'>plot.box</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
+  <span class='kw'>plot.enrich</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>top.n</span> <span class='kw'>=</span> <span class='fl'>100</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -188,6 +189,11 @@ combinations of <code>padj.thresh</code> and <code>fc.thresh</code>.</p></td>
       <th>plot.box</th>
       <td><p>Boolean indicating whether box plots for DEGs should be 
 created for each comparison. If so, the <code>top.n</code> genes will be plotted.</p></td>
+    </tr>
+    <tr>
+      <th>plot.enrich</th>
+      <td><p>Boolean indicating whether enrichment analyses for DEGs 
+should be run and plotted for each comparison.</p></td>
     </tr>
     <tr>
       <th>top.n</th>

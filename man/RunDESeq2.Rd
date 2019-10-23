@@ -6,7 +6,8 @@
 \usage{
 RunDESeq2(outpath, quants.path, samplesheet, tx2gene, level,
   padj.thresh = 0.05, fc.thresh = 2, plot.annos = NULL,
-  plot.box = TRUE, top.n = 100, block = NULL, count.filt = 10)
+  plot.box = TRUE, plot.enrich = TRUE, top.n = 100, block = NULL,
+  count.filt = 10)
 }
 \arguments{
 \item{outpath}{Path to directory to be used for output. Additional 
@@ -38,6 +39,9 @@ combinations of \code{padj.thresh} and \code{fc.thresh}.}
 \item{plot.box}{Boolean indicating whether box plots for DEGs should be 
 created for each comparison. If so, the \code{top.n} genes will be plotted.
 This step is quite time-consuming with many genes.}
+
+\item{plot.enrich}{Boolean indicating whether enrichment analyses for DEGs 
+should be run and plotted for each comparison.}
 
 \item{top.n}{Number of differentially expressed genes to create boxplots for, 
 ranked by adj. p-value after applying \code{padj.thresh} and 

@@ -54,12 +54,14 @@ PlotEnrichments <- function(res.list, outpath, padj.thresh,
     dir.create(file.path(base, paste0(g2, "up")), showWarnings = FALSE, 
       recursive = TRUE)
 
-    one.two <- subset(res, 
-      padj <= padj.thresh & abs(log2FoldChange) >= fc.thresh)
-    one.up <- subset(res, 
-      padj <= padj.thresh & log2FoldChange >= fc.thresh)
-    two.up <- subset(res, 
-      padj <= padj.thresh & log2FoldChange <= -fc.thresh)
+    one.two <- res[(res[, 'padj'] <= padj.thresh) %in% TRUE & 
+      abs(res[, 'log2FoldChange']) >= fc.thresh, ]
+
+    one.up <- res[(res[, 'padj'] <= padj.thresh) %in% TRUE & 
+      res[, 'log2FoldChange'] >= fc.thresh, ]
+
+    two.up <- res[(res[, 'padj'] <= padj.thresh) %in% TRUE & 
+      res[, 'log2FoldChange'] <= -fc.thresh, ]
     
     one.two.terms <- RunEnrichr(rownames(one.two), libraries = libraries,
       outdir = paste0(base, "/AllGenes"))
