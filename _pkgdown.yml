@@ -24,4 +24,4 @@ reference:
     desc: Functions used to create directory structure and save output. Users shouldn't need to call these explicitely.
     contents: 
       - CreateRNAOutputStructure
-      - SaveResults
+      - SaveRNAResults

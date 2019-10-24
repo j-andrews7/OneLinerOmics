@@ -254,7 +254,7 @@ ProcessDEGs <- function(dds, rld, vsd, outpath, level, plot.annos,
 
   ### SAVING TABLES ###
   message("\n# SAVING RESULTS TABLES #\n")
-  SaveResults(res.list, dds, outpath)
+  SaveRNAResults(res.list, dds, outpath)
 
   return(list(res.list = res.list, dds = dds, rld = rld, vsd = vsd))
 }

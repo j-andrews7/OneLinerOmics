@@ -4,7 +4,7 @@ author:
 - name: Jared Andrews
   email: jared.andrews07@gmail.com
   affiliation: Washington University School of Medicine, Department of Laboratory and Genomic Medicine
-date: "Revised: Ocotober 23rd, 2019"
+date: "Revised: Ocotober 24th, 2019"
 output:
   BiocStyle::html_document:
     toc_float: true
@@ -22,7 +22,7 @@ library(BiocStyle)
 # Introduction
 
 This vignette walks through analysis of the B cell lymphoma RNA-seq data included in the future Andrews et al. (2019, your favorite journal with an impact factor > 30) paper.
-It uses the convenience functions included in this [package](https://github.com/j-andrews7/AndrewsBCellLymphoma) to streamline the process.
+It uses the convenience functions included in this [package](https://github.com/j-andrews7/OneLinerOmics) to streamline the process.
 
 Several command line tools as well as python are also utilized - each code block should indicate whether it is `bash`, `R`, or `python` code. 
 If your system is set up properly, you can still [run many of these code chunks in Rmarkdown files within RStudio](https://bookdown.org/yihui/rmarkdown/language-engines.html), assuming you have all of the software installed.
@@ -33,7 +33,7 @@ Such instances will have `- cluster` appended to the language statement at the b
 Required Software:
 
 * R (3.6+)
-* python 
+* python3
 * [salmon (v0.14+)](https://combine-lab.github.io/salmon/)
 * [bedtools](https://bedtools.readthedocs.io/en/latest/) - only needed if generating salmon decoy transcriptome
 * [mashmap](https://github.com/marbl/MashMap) - only needed if generating salmon decoy transcriptome
@@ -100,7 +100,9 @@ This script crashed a lot for me, so I ended up editing it to just snag the last
 
 ```{bash salmon-decoy, eval=FALSE}
 # bash
-bash generateDecoyTranscriptome.sh -j 2 -a ./RNA_Seq/ref/gencode.v31lift37.annotation.gtf -g ./RNA_Seq/ref/GRCh37.primary_assembly.genome.fa -t ./RNA_Seq/ref/gencode.v31lift37.transcripts.fa -o ./RNA_Seq/ref/decoys/
+bash generateDecoyTranscriptome.sh -j 2 -a ./RNA_Seq/ref/gencode.v31lift37.annotation.gtf \
+-g ./RNA_Seq/ref/GRCh37.primary_assembly.genome.fa -t ./RNA_Seq/ref/gencode.v31lift37.transcripts.fa \
+-o ./RNA_Seq/ref/decoys/
 ```
 
 ### Index the transcriptome
@@ -110,7 +112,8 @@ This will generate the *decoy-aware* transcriptome index for our annotations.
 ```{bash salmon-index, eval=FALSE}
 # Bash
 # Now actually create the index for salmon. We lower k as some of our samples use 50 bp reads.
-salmon index -t ./RNA_Seq/ref/decoys/gentrome.fa -i ./RNA_Seq/ref/gencodev31_grch37_index --decoys ./RNA_Seq/ref/decoys/decoys.txt -k 25 --gencode
+salmon index -t ./RNA_Seq/ref/decoys/gentrome.fa -i ./RNA_Seq/ref/gencodev31_grch37_index \
+--decoys ./RNA_Seq/ref/decoys/decoys.txt -k 25 --gencode
 ```
 
 ### Quantify
@@ -124,9 +127,11 @@ for f in ./RNA_Seq/FASTQs/*; do
     echo "$count"
     if [ $count -gt 1 ]
     then
-        salmon quant --validateMappings --threads 2 --seqBias -l A -1 "$f"/"$samp"_1.fq.gz -2 "$f"/"$samp"_2.fq.gz -o ./RNA_Seq/quants/"$samp" --index ./RNA_Seq/ref/gencodev31_grch37_index
+        salmon quant --validateMappings --threads 2 --seqBias -l A -1 "$f"/"$samp"_1.fq.gz \
+        -2 "$f"/"$samp"_2.fq.gz -o ./RNA_Seq/quants/"$samp" --index ./RNA_Seq/ref/gencodev31_grch37_index
     else
-        salmon quant --validateMappings --threads 2 --seqBias -l A -r "$f"/"$samp".RNA.fq.gz -o ./RNA_Seq/quants/"$samp" --index ./RNA_Seq/ref/gencodev31_grch37_index
+        salmon quant --validateMappings --threads 2 --seqBias -l A -r "$f"/"$samp".RNA.fq.gz \
+        -o ./RNA_Seq/quants/"$samp" --index ./RNA_Seq/ref/gencodev31_grch37_index
     fi
 done
 ```
@@ -152,11 +157,12 @@ outter.close()
 
 ## Analysis with R
 
-Install this package if you haven't already with `devtools::install_github("j-andrews7/AndrewsBCellLymphoma")`. If you don't have `devtools`, it can be installed with `install.packages("devtools")`.
+Install this package if you haven't already with `devtools::install_github("j-andrews7/OneLinerOmics")`.
+If you don't have `devtools`, it can be installed with `install.packages("devtools")`.
 
 ```{r load, eval=TRUE}
 # R
-suppressPackageStartupMessages(library(AndrewsBCellLymphoma))
+suppressPackageStartupMessages(library(OneLinerOmics))
 ```
 
 The only thing you need now is a sample sheet, which is just a table with sample names and metadata columns. 

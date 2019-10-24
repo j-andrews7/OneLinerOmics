@@ -243,7 +243,6 @@ PlotBoxplots <- function(res.list, dds, rld, outpath, padj.thresh, fc.thresh,
         print(p)
 
         e <- d[d[, level] == g1 | d[, level] == g2, ]
-        #e <- subset(d, (get(level) == g1 | get(level) == g2))
         p <- ggplot(e, aes(x = e[,level], y = count)) + 
           geom_boxplot(fill = fill[1:2], colour = "#000000") + 
           ggtitle(ressig$Gene[i]) + coord_trans(y = "log10") + theme_classic() +
@@ -260,7 +259,6 @@ PlotBoxplots <- function(res.list, dds, rld, outpath, padj.thresh, fc.thresh,
         print(p)
 
         e <- d[d[, level] == g1 | d[, level] == g2, ]
-        #e <- subset(d, (get(level) == g1 | get(level) == g2))
         p <- ggplot(e, aes(x = e[,level], y = count)) + 
           geom_boxplot(fill = fill[1:2], colour = "#000000") + 
           ggtitle(ressig$Gene[i]) + theme_classic() +
