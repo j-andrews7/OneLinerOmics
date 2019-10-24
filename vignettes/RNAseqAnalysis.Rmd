@@ -4,7 +4,7 @@ author:
 - name: Jared Andrews
   email: jared.andrews07@gmail.com
   affiliation: Washington University School of Medicine, Department of Laboratory and Genomic Medicine
-date: "Revised: Ocotober 22nd, 2019"
+date: "Revised: Ocotober 23rd, 2019"
 output:
   BiocStyle::html_document:
     toc_float: true
@@ -25,7 +25,10 @@ This vignette walks through analysis of the B cell lymphoma RNA-seq data include
 It uses the convenience functions included in this [package](https://github.com/j-andrews7/AndrewsBCellLymphoma) to streamline the process.
 
 Several command line tools as well as python are also utilized - each code block should indicate whether it is `bash`, `R`, or `python` code. 
-If your system is set up properly, you can still [run these code chunks in Rmarkdown files within RStudio](https://bookdown.org/yihui/rmarkdown/language-engines.html), assuming you have all of the software installed.
+If your system is set up properly, you can still [run many of these code chunks in Rmarkdown files within RStudio](https://bookdown.org/yihui/rmarkdown/language-engines.html), assuming you have all of the software installed.
+
+Some of this code is best ran on a computing cluster, as it takes a significant amount of time locally.
+Such instances will have `- cluster` appended to the language statement at the beginning of the code block.
 
 Required Software:
 
@@ -34,25 +37,36 @@ Required Software:
 * [salmon (v0.14+)](https://combine-lab.github.io/salmon/)
 * [bedtools](https://bedtools.readthedocs.io/en/latest/) - only needed if generating salmon decoy transcriptome
 * [mashmap](https://github.com/marbl/MashMap) - only needed if generating salmon decoy transcriptome
+* [STAR](https://github.com/alexdobin/STAR) - only needed if generating tracks
+* [deeptools](https://deeptools.readthedocs.io/en/latest/index.html) - only needed if generating tracks
 
-# Suggested Reading
+# FAQs/Suggested Reading
 
-That is, if you ask me a question and haven't read these first, I'm going to tell you to read them.
+That is, if you ask me one of the following questions and haven't read/tried these first, I'm going to tell you to read/try them.
 
-* The [DESeq2 vignette](https://bioconductor.org/packages/release/bioc/vignettes/DESeq2/inst/doc/DESeq2.html#standard-workflow)
-* The [rnaseqGene](http://master.bioconductor.org/packages/release/workflows/vignettes/rnaseqGene/inst/doc/rnaseqGene.html) workflow, which walks through a DESeq2 analysis in great detail.
+* "How do I tweak (x) part of the analysis?"
+	* Read the [rnaseqGene](http://master.bioconductor.org/packages/release/workflows/vignettes/rnaseqGene/inst/doc/rnaseqGene.html) workflow, which walks through a DESeq2 analysis in great detail.
+	* Read the [DESeq2 vignette](https://bioconductor.org/packages/release/bioc/vignettes/DESeq2/inst/doc/DESeq2.html#standard-workflow).
+* "How does the design formula work?"
+	* Read [this chapter](https://cran.r-project.org/doc/manuals/R-intro.html#Statistical-models-in-R) on statistical models in R, which explains linear models and formulae relatively clearly.
 
 ## Generating gene counts
 
-Going the `salmon` -> `DESeq2` route. This requires R, salmon v0.14, and DESeq2 (along with a few other packages). Using hg19, cause forget re-aligning all the ChIP-seq and making new tracks. `salmon` needs `mashmap` and `bedtools` as well if generating "decoy-aware" transcriptomes. The Google can show you how to install those.
+This requires R, salmon v0.14, and DESeq2 (along with a few other packages). 
+I'm using hg19, but you can supply newer annotations if you want. 
+`salmon` needs `mashmap` and `bedtools` as well if generating "decoy-aware" transcriptomes. 
 
 ### Create decoy reference transcriptome
 
-Newer versions of salmon recommend using a *decoy-aware* transcriptome to generate the index file to be used for selective alignment. This process is a bit annoying, so the authors have pre-computed some [decoy transcriptomes](https://drive.google.com/drive/folders/14VqSdZAKH82QwDWhMXNLFqMoskoqv3fS) for hg19 and hg38 with different annotations. In this case, I used the [GENCODE v31 annotations](ftp://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_31/GRCh37_mapping/) that had been lifted over to hg19, so I had to generate them myself.
+Newer versions of salmon recommend using a *decoy-aware* transcriptome to generate the index file to be used for selective alignment.
+This process is a bit annoying, so the authors have pre-computed some [decoy transcriptomes](https://drive.google.com/drive/folders/14VqSdZAKH82QwDWhMXNLFqMoskoqv3fS) for hg19 and hg38 with different annotations.
+In this case, I used the [GENCODE v31 annotations](ftp://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_31/GRCh37_mapping/) that had been lifted over to hg19, so I had to generate them myself.
 
 > **This had to be run on a cluster with 128 GB RAM. If you can avoid this step by using their pre-generated decoys, I recommend doing so.**
 
-My data is already in folders and all, so some of the paths are kinda inefficient, but I really don't care. This is needed to create the index for `salmon`. Using GENCODE v31 annotations/sequences that have been mapped back to GRCh37 (hg19).
+My data is already in folders and all, so some of the paths are kinda inefficient, but I really don't care.
+This is needed to create the index for `salmon`.
+Using GENCODE v31 annotations/sequences that have been mapped back to GRCh37 (hg19).
 
 ```{bash dl-annotations, eval=FALSE}
 # bash
@@ -145,7 +159,9 @@ Install this package if you haven't already with `devtools::install_github("j-an
 suppressPackageStartupMessages(library(AndrewsBCellLymphoma))
 ```
 
-The only thing you need now is a sample sheet, which is just a table with sample names and metadata columns. We can take a peek at the sample sheet I'm using so he can see how they're constructed. It can include as many metadata columns as you'd like.
+The only thing you need now is a sample sheet, which is just a table with sample names and metadata columns. 
+We can take a peek at the sample sheet I'm using so he can see how they're constructed. 
+It can include as many metadata columns as you'd like.
 
 ```{r samplesheet, eval=FALSE}
 # R
@@ -156,9 +172,15 @@ head(samples, 10)
 
 ### Run DESeq2
 
-DESeq2 is a very popular R package for performing differential expression analysis. Raw RNA-seq counts follow a negative binomial distribution, which is how DESeq2 models the data. It is quick, flexible, and generally works quite well with little to no parameter tweaking. It can also help to mitigate the technical or batch effects on the analysis, a feature which we'll take advantage of here. 
+DESeq2 is a very popular R package for performing differential expression analysis.
+Raw RNA-seq counts follow a negative binomial distribution, which is how DESeq2 models the data.
+It is quick, flexible, and generally works quite well with little to no parameter tweaking.
+It can also help to mitigate the technical or batch effects on the analysis, a feature which we'll take advantage of here. 
 
-Most of these samples are 150 bp, paired-end sequencing (as shown in the 'lib' column of the sample sheet). A handful are 50 bp, single-end sequencing, which introduces a significant confounding factor to the analysis. In our model design, we'll specify that we want to ignore effects due to this technical difference (by setting `block = "lib"`). The model isn't magic, so we may very well still see evidence of the library-prep differences regardless, as they are quite strong.
+Most of these samples are 150 bp, paired-end sequencing (as shown in the 'lib' column of the sample sheet).
+A handful are 50 bp, single-end sequencing, which introduces a significant confounding factor to the analysis.
+In our model design, we'll specify that we want to ignore effects due to this technical difference (by setting `block = "lib"`).
+The model isn't magic, so we may very well still see evidence of the library-prep differences regardless, as they are quite strong.
 
 ```{r run-deseq2, EVAL=FALSE}
 # R
@@ -170,7 +192,49 @@ mydata <- RunDESeq2(outpath = "./RNA_Seq/Final_Analyses/allCLL", quants.path = "
 
 ### Next Steps
 
-Yes, that's it. Explore the plots, tables, enrichments, etc. Re-run if necessary, tweaking parameters as you see fit. 
+Yes, that's it.
+Explore the plots, tables, enrichments, etc.
+Re-run if necessary, tweaking parameters as you see fit. 
+
+## Alignment & Creating Tracks
+
+Using a pseudoalignment-based quantification method is nice because it avoids the time-consuming headache of alignment and track generation, saving a lot of time and storage space.
+
+> STAR requires a lot of memory (>32 GB), so running locally is really not recommended. Utilize a computing cluster/cloud.
+
+If you're _really_ set on this, something like the following shows how to do so (for single-end reads). 
+Paired-end is similar, you just need to tweak things to provide the second reads file to `--readFilesIn`. 
+In this case, I use [GENCODE annotations](https://www.gencodegenes.org/human/release_19.html), which provide necessary information for handling gapped-reads spanning splice-junctions (less important here, but critical if attempting de novo transcript discovery).
+
+```{bash make_tracks, eval=FALSE}
+# bash-cluster
+
+# Create index.
+STAR --runThreadN 8 --runMode genomeGenerate --genomeDir ./STAR_Index \
+--genomeFastaFiles ./Homo_sapiens.GRCh37.75.dna.primary_assembly.fa \
+--sjdbGTFfile ./gencode.v19.annotation.gtf
+
+# Align gzipped FASTQs.
+for f in *.gz; do
+  STAR --runThreadN 8 --runMode alignReads --outFilterMultimapNmax 20 \
+  --alignSJoverhangMin 8 --alignSJDBoverhangMin 1 --alignIntronMin 20 \
+  --alignIntronMax 1000000 --outFilterMismatchNmax 999 \
+  --readFilesCommand gunzip -c --genomeDir ./STAR_Index \
+  --outSAMtype BAM SortedByCoordinate --readFilesIn "$f" \
+  --outFileNamePrefix ${f%%.RNA*};
+done
+
+# Change --effectiveGenomeSize if using hg38 or different organism.
+for f in *.bam; do 
+	echo "$f"; 
+	samtools index "$f";
+	bamCoverage --bam "$f" -o "$f".rpkm.bw --binSize 10 \
+	--ignoreForNormalization chrX chrM chrY --normalizeUsing RPKM \
+	-p 8 --effectiveGenomeSize 2864785220; 
+done
+```
+
+Happy? Now you can view the `bigWig` files on UCSC by using a [track hub](https://genome.ucsc.edu/goldenPath/help/hgTrackHubHelp.html) if you have a publicly accessible location to put the files.
 
 # Session Information
 
