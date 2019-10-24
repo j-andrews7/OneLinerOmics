@@ -1,6 +1,6 @@
-Package: AndrewsBCellLymphoma
-Title: B Cell Lymphoma Analysis for Andrews et al (2019)
-Date: 2019-10-22
+Package: OneLinerOmics
+Title: One liner RNA-seq and ChIP-seq analyses.
+Date: 2019-10-24
 Version: 0.0.0.9000
 Authors@R: 
     person(given = "Jared",
@@ -9,8 +9,8 @@ Authors@R:
            email = "jared.andrews07@gmail.com",
            comment = c(ORCID = "0000-0002-0780-6248"))
 Description: This package is a complement to Andrews et al, 2019. 
-    It provides simple functions for major analysis steps dealing with
-    both RNA-seq and ChIP-seq data in addition to a vignette detailing
+    It provides simple functions for major analyses of RNA-seq 
+    and ChIP-seq data in addition to vignettes detailing
     how it was used to process and analyze data in the paper.
 License: GPL-3 + file LICENSE
 Imports:
@@ -49,8 +49,8 @@ Suggests:
     rmarkdown
 Remotes:
     j-andrews7/EZscRNA
-URL: https://github.com/j-andrews7/AndrewsBCellLymphoma
-BugReports: https://github.com/j-andrews7/AndrewsBCellLymphoma/issues
+URL: https://github.com/j-andrews7/OneLinerOmics
+BugReports: https://github.com/j-andrews7/OneLinerOmics/issues
 Encoding: UTF-8
 LazyData: true
 VignetteBuilder: knitr

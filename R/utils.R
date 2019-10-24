@@ -86,7 +86,7 @@ CreateRNAOutputStructure <- function(block, level, base) {
 
 #' Save comparison results
 #'
-#' \code{SaveResults} saves the results for each comparison in \code{res.list} 
+#' \code{SaveRNAResults} saves the results for each comparison in \code{res.list} 
 #' along with the gene counts.
 #'
 #' @param res.list Named List containing \linkS4class{DESeqResults} objects for 
@@ -101,7 +101,7 @@ CreateRNAOutputStructure <- function(block, level, base) {
 #'
 #' @author Jared Andrews
 #'
-SaveResults <- function (res.list, dds, outpath) {
+SaveRNAResults <- function (res.list, dds, outpath) {
   out <- paste0(outpath, "/ResultsTables/")
 
   write.table(counts(dds, normalized = TRUE), file = paste0(out, 
