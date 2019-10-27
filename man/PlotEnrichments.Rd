@@ -4,10 +4,7 @@
 \alias{PlotEnrichments}
 \title{Perform GO/Pathway enrichment for DEGs via enrichR}
 \usage{
-PlotEnrichments(res.list, outpath, padj.thresh, fc.thresh,
-  libraries = c("GO_Molecular_Function_2018",
-  "GO_Cellular_Component_2018", "GO_Biological_Process_2018",
-  "KEGG_2019_Human", "Reactome_2016", "BioCarta_2016", "Panther_2016"))
+PlotEnrichments(res.list, outpath, padj.thresh, fc.thresh, libraries)
 }
 \arguments{
 \item{res.list}{Named List containing \linkS4class{DESeqResults} objects for 

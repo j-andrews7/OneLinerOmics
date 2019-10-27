@@ -136,7 +136,10 @@ need to generate all of the exploratory data analysis figures again.</p>
 
     <pre class="usage"><span class='fu'>ProcessDEGs</span>(<span class='no'>dds</span>, <span class='no'>rld</span>, <span class='no'>vsd</span>, <span class='no'>outpath</span>, <span class='no'>level</span>, <span class='no'>plot.annos</span>,
   <span class='kw'>padj.thresh</span> <span class='kw'>=</span> <span class='fl'>0.05</span>, <span class='kw'>fc.thresh</span> <span class='kw'>=</span> <span class='fl'>2</span>, <span class='kw'>plot.box</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
-  <span class='kw'>plot.enrich</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>top.n</span> <span class='kw'>=</span> <span class='fl'>100</span>)</pre>
+  <span class='kw'>plot.enrich</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>enrich.libs</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"GO_Molecular_Function_2018"</span>,
+  <span class='st'>"GO_Cellular_Component_2018"</span>, <span class='st'>"GO_Biological_Process_2018"</span>,
+  <span class='st'>"KEGG_2019_Human"</span>, <span class='st'>"Reactome_2016"</span>, <span class='st'>"BioCarta_2016"</span>, <span class='st'>"Panther_2016"</span>),
+  <span class='kw'>top.n</span> <span class='kw'>=</span> <span class='fl'>100</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -194,6 +197,13 @@ created for each comparison. If so, the <code>top.n</code> genes will be plotted
       <th>plot.enrich</th>
       <td><p>Boolean indicating whether enrichment analyses for DEGs 
 should be run and plotted for each comparison.</p></td>
+    </tr>
+    <tr>
+      <th>enrich.libs</th>
+      <td><p>A vector of valid <code>enrichR</code> libraries to test the genes 
+  against.</p>
+<p>Available libraries can be viewed with <code>listEnrichrDbs</code> from the
+  <code>enrichR</code> package.</p></td>
     </tr>
     <tr>
       <th>top.n</th>

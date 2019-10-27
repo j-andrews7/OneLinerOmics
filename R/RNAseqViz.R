@@ -130,9 +130,11 @@ PlotCombinedHeatmaps <- function(res.list, rld, vsd, outpath,
       padj.thresh, " and abs(log2FoldChange) >= ", fc.thresh)
 
   # Set color breaks and palette.
-  mycol <- colorRampPalette(c("darkblue", "snow", "darkred"))(1000)
-  colors <- c(seq(-3, -.11, length=500), seq(-.1, .1, length=1),
-    seq(.11, 3, length=500))
+  breaks <- c(seq(-3, -1.251, length=250), seq(-1.25, -0.1001, length=250), 
+    seq(-0.1, 0.1, length=1), seq(0.1001, 1.25, length=250), 
+    seq(1.251, 3, length=250))
+  colors <- colorRampPalette(c("#053061","#2166ac", "#f5f5f5", 
+    "#b2182b", "#67001f"))(n = 1000)
 
   # Get all DEGs from all comparisons.
   siggy <- unique(unlist(sapply(res.list, 
