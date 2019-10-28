@@ -243,7 +243,7 @@ ProcessDEGs <- function(dds, rld, vsd, outpath, level, plot.annos,
       PlotHeatmaps(res.list, rld, vsd, level, outpath, p, fc, plot.annos)
       PlotCombinedHeatmaps(res.list, rld, vsd, outpath, p, fc, plot.annos)
       if (plot.enrich) {
-        PlotEnrichments(res.list, outpath, p, fc)
+        PlotEnrichments(res.list, outpath, p, fc, enrich.libs)
       }
     }
   }

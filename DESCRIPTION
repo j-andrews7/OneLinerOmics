@@ -1,7 +1,7 @@
 Package: OneLinerOmics
 Title: One liner RNA-seq and ChIP-seq analyses.
-Date: 2019-10-24
-Version: 0.0.0.9000
+Date: 2019-10-28
+Version: 0.1.0.9000
 Authors@R: 
     person(given = "Jared",
            family = "Andrews",
@@ -13,6 +13,8 @@ Description: This package is a complement to Andrews et al, 2019.
     and ChIP-seq data in addition to vignettes detailing
     how it was used to process and analyze data in the paper.
 License: GPL-3 + file LICENSE
+Depends:
+    enrichR
 Imports:
     DESeq2,
     ggplot2,
@@ -32,7 +34,6 @@ Imports:
     TxDb.Hsapiens.UCSC.hg19.knownGene,
     plotly,
     EZscRNA,
-    enrichR,
     grDevices,
     scales,
     pheatmap,

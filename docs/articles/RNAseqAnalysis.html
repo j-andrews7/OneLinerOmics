@@ -31,7 +31,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">OneLinerOmics</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.0.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.0.9000</span>
       </span>
     </div>
 
@@ -85,7 +85,7 @@
       Washington University School of Medicine, Department of Laboratory and Genomic Medicine<br><a class="author_email" href="mailto:#"></a><a href="mailto:jared.andrews07@gmail.com" class="email">jared.andrews07@gmail.com</a>
       </address>
                   
-            <h4 class="date">Revised: Ocotober 24th, 2019</h4>
+            <h4 class="date">Revised: Ocotober 28th, 2019</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/j-andrews7/OneLinerOmics/blob/master/vignettes/RNAseqAnalysis.Rmd"><code>vignettes/RNAseqAnalysis.Rmd</code></a></small>
       <div class="hidden name"><code>RNAseqAnalysis.Rmd</code></div>
@@ -199,51 +199,60 @@
 <a class="sourceLine" id="cb5-13" title="13">    <span class="kw">fi</span></a>
 <a class="sourceLine" id="cb5-14" title="14"><span class="kw">done</span></a></code></pre></div>
 </div>
+<div id="check-mapping-rates" class="section level3">
+<h3 class="hasAnchor">
+<a href="#check-mapping-rates" class="anchor"></a>Check Mapping Rates</h3>
+<p>An easy diagnostic to ensure everything worked properly is just to check the mapping rates for each sample. Depending on the experimental setup and annotations, a mapping rate of 50-90% may be expected. Really low rates (&lt;40% or so) are worrying, and such samples should be removed from the analysis if possible.</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb6-1" title="1"><span class="kw"><a href="https://rdrr.io/r/base/Control.html">for</a></span> <span class="ex">f</span> in ./RNA_Seq/quants/*<span class="kw">;</span> <span class="kw">do</span></a>
+<a class="sourceLine" id="cb6-2" title="2">  <span class="bu">echo</span> <span class="st">"</span><span class="va">${f##</span>*/<span class="va">}</span><span class="st">"</span><span class="kw">;</span></a>
+<a class="sourceLine" id="cb6-3" title="3">  <span class="fu">grep</span> <span class="st">"Mapping rate"</span> <span class="st">"</span><span class="va">$f</span><span class="st">"</span>/logs/salmon_quant.log<span class="kw">;</span></a>
+<a class="sourceLine" id="cb6-4" title="4"><span class="kw">done</span></a></code></pre></div>
+</div>
 <div id="make-transcript-to-gene-mappings" class="section level3">
 <h3 class="hasAnchor">
 <a href="#make-transcript-to-gene-mappings" class="anchor"></a>Make Transcript-to-Gene Mappings</h3>
 <p>For gene-level summarization and readability.</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode python"><code class="sourceCode python"><a class="sourceLine" id="cb6-1" title="1"><span class="co"># python</span></a>
-<a class="sourceLine" id="cb6-2" title="2">outter <span class="op">=</span> <span class="bu">open</span>(<span class="st">"./RNA_Seq/ref/tx2gene.txt"</span>, <span class="st">"w"</span>)</a>
-<a class="sourceLine" id="cb6-3" title="3"><span class="cf">with</span> <span class="bu">open</span>(<span class="st">"./RNA_Seq/ref/gencode.v31lift37.transcripts.fa"</span>) <span class="im">as</span> f:</a>
-<a class="sourceLine" id="cb6-4" title="4">    <span class="cf">for</span> line <span class="kw"><a href="https://rdrr.io/r/base/Control.html">in</a></span> f:</a>
-<a class="sourceLine" id="cb6-5" title="5">        <span class="cf">if</span> <span class="kw">not</span> line.startswith(<span class="st">"&gt;"</span>):</a>
-<a class="sourceLine" id="cb6-6" title="6">            <span class="cf">continue</span></a>
-<a class="sourceLine" id="cb6-7" title="7">        line <span class="op">=</span> line.strip().strip(<span class="st">"&gt;"</span>).split(<span class="st">"|"</span>)</a>
-<a class="sourceLine" id="cb6-8" title="8">        tx <span class="op">=</span> line[<span class="dv">0</span>]</a>
-<a class="sourceLine" id="cb6-9" title="9">        symb <span class="op">=</span> line[<span class="dv">5</span>]</a>
-<a class="sourceLine" id="cb6-10" title="10">        out <span class="op">=</span> <span class="st">"</span><span class="ch">\t</span><span class="st">"</span>.join([tx, symb])</a>
-<a class="sourceLine" id="cb6-11" title="11">        <span class="bu">print</span>(out, <span class="bu">file</span> <span class="op">=</span> outter)</a>
-<a class="sourceLine" id="cb6-12" title="12"></a>
-<a class="sourceLine" id="cb6-13" title="13">outter.close()</a></code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode python"><code class="sourceCode python"><a class="sourceLine" id="cb7-1" title="1"><span class="co"># python</span></a>
+<a class="sourceLine" id="cb7-2" title="2">outter <span class="op">=</span> <span class="bu">open</span>(<span class="st">"./RNA_Seq/ref/tx2gene.txt"</span>, <span class="st">"w"</span>)</a>
+<a class="sourceLine" id="cb7-3" title="3"><span class="cf">with</span> <span class="bu">open</span>(<span class="st">"./RNA_Seq/ref/gencode.v31lift37.transcripts.fa"</span>) <span class="im">as</span> f:</a>
+<a class="sourceLine" id="cb7-4" title="4">    <span class="cf">for</span> line <span class="kw"><a href="https://rdrr.io/r/base/Control.html">in</a></span> f:</a>
+<a class="sourceLine" id="cb7-5" title="5">        <span class="cf">if</span> <span class="kw">not</span> line.startswith(<span class="st">"&gt;"</span>):</a>
+<a class="sourceLine" id="cb7-6" title="6">            <span class="cf">continue</span></a>
+<a class="sourceLine" id="cb7-7" title="7">        line <span class="op">=</span> line.strip().strip(<span class="st">"&gt;"</span>).split(<span class="st">"|"</span>)</a>
+<a class="sourceLine" id="cb7-8" title="8">        tx <span class="op">=</span> line[<span class="dv">0</span>]</a>
+<a class="sourceLine" id="cb7-9" title="9">        symb <span class="op">=</span> line[<span class="dv">5</span>]</a>
+<a class="sourceLine" id="cb7-10" title="10">        out <span class="op">=</span> <span class="st">"</span><span class="ch">\t</span><span class="st">"</span>.join([tx, symb])</a>
+<a class="sourceLine" id="cb7-11" title="11">        <span class="bu">print</span>(out, <span class="bu">file</span> <span class="op">=</span> outter)</a>
+<a class="sourceLine" id="cb7-12" title="12"></a>
+<a class="sourceLine" id="cb7-13" title="13">outter.close()</a></code></pre></div>
 </div>
 </div>
 <div id="analysis-with-r" class="section level2">
 <h2 class="hasAnchor">
 <a href="#analysis-with-r" class="anchor"></a>Analysis with R</h2>
 <p>Install this package if you haven’t already with <code><a href="https://rdrr.io/pkg/devtools/man/remote-reexports.html">devtools::install_github("j-andrews7/OneLinerOmics")</a></code>. If you don’t have <code>devtools</code>, it can be installed with <code><a href="https://rdrr.io/r/utils/install.packages.html">install.packages("devtools")</a></code>.</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb7-1" title="1"><span class="co"># R</span></a>
-<a class="sourceLine" id="cb7-2" title="2"><span class="kw"><a href="https://rdrr.io/r/base/message.html">suppressPackageStartupMessages</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span>(OneLinerOmics))</a></code></pre></div>
-<p>The only thing you need now is a sample sheet, which is just a table with sample names and metadata columns. We can take a peek at the sample sheet I’m using so he can see how they’re constructed. It can include as many metadata columns as you’d like.</p>
 <div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb8-1" title="1"><span class="co"># R</span></a>
-<a class="sourceLine" id="cb8-2" title="2"><span class="co"># Basic sample sheet.</span></a>
-<a class="sourceLine" id="cb8-3" title="3">samples &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/utils/read.table.html">read.table</a></span>(<span class="st">"./RNA_Seq/Samples.allCLL.txt"</span>, <span class="dt">header=</span><span class="ot">TRUE</span>, <span class="dt">sep =</span> <span class="st">"</span><span class="ch">\t</span><span class="st">"</span>)</a>
-<a class="sourceLine" id="cb8-4" title="4"><span class="kw"><a href="https://rdrr.io/r/utils/head.html">head</a></span>(samples, <span class="dv">10</span>)</a></code></pre></div>
+<a class="sourceLine" id="cb8-2" title="2"><span class="kw"><a href="https://rdrr.io/r/base/message.html">suppressPackageStartupMessages</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span>(OneLinerOmics))</a></code></pre></div>
+<p>The only thing you need now is a sample sheet, which is just a table with sample names and metadata columns. We can take a peek at the sample sheet I’m using so he can see how they’re constructed. It can include as many metadata columns as you’d like.</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb9-1" title="1"><span class="co"># R</span></a>
+<a class="sourceLine" id="cb9-2" title="2"><span class="co"># Basic sample sheet.</span></a>
+<a class="sourceLine" id="cb9-3" title="3">samples &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/utils/read.table.html">read.table</a></span>(<span class="st">"./RNA_Seq/Samples.pairedCLL.txt"</span>, <span class="dt">header=</span><span class="ot">TRUE</span>, <span class="dt">sep =</span> <span class="st">"</span><span class="ch">\t</span><span class="st">"</span>)</a>
+<a class="sourceLine" id="cb9-4" title="4"><span class="kw"><a href="https://rdrr.io/r/utils/head.html">head</a></span>(samples, <span class="dv">10</span>)</a></code></pre></div>
 <div id="run-deseq2" class="section level3">
 <h3 class="hasAnchor">
 <a href="#run-deseq2" class="anchor"></a>Run DESeq2</h3>
-<p>DESeq2 is a very popular R package for performing differential expression analysis. Raw RNA-seq counts follow a negative binomial distribution, which is how DESeq2 models the data. It is quick, flexible, and generally works quite well with little to no parameter tweaking. It can also help to mitigate the technical or batch effects on the analysis, a feature which we’ll take advantage of here.</p>
-<p>Most of these samples are 150 bp, paired-end sequencing (as shown in the ‘lib’ column of the sample sheet). A handful are 50 bp, single-end sequencing, which introduces a significant confounding factor to the analysis. In our model design, we’ll specify that we want to ignore effects due to this technical difference (by setting <code>block = "lib"</code>). The model isn’t magic, so we may very well still see evidence of the library-prep differences regardless, as they are quite strong.</p>
-<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb9-1" title="1"><span class="co"># R</span></a>
-<a class="sourceLine" id="cb9-2" title="2">mydata &lt;-<span class="st"> </span><span class="kw"><a href="../reference/RunDESeq2.html">RunDESeq2</a></span>(<span class="dt">outpath =</span> <span class="st">"./RNA_Seq/Final_Analyses/allCLL"</span>, <span class="dt">quants.path =</span> <span class="st">"./RNA_Seq/quants"</span>, </a>
-<a class="sourceLine" id="cb9-3" title="3">          <span class="dt">samplesheet =</span> <span class="st">"./RNA_Seq/Samples.allCLL.txt"</span>, <span class="dt">tx2gene =</span> <span class="st">"./RNA_Seq/ref/tx2gene.txt"</span>,</a>
-<a class="sourceLine" id="cb9-4" title="4">          <span class="dt">level =</span> <span class="st">"disease"</span>, <span class="dt">block =</span> <span class="st">"lib"</span>, <span class="dt">padj.thresh =</span> <span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">0.05</span>, <span class="fl">0.01</span>, <span class="fl">0.001</span>), </a>
-<a class="sourceLine" id="cb9-5" title="5">          <span class="dt">plot.annos =</span> <span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"disease"</span>, <span class="st">"disease.sub"</span>), <span class="dt">count.filt =</span> <span class="dv">50</span>)</a></code></pre></div>
+<p>DESeq2 is a very popular R package for performing differential expression analysis. Raw RNA-seq counts follow a negative binomial distribution, which is how DESeq2 models the data. It is quick, flexible, and generally works quite well with little to no parameter tweaking. It can also model technical or batch effects, mitigating their impact on the analysis.</p>
+<p>All of these samples are 150 bp, paired-end sequencing (as shown in the ‘lib’ column of the sample sheet). If we had a batch effect or confounding factor we wanted to try to model, we would feed the column name containing it to the <code>block</code> argument. To see the full range of options for the analysis, use <code><a href="../reference/RunDESeq2.html">?RunDESeq2</a></code>.</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb10-1" title="1"><span class="co"># R</span></a>
+<a class="sourceLine" id="cb10-2" title="2">mydata &lt;-<span class="st"> </span><span class="kw"><a href="../reference/RunDESeq2.html">RunDESeq2</a></span>(<span class="dt">outpath =</span> <span class="st">"./RNA_Seq/Final_Analyses/allCLL"</span>, <span class="dt">quants.path =</span> <span class="st">"./RNA_Seq/quants"</span>, </a>
+<a class="sourceLine" id="cb10-3" title="3">          <span class="dt">samplesheet =</span> <span class="st">"./RNA_Seq/Samples.pairedCLL.txt"</span>, <span class="dt">tx2gene =</span> <span class="st">"./RNA_Seq/ref/tx2gene.txt"</span>,</a>
+<a class="sourceLine" id="cb10-4" title="4">          <span class="dt">level =</span> <span class="st">"disease"</span>, <span class="dt">padj.thresh =</span> <span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">0.05</span>, <span class="fl">0.01</span>, <span class="fl">0.001</span>), </a>
+<a class="sourceLine" id="cb10-5" title="5">          <span class="dt">plot.annos =</span> <span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"disease"</span>, <span class="st">"disease.sub"</span>), <span class="dt">count.filt =</span> <span class="dv">50</span>)</a></code></pre></div>
 </div>
 <div id="next-steps" class="section level3">
 <h3 class="hasAnchor">
 <a href="#next-steps" class="anchor"></a>Next Steps</h3>
-<p>Yes, that’s it. Explore the plots, tables, enrichments, etc. Re-run if necessary, tweaking parameters as you see fit.</p>
+<p>Explore the plots, tables, enrichments, etc. Yes, that’s pretty much it. Re-run if necessary, tweaking parameters as you see fit.</p>
 <p><code>mydata</code> contains everything necessary to re-run visualizations via <code>ProcessDEGs</code>, which is quicker if you don’t want to read all the gene counts and perform the exporatory data analysis again.</p>
 </div>
 </div>
@@ -251,42 +260,43 @@
 <h2 class="hasAnchor">
 <a href="#alignment-creating-tracks" class="anchor"></a>Alignment &amp; Creating Tracks</h2>
 <p>Using a pseudoalignment-based quantification method is nice because it avoids the time-consuming headache of alignment and track generation, saving a lot of time and storage space.</p>
+<p>If you’re <em>really</em> set on this, something like the following shows how to do so (for single-end reads). Paired-end is similar, you just need to tweak things to provide the second reads file to <code>--readFilesIn</code>.</p>
 <blockquote>
 <p>STAR requires a lot of memory (&gt;32 GB), so running locally is really not recommended. Utilize a computing cluster/cloud.</p>
 </blockquote>
-<p>If you’re <em>really</em> set on this, something like the following shows how to do so (for single-end reads). Paired-end is similar, you just need to tweak things to provide the second reads file to <code>--readFilesIn</code>. In this case, I use <a href="https://www.gencodegenes.org/human/release_19.html">GENCODE annotations</a>, which provide necessary information for handling gapped-reads spanning splice-junctions (less important here, but critical if attempting de novo transcript discovery).</p>
-<div class="sourceCode" id="cb10"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb10-1" title="1"><span class="co"># bash-cluster</span></a>
-<a class="sourceLine" id="cb10-2" title="2"></a>
-<a class="sourceLine" id="cb10-3" title="3"><span class="co"># Create index.</span></a>
-<a class="sourceLine" id="cb10-4" title="4"><span class="ex">STAR</span> --runThreadN 8 --runMode genomeGenerate --genomeDir ./STAR_Index \</a>
-<a class="sourceLine" id="cb10-5" title="5">--genomeFastaFiles ./Homo_sapiens.GRCh37.75.dna.primary_assembly.fa \</a>
-<a class="sourceLine" id="cb10-6" title="6">--sjdbGTFfile ./gencode.v19.annotation.gtf</a>
-<a class="sourceLine" id="cb10-7" title="7"></a>
-<a class="sourceLine" id="cb10-8" title="8"><span class="co"># Align gzipped FASTQs.</span></a>
-<a class="sourceLine" id="cb10-9" title="9"><span class="kw"><a href="https://rdrr.io/r/base/Control.html">for</a></span> <span class="ex">f</span> in *.gz<span class="kw">;</span> <span class="kw">do</span></a>
-<a class="sourceLine" id="cb10-10" title="10">  <span class="ex">STAR</span> --runThreadN 8 --runMode alignReads --outFilterMultimapNmax 20 \</a>
-<a class="sourceLine" id="cb10-11" title="11">  --alignSJoverhangMin 8 --alignSJDBoverhangMin 1 --alignIntronMin 20 \</a>
-<a class="sourceLine" id="cb10-12" title="12">  --alignIntronMax 1000000 --outFilterMismatchNmax 999 \</a>
-<a class="sourceLine" id="cb10-13" title="13">  --readFilesCommand gunzip -c --genomeDir ./STAR_Index \</a>
-<a class="sourceLine" id="cb10-14" title="14">  --outSAMtype BAM SortedByCoordinate --readFilesIn <span class="st">"</span><span class="va">$f</span><span class="st">"</span> \</a>
-<a class="sourceLine" id="cb10-15" title="15">  --outFileNamePrefix <span class="va">${f%%</span>.RNA*<span class="va">}</span><span class="kw">;</span></a>
-<a class="sourceLine" id="cb10-16" title="16"><span class="kw">done</span></a>
-<a class="sourceLine" id="cb10-17" title="17"></a>
-<a class="sourceLine" id="cb10-18" title="18"><span class="co"># Change --effectiveGenomeSize if using hg38 or different organism.</span></a>
-<a class="sourceLine" id="cb10-19" title="19"><span class="kw"><a href="https://rdrr.io/r/base/Control.html">for</a></span> <span class="ex">f</span> in *.bam<span class="kw">;</span> <span class="kw">do</span> </a>
-<a class="sourceLine" id="cb10-20" title="20">    <span class="bu">echo</span> <span class="st">"</span><span class="va">$f</span><span class="st">"</span><span class="kw">;</span> </a>
-<a class="sourceLine" id="cb10-21" title="21">    <span class="ex">samtools</span> index <span class="st">"</span><span class="va">$f</span><span class="st">"</span><span class="kw">;</span></a>
-<a class="sourceLine" id="cb10-22" title="22">    <span class="ex">bamCoverage</span> --bam <span class="st">"</span><span class="va">$f</span><span class="st">"</span> -o <span class="st">"</span><span class="va">$f</span><span class="st">"</span>.rpkm.bw --binSize 10 \</a>
-<a class="sourceLine" id="cb10-23" title="23">    --ignoreForNormalization chrX chrM chrY --normalizeUsing RPKM \</a>
-<a class="sourceLine" id="cb10-24" title="24">    -p 8 --effectiveGenomeSize 2864785220<span class="kw">;</span> </a>
-<a class="sourceLine" id="cb10-25" title="25"><span class="kw">done</span></a></code></pre></div>
+<p>In this case, I use <a href="https://www.gencodegenes.org/human/release_19.html">GENCODE annotations</a>, which provide necessary information for handling gapped-reads spanning splice-junctions (less important here, but critical if attempting de novo transcript discovery).</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb11-1" title="1"><span class="co"># bash-cluster</span></a>
+<a class="sourceLine" id="cb11-2" title="2"></a>
+<a class="sourceLine" id="cb11-3" title="3"><span class="co"># Create index.</span></a>
+<a class="sourceLine" id="cb11-4" title="4"><span class="ex">STAR</span> --runThreadN 8 --runMode genomeGenerate --genomeDir ./STAR_Index \</a>
+<a class="sourceLine" id="cb11-5" title="5">--genomeFastaFiles ./Homo_sapiens.GRCh37.75.dna.primary_assembly.fa \</a>
+<a class="sourceLine" id="cb11-6" title="6">--sjdbGTFfile ./gencode.v19.annotation.gtf</a>
+<a class="sourceLine" id="cb11-7" title="7"></a>
+<a class="sourceLine" id="cb11-8" title="8"><span class="co"># Align gzipped FASTQs.</span></a>
+<a class="sourceLine" id="cb11-9" title="9"><span class="kw"><a href="https://rdrr.io/r/base/Control.html">for</a></span> <span class="ex">f</span> in *.gz<span class="kw">;</span> <span class="kw">do</span></a>
+<a class="sourceLine" id="cb11-10" title="10">  <span class="ex">STAR</span> --runThreadN 8 --runMode alignReads --outFilterMultimapNmax 20 \</a>
+<a class="sourceLine" id="cb11-11" title="11">  --alignSJoverhangMin 8 --alignSJDBoverhangMin 1 --alignIntronMin 20 \</a>
+<a class="sourceLine" id="cb11-12" title="12">  --alignIntronMax 1000000 --outFilterMismatchNmax 999 \</a>
+<a class="sourceLine" id="cb11-13" title="13">  --readFilesCommand gunzip -c --genomeDir ./STAR_Index \</a>
+<a class="sourceLine" id="cb11-14" title="14">  --outSAMtype BAM SortedByCoordinate --readFilesIn <span class="st">"</span><span class="va">$f</span><span class="st">"</span> \</a>
+<a class="sourceLine" id="cb11-15" title="15">  --outFileNamePrefix <span class="va">${f%%</span>.RNA*<span class="va">}</span><span class="kw">;</span></a>
+<a class="sourceLine" id="cb11-16" title="16"><span class="kw">done</span></a>
+<a class="sourceLine" id="cb11-17" title="17"></a>
+<a class="sourceLine" id="cb11-18" title="18"><span class="co"># Change --effectiveGenomeSize if using hg38 or different organism.</span></a>
+<a class="sourceLine" id="cb11-19" title="19"><span class="kw"><a href="https://rdrr.io/r/base/Control.html">for</a></span> <span class="ex">f</span> in *.bam<span class="kw">;</span> <span class="kw">do</span> </a>
+<a class="sourceLine" id="cb11-20" title="20">    <span class="bu">echo</span> <span class="st">"</span><span class="va">$f</span><span class="st">"</span><span class="kw">;</span> </a>
+<a class="sourceLine" id="cb11-21" title="21">    <span class="ex">samtools</span> index <span class="st">"</span><span class="va">$f</span><span class="st">"</span><span class="kw">;</span></a>
+<a class="sourceLine" id="cb11-22" title="22">    <span class="ex">bamCoverage</span> --bam <span class="st">"</span><span class="va">$f</span><span class="st">"</span> -o <span class="st">"</span><span class="va">$f</span><span class="st">"</span>.rpkm.bw --binSize 10 \</a>
+<a class="sourceLine" id="cb11-23" title="23">    --ignoreForNormalization chrX chrM chrY --normalizeUsing RPKM \</a>
+<a class="sourceLine" id="cb11-24" title="24">    -p 8 --effectiveGenomeSize 2864785220<span class="kw">;</span> </a>
+<a class="sourceLine" id="cb11-25" title="25"><span class="kw">done</span></a></code></pre></div>
 <p>Happy? Now you can view the <code>bigWig</code> files on UCSC by using a <a href="https://genome.ucsc.edu/goldenPath/help/hgTrackHubHelp.html">track hub</a> if you have a publicly accessible location to put the files.</p>
 </div>
 </div>
 <div id="session-information" class="section level1">
 <h1 class="hasAnchor">
 <a href="#session-information" class="anchor"></a>Session Information</h1>
-<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb11-1" title="1"><span class="kw"><a href="https://rdrr.io/r/utils/sessionInfo.html">sessionInfo</a></span>()</a></code></pre></div>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb12-1" title="1"><span class="kw"><a href="https://rdrr.io/r/utils/sessionInfo.html">sessionInfo</a></span>()</a></code></pre></div>
 <pre><code>## R version 3.6.1 (2019-07-05)
 ## Platform: x86_64-w64-mingw32/x64 (64-bit)
 ## Running under: Windows 10 x64 (build 16299)
@@ -304,7 +314,8 @@
 ## [1] stats     graphics  grDevices utils     datasets  methods   base     
 ## 
 ## other attached packages:
-## [1] OneLinerOmics_0.0.0.9000 BiocStyle_2.13.2        
+## [1] OneLinerOmics_0.1.0.9000 enrichR_2.1             
+## [3] BiocStyle_2.13.2        
 ## 
 ## loaded via a namespace (and not attached):
 ##   [1] reticulate_1.13             R.utils_2.9.0              
@@ -356,40 +367,40 @@
 ##  [93] xtable_1.8-4                XML_3.98-1.20              
 ##  [95] IRanges_2.19.16             gridExtra_2.3              
 ##  [97] compiler_3.6.1              scater_1.13.24             
-##  [99] tibble_2.1.3                monocle3_0.1.3.0           
-## [101] KernSmooth_2.23-15          crayon_1.3.4               
-## [103] R.oo_1.22.0                 htmltools_0.4.0            
-## [105] Formula_1.2-3               tidyr_1.0.0                
-## [107] geneplotter_1.63.0          RcppParallel_4.4.4         
-## [109] DBI_1.0.0                   MASS_7.3-51.4              
-## [111] Matrix_1.2-17               vsn_3.53.0                 
-## [113] R.methodsS3_1.7.1           gdata_2.18.0               
-## [115] parallel_3.6.1              metap_1.1                  
-## [117] igraph_1.2.4.1              GenomicRanges_1.37.16      
-## [119] pkgconfig_2.0.3             pkgdown_1.4.1              
-## [121] foreign_0.8-71              plotly_4.9.0               
-## [123] annotate_1.63.0             vipor_0.4.5                
-## [125] EnhancedVolcano_1.3.5       XVector_0.25.0             
-## [127] bibtex_0.4.2                stringr_1.4.0              
-## [129] digest_0.6.21               sctransform_0.2.0          
-## [131] RcppAnnoy_0.0.13            tsne_0.1-3                 
-## [133] rmarkdown_1.16              leiden_0.3.1               
-## [135] enrichR_2.1                 htmlTable_1.13.2           
-## [137] uwot_0.1.4                  DelayedMatrixStats_1.7.2   
-## [139] gtools_3.8.1                rjson_0.2.20               
-## [141] lifecycle_0.1.0             EZscRNA_0.1.0.9000         
-## [143] nlme_3.1-140                jsonlite_1.6               
-## [145] BiocNeighbors_1.3.5         limma_3.41.17              
-## [147] desc_1.2.0                  viridisLite_0.3.0          
-## [149] pillar_1.4.2                lattice_0.20-38            
-## [151] httr_1.4.1                  survival_2.44-1.1          
-## [153] glue_1.3.1                  png_0.1-7                  
-## [155] bit_1.1-14                  stringi_1.4.3              
-## [157] blob_1.2.0                  DESeq2_1.25.13             
-## [159] BiocSingular_1.1.7          latticeExtra_0.6-28        
-## [161] caTools_1.17.1.2            memoise_1.1.0              
-## [163] dplyr_0.8.3                 irlba_2.3.3                
-## [165] future.apply_1.3.0          ape_5.3</code></pre>
+##  [99] tibble_2.1.3                KernSmooth_2.23-15         
+## [101] crayon_1.3.4                R.oo_1.22.0                
+## [103] htmltools_0.4.0             Formula_1.2-3              
+## [105] tidyr_1.0.0                 geneplotter_1.63.0         
+## [107] RcppParallel_4.4.4          DBI_1.0.0                  
+## [109] MASS_7.3-51.4               Matrix_1.2-17              
+## [111] vsn_3.53.0                  R.methodsS3_1.7.1          
+## [113] gdata_2.18.0                parallel_3.6.1             
+## [115] metap_1.1                   igraph_1.2.4.1             
+## [117] GenomicRanges_1.37.16       pkgconfig_2.0.3            
+## [119] pkgdown_1.4.1               foreign_0.8-71             
+## [121] plotly_4.9.0                annotate_1.63.0            
+## [123] vipor_0.4.5                 EnhancedVolcano_1.3.5      
+## [125] XVector_0.25.0              bibtex_0.4.2               
+## [127] stringr_1.4.0               digest_0.6.21              
+## [129] sctransform_0.2.0           RcppAnnoy_0.0.13           
+## [131] tsne_0.1-3                  rmarkdown_1.16             
+## [133] leiden_0.3.1                htmlTable_1.13.2           
+## [135] uwot_0.1.4                  DelayedMatrixStats_1.7.2   
+## [137] curl_4.2                    gtools_3.8.1               
+## [139] rjson_0.2.20                lifecycle_0.1.0            
+## [141] EZscRNA_0.1.0.9000          nlme_3.1-140               
+## [143] jsonlite_1.6                BiocNeighbors_1.3.5        
+## [145] limma_3.41.17               desc_1.2.0                 
+## [147] viridisLite_0.3.0           pillar_1.4.2               
+## [149] lattice_0.20-38             httr_1.4.1                 
+## [151] survival_2.44-1.1           glue_1.3.1                 
+## [153] png_0.1-7                   bit_1.1-14                 
+## [155] stringi_1.4.3               blob_1.2.0                 
+## [157] DESeq2_1.25.13              BiocSingular_1.1.7         
+## [159] latticeExtra_0.6-28         caTools_1.17.1.2           
+## [161] memoise_1.1.0               dplyr_0.8.3                
+## [163] irlba_2.3.3                 future.apply_1.3.0         
+## [165] ape_5.3</code></pre>
 </div>
   </div>
 

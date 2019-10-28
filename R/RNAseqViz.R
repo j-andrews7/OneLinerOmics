@@ -156,13 +156,13 @@ PlotCombinedHeatmaps <- function(res.list, rld, vsd, outpath,
     df <- as.data.frame(colData(rld)[, plot.annos])
     p <- pheatmap(heat, cluster_rows = TRUE, show_rownames=  FALSE,
       cluster_cols = FALSE, annotation_col = df, fontsize_col = 6, 
-      fontsize = 6, scale = "row", color = mycol, breaks = colors,
+      fontsize = 6, scale = "row", color = colors, breaks = breaks,
       main = paste0("All Comparisons - ", labs[ind]))
     print(p)
     
     p <- pheatmap(heat, cluster_rows = TRUE, show_rownames=  FALSE,
       cluster_cols = TRUE, annotation_col = df, fontsize_col = 6, 
-      fontsize = 6, scale = "row", color = mycol, breaks = colors,
+      fontsize = 6, scale = "row", color = colors, breaks = breaks,
       main = paste0("All Comparisons - ", labs[ind]))
     print(p)
 

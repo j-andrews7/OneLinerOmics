@@ -1,5 +1,11 @@
-
-RunChIPQC <- function(base, samplesheet, facet = NULL) {
+#' Run ChIPQC on a sample sheet
+#'
+#'
+#'
+#'
+#'
+#'
+RunChIPQC <- function(outpath, samplesheet, facet = NULL) {
   # Base will just be the base path to create the output report in.
   # samplesheet is just a string containing the path to the samplesheet.
   # facet is a string or vector containing the columns to group samples by for plots.
