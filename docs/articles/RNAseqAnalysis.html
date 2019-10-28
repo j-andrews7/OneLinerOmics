@@ -244,7 +244,7 @@
 <p>DESeq2 is a very popular R package for performing differential expression analysis. Raw RNA-seq counts follow a negative binomial distribution, which is how DESeq2 models the data. It is quick, flexible, and generally works quite well with little to no parameter tweaking. It can also model technical or batch effects, mitigating their impact on the analysis.</p>
 <p>All of these samples are 150 bp, paired-end sequencing (as shown in the ‘lib’ column of the sample sheet). If we had a batch effect or confounding factor we wanted to try to model, we would feed the column name containing it to the <code>block</code> argument. To see the full range of options for the analysis, use <code><a href="../reference/RunDESeq2.html">?RunDESeq2</a></code>.</p>
 <div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb10-1" title="1"><span class="co"># R</span></a>
-<a class="sourceLine" id="cb10-2" title="2">mydata &lt;-<span class="st"> </span><span class="kw"><a href="../reference/RunDESeq2.html">RunDESeq2</a></span>(<span class="dt">outpath =</span> <span class="st">"./RNA_Seq/Final_Analyses/allCLL"</span>, <span class="dt">quants.path =</span> <span class="st">"./RNA_Seq/quants"</span>, </a>
+<a class="sourceLine" id="cb10-2" title="2">mydata &lt;-<span class="st"> </span><span class="kw"><a href="../reference/RunDESeq2.html">RunDESeq2</a></span>(<span class="dt">outpath =</span> <span class="st">"./RNA_Seq/Final_Analyses/pairedCLL"</span>, <span class="dt">quants.path =</span> <span class="st">"./RNA_Seq/quants"</span>, </a>
 <a class="sourceLine" id="cb10-3" title="3">          <span class="dt">samplesheet =</span> <span class="st">"./RNA_Seq/Samples.pairedCLL.txt"</span>, <span class="dt">tx2gene =</span> <span class="st">"./RNA_Seq/ref/tx2gene.txt"</span>,</a>
 <a class="sourceLine" id="cb10-4" title="4">          <span class="dt">level =</span> <span class="st">"disease"</span>, <span class="dt">padj.thresh =</span> <span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">0.05</span>, <span class="fl">0.01</span>, <span class="fl">0.001</span>), </a>
 <a class="sourceLine" id="cb10-5" title="5">          <span class="dt">plot.annos =</span> <span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"disease"</span>, <span class="st">"disease.sub"</span>), <span class="dt">count.filt =</span> <span class="dv">50</span>)</a></code></pre></div>
@@ -314,7 +314,7 @@
 ## [1] stats     graphics  grDevices utils     datasets  methods   base     
 ## 
 ## other attached packages:
-## [1] OneLinerOmics_0.1.0.9000 enrichR_2.1             
+## [1] OneLinerOmics_0.0.0.9000 enrichR_2.1             
 ## [3] BiocStyle_2.13.2        
 ## 
 ## loaded via a namespace (and not attached):
