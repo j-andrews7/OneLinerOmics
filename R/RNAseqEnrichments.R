@@ -24,6 +24,7 @@
 #'   against.
 #' 
 #' @importFrom EZscRNA RunEnrichr VizEnrichments
+#' @import enrichR
 #'
 #' @export
 #'
@@ -34,9 +35,7 @@
 #' @author Jared Andrews
 #'
 PlotEnrichments <- function(res.list, outpath, padj.thresh, 
-  fc.thresh, libraries = c("GO_Molecular_Function_2018", 
-  "GO_Cellular_Component_2018", "GO_Biological_Process_2018", "KEGG_2019_Human",
-  "Reactome_2016", "BioCarta_2016", "Panther_2016")) {
+  fc.thresh, libraries) {
 
   for (r in seq_along(res.list)) {
     res <- res.list[[r]]

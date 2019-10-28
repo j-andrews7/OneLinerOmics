@@ -35,6 +35,11 @@
 #'   This step is quite time-consuming with many genes.
 #' @param plot.enrich Boolean indicating whether enrichment analyses for DEGs 
 #'   should be run and plotted for each comparison. 
+#' @param enrich.libs A vector of valid \code{enrichR} libraries to test the genes 
+#'   against.
+#'
+#'   Available libraries can be viewed with \code{listEnrichrDbs} from the
+#'   \code{enrichR} package.
 #' @param top.n Number of differentially expressed genes to create boxplots for, 
 #'   ranked by adj. p-value after applying \code{padj.thresh} and 
 #'   \code{fc.thresh} thresholds. If multiple thresholds are provided, the 
@@ -67,7 +72,10 @@
 #'
 RunDESeq2 <- function(outpath, quants.path, samplesheet, tx2gene, level,  
   padj.thresh = 0.05, fc.thresh = 2, plot.annos = NULL, plot.box = TRUE, 
-  plot.enrich = TRUE, top.n = 100, block = NULL, count.filt = 10) {
+  plot.enrich = TRUE, enrich.libs = c("GO_Molecular_Function_2018", 
+  "GO_Cellular_Component_2018", "GO_Biological_Process_2018", "KEGG_2019_Human",
+  "Reactome_2016", "BioCarta_2016", "Panther_2016"), top.n = 100, block = NULL, 
+  count.filt = 10) {
     
   message("### EXPLORATORY DATA ANALYSIS ###\n")
   message("# SET DIRECTORY STRUCTURE AND MODEL DESIGN #\n")
@@ -129,7 +137,7 @@ RunDESeq2 <- function(outpath, quants.path, samplesheet, tx2gene, level,
 
   # All the actual processing occurs here.
   full <- ProcessDEGs(dds, rld, vsd, base, level, plot.annos, padj.thresh,
-    fc.thresh, plot.box, plot.enrich, top.n)
+    fc.thresh, plot.box, plot.enrich, enrich.libs, top.n)
 
   ### SAVING OBJECTS ###
   message("\n# SAVING ROBJECTS #\n")
@@ -180,7 +188,12 @@ RunDESeq2 <- function(outpath, quants.path, samplesheet, tx2gene, level,
 #' @param plot.box Boolean indicating whether box plots for DEGs should be 
 #'   created for each comparison. If so, the \code{top.n} genes will be plotted.
 #' @param plot.enrich Boolean indicating whether enrichment analyses for DEGs 
-#'   should be run and plotted for each comparison. 
+#'   should be run and plotted for each comparison.
+#' @param enrich.libs A vector of valid \code{enrichR} libraries to test the genes 
+#'   against.
+#'
+#'   Available libraries can be viewed with \code{listEnrichrDbs} from the
+#'   \code{enrichR} package.
 #' @param top.n Number of differentially expressed genes to create boxplots for, 
 #'   ranked by adj. p-value after applying \code{padj.thresh} and 
 #'   \code{fc.thresh} thresholds. If multiple thresholds are provided, the 
@@ -193,7 +206,7 @@ RunDESeq2 <- function(outpath, quants.path, samplesheet, tx2gene, level,
 #'   \code{\link[DESeq2]{rlog}}, and a \linkS4class{RangedSummarizedExperiment} 
 #'   object from running \code{\link[DESeq2]{vst}} named 'vsd'.
 #'
-#' @importFrom DESeq2 lfcShrink counts plotCounts
+#' @importFrom DESeq2 lfcShrink counts plotCounts plotMA
 #'
 #' @export
 #'
@@ -201,7 +214,9 @@ RunDESeq2 <- function(outpath, quants.path, samplesheet, tx2gene, level,
 #'
 ProcessDEGs <- function(dds, rld, vsd, outpath, level, plot.annos, 
   padj.thresh = 0.05, fc.thresh = 2, plot.box = TRUE, plot.enrich = TRUE, 
-  top.n = 100) {
+  enrich.libs = c("GO_Molecular_Function_2018", 
+  "GO_Cellular_Component_2018", "GO_Biological_Process_2018", "KEGG_2019_Human",
+  "Reactome_2016", "BioCarta_2016", "Panther_2016"), top.n = 100) {
 
   message("\n# COLLECTING RESULTS #\n")
   # Get all possible sample comparisons.
@@ -228,7 +243,7 @@ ProcessDEGs <- function(dds, rld, vsd, outpath, level, plot.annos,
       PlotHeatmaps(res.list, rld, vsd, level, outpath, p, fc, plot.annos)
       PlotCombinedHeatmaps(res.list, rld, vsd, outpath, p, fc, plot.annos)
       if (plot.enrich) {
-        PlotEnrichments(res.list, outpath, p, fc)
+        PlotEnrichments(res.list, outpath, p, fc, enrich.libs)
       }
     }
   }

@@ -5,15 +5,15 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>B Cell Lymphoma Analysis for Andrews et al (2019) • AndrewsBCellLymphoma</title>
+<title>One liner RNA-seq and ChIP-seq analyses. • OneLinerOmics</title>
 <!-- jquery --><script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script><!-- Bootstrap --><link href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/3.3.7/sandstone/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha256-U5ZEeKfGNOja007MMD3YBI0A3OSZOQbeG6z2f2Y0hu8=" crossorigin="anonymous"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/all.min.css" integrity="sha256-nAmazAk6vS34Xqo0BSrTb+abbtFlgsFK7NKSi6o7Y78=" crossorigin="anonymous">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/v4-shims.min.css" integrity="sha256-6qHlizsOWFskGlwVOKuns+D1nB6ssZrHQrNj1wGplHc=" crossorigin="anonymous">
 <!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.4/clipboard.min.js" integrity="sha256-FiZwavyI2V6+EXO1U+xzLG3IKldpiTFf3153ea9zikQ=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/headroom.min.js" integrity="sha256-DJFC1kqIhelURkuza0AvYal5RxMtpzLjFhsnVIeuk+U=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- pkgdown --><link href="pkgdown.css" rel="stylesheet">
-<script src="pkgdown.js"></script><meta property="og:title" content="B Cell Lymphoma Analysis for Andrews et al (2019)">
+<script src="pkgdown.js"></script><meta property="og:title" content="One liner RNA-seq and ChIP-seq analyses.">
 <meta property="og:description" content="This package is a complement to Andrews et al, 2019. 
-    It provides simple functions for major analysis steps dealing with
-    both RNA-seq and ChIP-seq data in addition to a vignette detailing
+    It provides simple functions for major analyses of RNA-seq 
+    and ChIP-seq data in addition to vignettes detailing
     how it was used to process and analyze data in the paper.">
 <meta name="twitter:card" content="summary">
 <!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js" integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/config/TeX-AMS-MML_HTMLorMML.js" integrity="sha256-84DKXVJXs0/F8OTMzX4UR909+jtl4G7SPypPavF+GfA=" crossorigin="anonymous"></script><!--[if lt IE 9]>
@@ -33,8 +33,8 @@
         <span class="icon-bar"></span>
       </button>
       <span class="navbar-brand">
-        <a class="navbar-link" href="index.html">AndrewsBCellLymphoma</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.0.9000</span>
+        <a class="navbar-link" href="index.html">OneLinerOmics</a>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.0.9000</span>
       </span>
     </div>
 
@@ -64,7 +64,7 @@
       </ul>
 <ul class="nav navbar-nav navbar-right">
 <li>
-  <a href="https://github.com/j-andrews7/AndrewsBCellLymphoma">
+  <a href="https://github.com/j-andrews7/OneLinerOmics">
     <span class="fab fa fab fa-github fa-lg"></span>
      
   </a>
@@ -81,26 +81,26 @@
 
       </header><div class="row">
   <div class="contents col-md-9">
-<div id="andrewsbcelllymphoma" class="section level1">
+<div id="onelineromics" class="section level1">
 <div class="page-header"><h1 class="hasAnchor">
-<a href="#andrewsbcelllymphoma" class="anchor"></a>AndrewsBCellLymphoma</h1></div>
+<a href="#onelineromics" class="anchor"></a>OneLinerOmics</h1></div>
 
 <p>This R package contains several functions that compress major RNA-seq and ChIP-seq analysis steps into one-liners (or two, I’m not perfect). It is meant to serve as a complement to the (future) publication and as a record of how the data was analyzed in addition to serving as a basis for the Payton Lab bulk RNA-seq and ChIP-seq analyses moving forwards.</p>
 <div id="installation" class="section level2">
 <h2 class="hasAnchor">
 <a href="#installation" class="anchor"></a>Installation</h2>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a><span class="kw"><a href="https://rdrr.io/r/base/library.html">require</a></span>(<span class="st">"devtools"</span>)</span>
-<span id="cb1-2"><a href="#cb1-2"></a>devtools<span class="op">::</span><span class="kw"><a href="https://rdrr.io/pkg/devtools/man/remote-reexports.html">install_github</a></span>(<span class="st">"j-andrews7/AndrewsBCellLymphoma"</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" title="1"><span class="kw"><a href="https://rdrr.io/r/base/library.html">require</a></span>(<span class="st">"devtools"</span>)</a>
+<a class="sourceLine" id="cb1-2" title="2">devtools<span class="op">::</span><span class="kw"><a href="https://rdrr.io/pkg/devtools/man/remote-reexports.html">install_github</a></span>(<span class="st">"j-andrews7/OneLinerOmics"</span>)</a></code></pre></div>
 </div>
 <div id="usage" class="section level2">
 <h2 class="hasAnchor">
 <a href="#usage" class="anchor"></a>Usage</h2>
-<p>Please see the <a href="https://j-andrews7.github.io/AndrewsBCellLymphoma">docs</a> for a full reference and vignettes with examples (including steps like gene count quantification). The <a href="https://combine-lab.github.io/salmon/getting_started/">salmon</a>, <a href="https://bioconductor.org/packages/release/bioc/html/DESeq2.html">DESeq2</a>, and <a href="https://bioconductor.org/packages/release/bioc/html/DiffBind.html">DiffBind</a> manuals and vignettes may also be helpful for understanding what’s going on under the hood and interpreting the output.</p>
+<p>Please see the <a href="https://j-andrews7.github.io/OneLinerOmics">docs</a> for a full reference and vignettes with examples (including steps like gene count quantification). The <a href="https://combine-lab.github.io/salmon/getting_started/">salmon</a>, <a href="https://bioconductor.org/packages/release/bioc/html/DESeq2.html">DESeq2</a>, and <a href="https://bioconductor.org/packages/release/bioc/html/DiffBind.html">DiffBind</a> manuals and vignettes may also be helpful for understanding what’s going on under the hood and interpreting the output.</p>
 </div>
 <div id="issues" class="section level2">
 <h2 class="hasAnchor">
 <a href="#issues" class="anchor"></a>Issues</h2>
-<p>Please direct all complaints to <a href="https://github.com/j-andrews7/AndrewsBCellLymphoma/issues">management</a>.</p>
+<p>Please direct all complaints to <a href="https://github.com/j-andrews7/OneLinerOmics/issues">management</a>.</p>
 </div>
 </div>
   </div>
@@ -109,9 +109,9 @@
     <div class="links">
 <h2>Links</h2>
 <ul class="list-unstyled">
-<li>Browse source code at <br><a href="https://github.com/j-andrews7/AndrewsBCellLymphoma">https://​github.com/​j-andrews7/​AndrewsBCellLymphoma</a>
+<li>Browse source code at <br><a href="https://github.com/j-andrews7/OneLinerOmics">https://​github.com/​j-andrews7/​OneLinerOmics</a>
 </li>
-<li>Report a bug at <br><a href="https://github.com/j-andrews7/AndrewsBCellLymphoma/issues">https://​github.com/​j-andrews7/​AndrewsBCellLymphoma/​issues</a>
+<li>Report a bug at <br><a href="https://github.com/j-andrews7/OneLinerOmics/issues">https://​github.com/​j-andrews7/​OneLinerOmics/​issues</a>
 </li>
 </ul>
 </div>
@@ -134,7 +134,7 @@
   <div class="dev-status">
 <h2>Dev status</h2>
 <ul class="list-unstyled">
-<li><a href="https://j-andrews7.github.io/AndrewsBCellLymphoma"><img src="https://img.shields.io/badge/docs-site-brightgreen?style=plastic" alt="Docs"></a></li>
+<li><a href="https://j-andrews7.github.io/OneLinerOmics"><img src="https://img.shields.io/badge/docs-site-brightgreen?style=plastic" alt="Docs"></a></li>
 </ul>
 </div>
 </div>

@@ -6,7 +6,10 @@
 \usage{
 ProcessDEGs(dds, rld, vsd, outpath, level, plot.annos,
   padj.thresh = 0.05, fc.thresh = 2, plot.box = TRUE,
-  plot.enrich = TRUE, top.n = 100)
+  plot.enrich = TRUE, enrich.libs = c("GO_Molecular_Function_2018",
+  "GO_Cellular_Component_2018", "GO_Biological_Process_2018",
+  "KEGG_2019_Human", "Reactome_2016", "BioCarta_2016", "Panther_2016"),
+  top.n = 100)
 }
 \arguments{
 \item{dds}{A \linkS4class{DESeqDataSet} object as returned by 
@@ -42,6 +45,12 @@ created for each comparison. If so, the \code{top.n} genes will be plotted.}
 
 \item{plot.enrich}{Boolean indicating whether enrichment analyses for DEGs 
 should be run and plotted for each comparison.}
+
+\item{enrich.libs}{A vector of valid \code{enrichR} libraries to test the genes 
+  against.
+
+  Available libraries can be viewed with \code{listEnrichrDbs} from the
+  \code{enrichR} package.}
 
 \item{top.n}{Number of differentially expressed genes to create boxplots for, 
 ranked by adj. p-value after applying \code{padj.thresh} and 

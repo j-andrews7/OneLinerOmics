@@ -4,7 +4,7 @@ author:
 - name: Jared Andrews
   email: jared.andrews07@gmail.com
   affiliation: Washington University School of Medicine, Department of Laboratory and Genomic Medicine
-date: "Revised: Ocotober 24th, 2019"
+date: "Revised: Ocotober 28th, 2019"
 output:
   BiocStyle::html_document:
     toc_float: true
@@ -136,6 +136,19 @@ for f in ./RNA_Seq/FASTQs/*; do
 done
 ```
 
+### Check Mapping Rates
+
+An easy diagnostic to ensure everything worked properly is just to check the mapping rates for each sample. 
+Depending on the experimental setup and annotations, a mapping rate of 50-90% may be expected.
+Really low rates (<40% or so) are worrying, and such samples should be removed from the analysis if possible.
+
+```{bash}
+for f in ./RNA_Seq/quants/*; do
+  echo "${f##*/}";
+  grep "Mapping rate" "$f"/logs/salmon_quant.log;
+done
+```
+
 ### Make Transcript-to-Gene Mappings
 For gene-level summarization and readability.
 
@@ -172,7 +185,7 @@ It can include as many metadata columns as you'd like.
 ```{r samplesheet, eval=FALSE}
 # R
 # Basic sample sheet.
-samples <- read.table("./RNA_Seq/Samples.allCLL.txt", header=TRUE, sep = "\t")
+samples <- read.table("./RNA_Seq/Samples.pairedCLL.txt", header=TRUE, sep = "\t")
 head(samples, 10)
 ```
 
@@ -181,35 +194,37 @@ head(samples, 10)
 DESeq2 is a very popular R package for performing differential expression analysis.
 Raw RNA-seq counts follow a negative binomial distribution, which is how DESeq2 models the data.
 It is quick, flexible, and generally works quite well with little to no parameter tweaking.
-It can also help to mitigate the technical or batch effects on the analysis, a feature which we'll take advantage of here. 
+It can also model technical or batch effects, mitigating their impact on the analysis. 
 
-Most of these samples are 150 bp, paired-end sequencing (as shown in the 'lib' column of the sample sheet).
-A handful are 50 bp, single-end sequencing, which introduces a significant confounding factor to the analysis.
-In our model design, we'll specify that we want to ignore effects due to this technical difference (by setting `block = "lib"`).
-The model isn't magic, so we may very well still see evidence of the library-prep differences regardless, as they are quite strong.
+All of these samples are 150 bp, paired-end sequencing (as shown in the 'lib' column of the sample sheet).
+If we had a batch effect or confounding factor we wanted to try to model, we would feed the column name containing it to the `block` argument.
+To see the full range of options for the analysis, use `?RunDESeq2`.
 
 ```{r run-deseq2, EVAL=FALSE}
 # R
 mydata <- RunDESeq2(outpath = "./RNA_Seq/Final_Analyses/allCLL", quants.path = "./RNA_Seq/quants", 
-          samplesheet = "./RNA_Seq/Samples.allCLL.txt", tx2gene = "./RNA_Seq/ref/tx2gene.txt",
-          level = "disease", block = "lib", padj.thresh = c(0.05, 0.01, 0.001), 
+          samplesheet = "./RNA_Seq/Samples.pairedCLL.txt", tx2gene = "./RNA_Seq/ref/tx2gene.txt",
+          level = "disease", padj.thresh = c(0.05, 0.01, 0.001), 
           plot.annos = c("disease", "disease.sub"), count.filt = 50)
 ```
 
 ### Next Steps
 
-Yes, that's it.
 Explore the plots, tables, enrichments, etc.
+Yes, that's pretty much it.
 Re-run if necessary, tweaking parameters as you see fit. 
+
+`mydata` contains everything necessary to re-run visualizations via `ProcessDEGs`, which is quicker if you don't want to read all the gene counts and perform the exporatory data analysis again.
 
 ## Alignment & Creating Tracks
 
 Using a pseudoalignment-based quantification method is nice because it avoids the time-consuming headache of alignment and track generation, saving a lot of time and storage space.
 
+If you're _really_ set on this, something like the following shows how to do so (for single-end reads). 
+Paired-end is similar, you just need to tweak things to provide the second reads file to `--readFilesIn`.
+
 > STAR requires a lot of memory (>32 GB), so running locally is really not recommended. Utilize a computing cluster/cloud.
 
-If you're _really_ set on this, something like the following shows how to do so (for single-end reads). 
-Paired-end is similar, you just need to tweak things to provide the second reads file to `--readFilesIn`. 
 In this case, I use [GENCODE annotations](https://www.gencodegenes.org/human/release_19.html), which provide necessary information for handling gapped-reads spanning splice-junctions (less important here, but critical if attempting de novo transcript discovery).
 
 ```{bash make_tracks, eval=FALSE}
