@@ -24,7 +24,6 @@
 #'   against.
 #' 
 #' @importFrom EZscRNA RunEnrichr VizEnrichments
-#' @import enrichR
 #'
 #' @export
 #'

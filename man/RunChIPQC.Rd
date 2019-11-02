@@ -4,8 +4,25 @@
 \alias{RunChIPQC}
 \title{Run ChIPQC on a sample sheet}
 \usage{
-RunChIPQC(outpath, samplesheet, facet = NULL)
+RunChIPQC(outpath, samplesheet, chromosomes = "chr10")
+}
+\arguments{
+\item{outpath}{Path to directory to be used for output.}
+
+\item{samplesheet}{Path to samplesheet containing sample metadata.}
+
+\item{chromosomes}{String or character vector indicating chromosomes to be 
+used for QC.}
+}
+\value{
+Dataframe containing QC metrics for each sample, including 
+  cross-correlation scores, fraction of reads in peaks, fragment length, etc.
 }
 \description{
-Run ChIPQC on a sample sheet
+This function simply runs \code{\link[ChIPQC]{ChIPQC}} on a sample sheet and
+returns QC metrics. It generates a consensus peakset between all sets before
+defining the fraction of reads in peaks and other metrics.
+}
+\author{
+Jared Andrews
 }

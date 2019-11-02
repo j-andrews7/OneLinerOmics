@@ -179,7 +179,7 @@ suppressPackageStartupMessages(library(OneLinerOmics))
 ```
 
 The only thing you need now is a sample sheet, which is just a table with sample names and metadata columns. 
-We can take a peek at the sample sheet I'm using so he can see how they're constructed. 
+We can take a peek at the sample sheet I'm using so we can see how they're constructed. 
 It can include as many metadata columns as you'd like.
 
 ```{r samplesheet, eval=FALSE}
@@ -202,7 +202,7 @@ To see the full range of options for the analysis, use `?RunDESeq2`.
 
 ```{r run-deseq2, EVAL=FALSE}
 # R
-mydata <- RunDESeq2(outpath = "./RNA_Seq/Final_Analyses/allCLL", quants.path = "./RNA_Seq/quants", 
+mydata <- RunDESeq2(outpath = "./RNA_Seq/Final_Analyses/pairedCLL", quants.path = "./RNA_Seq/quants", 
           samplesheet = "./RNA_Seq/Samples.pairedCLL.txt", tx2gene = "./RNA_Seq/ref/tx2gene.txt",
           level = "disease", padj.thresh = c(0.05, 0.01, 0.001), 
           plot.annos = c("disease", "disease.sub"), count.filt = 50)

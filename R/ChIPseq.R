@@ -1,21 +1,36 @@
 #' Run ChIPQC on a sample sheet
 #'
+#' This function simply runs \code{\link[ChIPQC]{ChIPQC}} on a sample sheet and
+#' returns QC metrics. It generates a consensus peakset between all sets before
+#' defining the fraction of reads in peaks and other metrics.
 #'
+#' @param outpath Path to directory to be used for output.
+#' @param samplesheet Path to samplesheet containing sample metadata.
+#' @param chromosomes String or character vector indicating chromosomes to be 
+#'   used for QC. 
+#' @return Dataframe containing QC metrics for each sample, including 
+#'   cross-correlation scores, fraction of reads in peaks, fragment length, etc.
 #'
+#' @importFrom ChIPQC ChIPQC QCmetrics
+#' @importFrom BiocParallel SerialParam register
+#' @importFrom utils write.table
+#' 
+#' @export
 #'
+#' @author Jared Andrews
 #'
-#'
-RunChIPQC <- function(outpath, samplesheet, facet = NULL) {
-  # Base will just be the base path to create the output report in.
-  # samplesheet is just a string containing the path to the samplesheet.
-  # facet is a string or vector containing the columns to group samples by for plots.
+RunChIPQC <- function(outpath, samplesheet, chromosomes = "chr10") {
+
+  register(SerialParam())
+  exp <- suppressMessages(suppressWarnings(ChIPQC(samplesheet, 
+    chromosomes = chromosomes, consensus = TRUE, 
+    bCount = FALSE)))
+  metrics <- as.data.frame(QCmetrics(exp))
   
-  data(blacklist_hg19)
-  exp = ChIPQC(samplesheet, consensus=TRUE, bCount=TRUE, bParallel=FALSE)
-  print(exp)
-  ChIPQCreport(exp, reportFolder=base, facetBy=facet)
+  write.table(metrics, file = paste0(outpath, "/QCmetrics.txt"), quote = FALSE,
+    sep = "\t")
   
-  return(exp)
+  return(metrics)
 }
 
 
@@ -424,33 +439,6 @@ ProcessSEs <- function(samplesheet, rblock, g1, g2, base, breaks, color) {
   compare.peak_heights(g1, g2, df, base, process_se=TRUE)
   dev.off()
   
-  #message('# DEALING WITH DB SEs #\n\n')
-  # Subset so that we can compare localization and pathways between these groups as well.
-  #if (!is.null(rblock)) {
-    #reportdb = dba.report(results, th = 0.05, bCalled = TRUE, 
-      #bCalledDetail = TRUE, bCounts = TRUE, method = DBA_DESEQ2_BLOCK)
-  #} else {
-    #reportdb = dba.report(results, th = 0.05, bCalled = TRUE, 
-      #bCalledDetail = TRUE, bCounts = TRUE, method = DBA_DESEQ2)
-  #}
-  #g1up = reportdb[(reportdb$Fold > 0)]
-  #g2up = reportdb[(reportdb$Fold < 0)]
-  
-  #if (nrow(as.data.frame(reportdb)) > 1 & !(is.null(reportdb))) {
-
-      # Create a named list of our subsets.
-      #files = GRangesList(reportdb,g1up,g2up)
-      #names(files) = c("All_DB", paste0(g1,".up"), paste0(g2,".up"))
-      #peakAnnoList <- lapply(files, annotatePeak, TxDb = txdb,
-        #tssRegion=c(-2000, 2000), verbose = FALSE, annoDb = "org.Hs.eg.db")
-      #x = as.data.frame(peakAnnoList[1])
-      #write.table(x, 
-        #file = paste0(base, "/", g1, '-v-', g2, ".", mark, ".AllDB.SEs.txt"), 
-        #sep = "\t", quote = FALSE, row.names = FALSE)
-      #process.dbs(peakAnnoList, reportdb, results, rblock, g1, g2, base, mark, 
-        #color, breaks)
-  #}
-  
   return(df)
 }
 
@@ -726,304 +714,3 @@ RunEnrichments <- function(peakAnnoList, g1, g2, outpath) {
   dev.off()
 }
 
-
-GetOverlaps <- function(h3, k27, g1, g2, base, block){
-  # h3 = dataframe of H3ac peaks.
-  # k27 = dataframe of H3K27ac peaks.
-  # g1 = Name of group 1 for file naming, etc.
-  # g2 = Name of group 2 for file naming, etc.
-  # base = Base filepath to save plots.
-  # block = Block
-  
-  # Create output folder if necessary.
-  if (!dir.exists(file.path(base,"H3ac-K27ac-Overlap", block))) {
-    dir.create(file.path(base,"H3ac-K27ac-Overlap", block), recursive=TRUE)
-  }
-  base <- file.path(base,"H3ac-K27ac-Overlap",block)
-  
-  # Convert each to GRanges objects for easy overlap.
-  h3 <- makeGRangesFromDataFrame(h3, keep.extra.columns=TRUE)
-  k27 <- makeGRangesFromDataFrame(k27, keep.extra.columns=TRUE)
-  
-  # Additional subsetting.
-  # Differentially bound peaks
-  h3.db <- h3[h3$FDR <= 0.05]
-  k27.db <- k27[k27$FDR <= 0.05]
-  
-  h3.dbup <- h3.db[h3.db$Fold > 0]
-  k27.dbup <- k27.db[k27.db$Fold > 0]
-  
-  h3.dbdown <- h3.db[h3.db$Fold < 0]
-  k27.dbdown <- k27.db[k27.db$Fold < 0]
-  
-  # All promoters.
-  h3.prom <- h3[(h3$cat=="PROM" | h3$cat=="PROM.SE")]
-  k27.prom <- k27[(k27$cat=="PROM" | k27$cat=="PROM.SE")]
-  
-  h3.promup <- h3.prom[h3.prom$Fold > 0]
-  k27.promup <- k27.prom[k27.prom$Fold > 0]
-  
-  h3.promdown <- h3.prom[h3.prom$Fold < 0]
-  k27.promdown <- k27.prom[k27.prom$Fold < 0]
-  
-  # Promoters in SEs.
-  h3.prom.se <- h3[(h3$cat=="PROM.SE")]
-  k27.prom.se <- k27[(k27$cat=="PROM.SE")]
-  
-  h3.promup.se <- h3.prom.se[h3.prom.se$Fold > 0]
-  k27.promup.se <- k27.prom.se[k27.prom.se$Fold > 0]
-  
-  h3.promdown.se <- h3.prom.se[h3.prom.se$Fold < 0]
-  k27.promdown.se <- k27.prom.se[k27.prom.se$Fold < 0]
-  
-  # Promoters outside SEs.
-  h3.prom.nose <- h3[(h3$cat=="PROM")]
-  k27.prom.nose <- k27[(k27$cat=="PROM")]
-  
-  h3.promup.nose <- h3.prom.nose[h3.prom.nose$Fold > 0]
-  k27.promup.nose <- k27.prom.nose[k27.prom.nose$Fold > 0]
-  
-  h3.promdown.nose <- h3.prom.nose[h3.prom.nose$Fold < 0]
-  k27.promdown.nose <- k27.prom.nose[k27.prom.nose$Fold < 0]
-  
-  # All DB promoters.
-  h3.db.prom <- h3.db[(h3.db$cat=="PROM" | h3.db$cat=="PROM.SE")]
-  k27.db.prom <- k27.db[(k27.db$cat=="PROM" | k27.db$cat=="PROM.SE")]
-  
-  h3.db.promup <- h3.db.prom[h3.db.prom$Fold > 0]
-  k27.db.promup <- k27.db.prom[k27.db.prom$Fold > 0]
-  
-  h3.db.promdown <- h3.db.prom[h3.db.prom$Fold < 0]
-  k27.db.promdown <- k27.db.prom[k27.db.prom$Fold < 0]
-  
-  # DB Promoters in SEs.
-  h3.db.prom.se <- h3.db[(h3.db$cat=="PROM.SE")]
-  k27.db.prom.se <- k27.db[(k27.db$cat=="PROM.SE")]
-  
-  h3.db.promup.se <- h3.db.prom.se[h3.db.prom.se$Fold > 0]
-  k27.db.promup.se <- k27.db.prom.se[k27.db.prom.se$Fold > 0]
-  
-  h3.db.promdown.se <- h3.db.prom.se[h3.db.prom.se$Fold < 0]
-  k27.db.promdown.se <- k27.db.prom.se[k27.db.prom.se$Fold < 0]
-  
-  # DB Promoters outside SEs.
-  h3.db.prom.nose <- h3.db[(h3.db$cat=="PROM")]
-  k27.db.prom.nose <- k27.db[(k27.db$cat=="PROM")]
-  
-  h3.db.promup.nose <- h3.db.prom.nose[h3.db.prom.nose$Fold > 0]
-  k27.db.promup.nose <- k27.db.prom.nose[k27.db.prom.nose$Fold > 0]
-  
-  h3.db.promdown.nose <- h3.db.prom.nose[h3.db.prom.nose$Fold < 0]
-  k27.db.promdown.nose <- k27.db.prom.nose[k27.db.prom.nose$Fold < 0]
-  
-  # All enhancers.
-  h3.ce <- h3[(h3$cat=="CE" | h3$cat=="CE.SE")]
-  k27.ce <- k27[(k27$cat=="CE" | k27$cat=="CE.SE")]
-  
-  h3.ceup <- h3.ce[h3.ce$Fold > 0]
-  k27.ceup <- k27.ce[k27.ce$Fold > 0]
-  
-  h3.cedown <- h3.ce[h3.ce$Fold < 0]
-  k27.cedown <- k27.ce[k27.ce$Fold < 0]
-  
-  # Enhancers in SEs.
-  h3.ce.se <- h3[(h3$cat=="PROM.SE")]
-  k27.ce.se <- k27[(k27$cat=="PROM.SE")]
-  
-  h3.ceup.se <- h3.ce.se[h3.ce.se$Fold > 0]
-  k27.ceup.se <- k27.ce.se[k27.ce.se$Fold > 0]
-  
-  h3.cedown.se <- h3.ce.se[h3.ce.se$Fold < 0]
-  k27.cedown.se <- k27.ce.se[k27.ce.se$Fold < 0]
-  
-  # enhancers outside SEs.
-  h3.ce.nose <- h3[(h3$cat=="PROM")]
-  k27.ce.nose <- k27[(k27$cat=="PROM")]
-  
-  h3.ceup.nose <- h3.ce.nose[h3.ce.nose$Fold > 0]
-  k27.ceup.nose <- k27.ce.nose[k27.ce.nose$Fold > 0]
-  
-  h3.cedown.nose <- h3.ce.nose[h3.ce.nose$Fold < 0]
-  k27.cedown.nose <- k27.ce.nose[k27.ce.nose$Fold < 0]
-  
-  # All DB enhancers.
-  h3.db.ce <- h3.db[(h3.db$cat=="PROM" | h3.db$cat=="PROM.SE")]
-  k27.db.ce <- k27.db[(k27.db$cat=="PROM" | k27.db$cat=="PROM.SE")]
-  
-  h3.db.ceup <- h3.db.ce[h3.db.ce$Fold > 0]
-  k27.db.ceup <- k27.db.ce[k27.db.ce$Fold > 0]
-  
-  h3.db.cedown <- h3.db.ce[h3.db.ce$Fold < 0]
-  k27.db.cedown <- k27.db.ce[k27.db.ce$Fold < 0]
-  
-  # DB enhancers in SEs.
-  h3.db.ce.se <- h3.db[(h3.db$cat=="PROM.SE")]
-  k27.db.ce.se <- k27.db[(k27.db$cat=="PROM.SE")]
-  
-  h3.db.ceup.se <- h3.db.ce.se[h3.db.ce.se$Fold > 0]
-  k27.db.ceup.se <- k27.db.ce.se[k27.db.ce.se$Fold > 0]
-  
-  h3.db.cedown.se <- h3.db.ce.se[h3.db.ce.se$Fold < 0]
-  k27.db.cedown.se <- k27.db.ce.se[k27.db.ce.se$Fold < 0]
-  
-  # DB enhancers outside SEs.
-  h3.db.ce.nose <- h3.db[(h3.db$cat=="PROM")]
-  k27.db.ce.nose <- k27.db[(k27.db$cat=="PROM")]
-  
-  h3.db.ceup.nose <- h3.db.ce.nose[h3.db.ce.nose$Fold > 0]
-  k27.db.ceup.nose <- k27.db.ce.nose[k27.db.ce.nose$Fold > 0]
-  
-  h3.db.cedown.nose <- h3.db.ce.nose[h3.db.ce.nose$Fold < 0]
-  k27.db.cedown.nose <- k27.db.ce.nose[k27.db.ce.nose$Fold < 0]
-  
-  # Overlaps.
-  hits <- findOverlaps(h3, k27)
-  hits.prom <- findOverlaps(h3.prom, k27.prom)
-  hits.promup <- findOverlaps(h3.promup, k27.promup)
-  hits.promdown <- findOverlaps(h3.promdown, k27.promdown)
-  hits.prom.se <- findOverlaps(h3.prom.se, k27.prom.se)
-  hits.promup.se <- findOverlaps(h3.promup.se, k27.promup.se)
-  hits.promdown.se <- findOverlaps(h3.promdown.se, k27.promdown.se)
-  hits.prom.nose <- findOverlaps(h3.prom.nose, k27.prom.nose)
-  hits.promup.nose <- findOverlaps(h3.promup.nose, k27.promup.nose)
-  hits.promdown.nose <- findOverlaps(h3.promdown.nose, k27.promdown.nose)
-  hits.ce <- findOverlaps(h3.ce, k27.ce)
-  hits.ceup <- findOverlaps(h3.ceup, k27.ceup)
-  hits.cedown <- findOverlaps(h3.cedown, k27.cedown)
-  hits.ce.se <- findOverlaps(h3.ce.se, k27.ce.se)
-  hits.ceup.se <- findOverlaps(h3.ceup.se, k27.ceup.se)
-  hits.cedown.se <- findOverlaps(h3.cedown.se, k27.cedown.se)
-  hits.ce.nose <- findOverlaps(h3.ce.nose, k27.ce.nose)
-  hits.ceup.nose <- findOverlaps(h3.ceup.nose, k27.ceup.nose)
-  hits.cedown.nose <- findOverlaps(h3.cedown.nose, k27.cedown.nose)
-  
-  hits.db <- findOverlaps(h3.db, k27.db)
-  hits.db.prom <- findOverlaps(h3.db.prom, k27.db.prom)
-  hits.db.promup <- findOverlaps(h3.db.promup, k27.db.promup)
-  hits.db.promdown <- findOverlaps(h3.db.promdown, k27.db.promdown)
-  hits.db.prom.se <- findOverlaps(h3.db.prom.se, k27.db.prom.se)
-  hits.db.promup.se <- findOverlaps(h3.db.promup.se, k27.db.promup.se)
-  hits.db.promdown.se <- findOverlaps(h3.db.promdown.se, k27.db.promdown.se)
-  hits.db.prom.nose <- findOverlaps(h3.db.prom.nose, k27.db.prom.nose)
-  hits.db.promup.nose <- findOverlaps(h3.db.promup.nose, k27.db.promup.nose)
-  hits.db.promdown.nose <- findOverlaps(h3.db.promdown.nose, 
-    k27.db.promdown.nose)
-  hits.db.ce <- findOverlaps(h3.db.ce, k27.db.ce)
-  hits.db.ceup <- findOverlaps(h3.db.ceup, k27.db.ceup)
-  hits.db.cedown <- findOverlaps(h3.db.cedown, k27.db.cedown)
-  hits.db.ce.se <- findOverlaps(h3.db.ce.se, k27.db.ce.se)
-  hits.db.ceup.se <- findOverlaps(h3.db.ceup.se, k27.db.ceup.se)
-  hits.db.cedown.se <- findOverlaps(h3.db.cedown.se, k27.db.cedown.se)
-  hits.db.ce.nose <- findOverlaps(h3.db.ce.nose, k27.db.ce.nose)
-  hits.db.ceup.nose <- findOverlaps(h3.db.ceup.nose, k27.db.ceup.nose)
-  hits.db.cedown.nose <- findOverlaps(h3.db.cedown.nose, k27.db.cedown.nose)
-  
-  all.overlaps <- list(
-    'All.Peaks' = hits, 'Promoters' = hits.prom, 'Promoters.Up' = hits.promup, 
-    'Promoters.Down' = hits.promdown, 'Promoters.in.SEs' = hits.prom.se, 
-    'Promoters.Up.in.SEs' = hits.promup.se, 
-    'Promoters.Down.in.SEs' = hits.promdown.se, 
-    'Promoters.Outside.SEs' = hits.prom.nose, 
-    'Promoters.Up.Outside.SEs' = hits.promup.nose, 
-    'Promoters.Down.outside.SEs' = hits.promdown.nose, 'Enhancers' = hits.ce, 
-    'Enhancers.Up' = hits.ceup, 'Enhancers.Down' = hits.cedown, 
-    'Enhancers.in.SEs' = hits.ce.se, 'Enhancers.Up.in.SEs' = hits.ceup.se, 
-    'Enhancers.Down.in.SEs' = hits.cedown.se, 
-    'Enhancers.Outside.SEs' = hits.ce.nose, 
-    'Enhancers.Up.Outside.SEs' = hits.ceup.nose, 
-    'Enhancers.Down.Outside.SEs' = hits.cedown.nose)
-  
-  db.overlaps <- list(
-    'All.DB.Peaks' = hits.db, 'DB.Promoters' = hits.db.prom, 
-    'DB.Promoters.Up' = hits.db.promup, 'DB.Promoters.Down' = hits.db.promdown, 
-    'DB.Promoters.in.SEs' = hits.db.prom.se, 
-    'DB.Promoters.Up.in.SEs' = hits.db.promup.se, 
-    'DB.Promoters.Down.in.SEs' = hits.db.promdown.se, 
-    'DB.Promoters.Outside.SEs' = hits.db.prom.nose, 
-    'DB.Promoters.Up.Outside.SEs' = hits.db.promup.nose, 
-    'DB.Promoters.Down.Outside.SEs' = hits.db.promdown.nose, 
-    'DB.Enhancers' = hits.db.ce, 'DB.Enhancers.Up' = hits.db.ceup, 
-    'DB.Enhancers.Down' = hits.db.cedown, 'DB.Enhancers.in.SEs' = hits.db.ce.se, 
-    'DB.Enhancers.Up.in.SEs' = hits.db.ceup.se, 
-    'DB.Enhancers.Down.in.SEs' = hits.db.cedown.se, 
-    'DB.Enhancers.Outside.SEs' = hits.db.ce.nose, 
-    'DB.Enhancers.Up.Outside.SEs' = hits.db.ceup.nose, 
-    'DB.Enhancers.Down.Outside.SEs' = hits.db.cedown.nose)
-  
-  # Plotting.
-  pdf(paste0(base,'/AllPeaks.Overlaps.pdf'))
-  plot.hits(all.overlaps)
-  dev.off()
-  
-  pdf(paste0(base,'/DBPeaks.Overlaps.pdf'))
-  plot.hits(db.overlaps)
-  dev.off()
-  
-  return(list(all.overlaps, db.overlaps))
-}
-
-
-PlotHits <- function(hits){
-  # hits = List of Hits object from findOverlaps().
-
-  for (i in 1:length(hits)) {
-    name <- names(hits)[i]
-    blips <- hits[[i]]
-
-    # If there aren't any overlaps, just skip it.
-    if (length(queryHits(blips)) > 0 & length(subjectHits(blips) > 0)) {
-      fit <- euler(c(
-        H3ac = (queryLength(blips) - length(unique(queryHits(blips)))), 
-        H3K27ac = (subjectLength(blips) - length(unique(subjectHits(blips)))), 
-                     "H3ac&H3K27ac" = length(blips)))
-      p1 <- plot(fit, quantities = TRUE, fill = c("#009999", "#009900"), 
-        alpha = 0.5)
-
-      h3.total <- queryLength(blips)
-      h3.uniq <- (queryLength(blips) - length(unique(queryHits(blips))))
-      h3.uniq.p <- (h3.uniq / h3.total) * 100
-      h3.ovlp <- length(unique(queryHits(blips)))
-      h3.ovlp.p <- (h3.ovlp / h3.total) * 100
-
-      k27.total <- subjectLength(blips)
-      k27.uniq <- (subjectLength(blips) - 
-        length(unique(subjectHits(blips))))
-      k27.uniq.p <- (k27.uniq / k27.total) * 100
-      k27.ovlp <- length(unique(subjectHits(blips)))
-      k27.ovlp.p <- (k27.ovlp / k27.total) * 100
-
-      count <- c(h3.total, h3.uniq, h3.ovlp, k27.total, k27.uniq, k27.ovlp)
-      pct <- c(h3.uniq.p, h3.ovlp.p, k27.uniq.p, k27.ovlp.p)
-      type <- c("Total", "Unique", "Overlap", "Total", "Unique", "Overlap")
-      type.p <- c("Unique", "Overlap", "Unique", "Overlap")
-      mark <- c("H3ac", "H3ac", "H3ac", "H3K27ac", "H3K27ac", "H3K27ac")
-      mark.p <- c("H3ac", "H3ac", "H3K27ac", "H3K27ac")
-
-      df2 <- data.frame(count = count, type = type, mark = mark)
-      df2$type.ordered <- factor(df2$type, levels = c("Total", "Unique", 
-        "Overlap"))
-      p2 <- ggplot(data = df2, aes(x = mark, y = count, fill = type.ordered)) +
-        geom_bar(stat = "identity", position = position_dodge(), 
-          colour = "black") + scale_fill_manual(values=c("#00B7EC", "#FAA200", 
-            "#E27DAC")) + ylab("Counts") + xlab("") + 
-        theme(axis.text = element_text(size = 10),
-          axis.text.x = element_text(angle = 315), 
-          legend.title = element_blank())
-
-      df3 <- data.frame(pct = pct, type = type.p, mark = mark.p)
-      df3$type.ordered <- factor(df3$type, levels=c("Unique", "Overlap"))
-      p3 <- ggplot(data = df3, aes(x = mark, y = pct, fill = type.ordered)) +
-          geom_bar(stat = "identity", position = position_dodge(), 
-            colour = "black") 
-          + ylim(0, 100) + scale_fill_manual(values = c("#FAA200", "#E27DAC")) +
-          ylab("% Peaks") + xlab("") + 
-          theme(axis.text = element_text(size = 10), 
-            axis.text.x = element_text(angle = 315), 
-            legend.title = element_blank())
-
-      g1 <- arrangeGrob(grobs = list(p2, p3), ncol = 2)
-      grid.arrange(grobs = list(p1, g1), ncol = 1, 
-        heights = unit(c(3, 3), c("in", "in")), top = name)
-    }
-  }
-}
