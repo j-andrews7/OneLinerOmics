@@ -19,12 +19,13 @@
 #'
 #' @author Jared Andrews
 #'
+#' @seealso \code{\link[ChIPQC]{ChIPQC}}
+#'
 RunChIPQC <- function(outpath, samplesheet, chromosomes = "chr10") {
 
   register(SerialParam())
   exp <- suppressMessages(suppressWarnings(ChIPQC(samplesheet, 
-    chromosomes = chromosomes, consensus = TRUE, 
-    bCount = FALSE)))
+    chromosomes = chromosomes, consensus = TRUE, bCount = FALSE)))
   metrics <- as.data.frame(QCmetrics(exp))
   
   write.table(metrics, file = paste0(outpath, "/QCmetrics.txt"), quote = FALSE,
@@ -100,7 +101,7 @@ RunDiffBind <- function(base, samplesheet, se_samplesheet = NULL, g1, g2, mark,
     } else if (block=="FACTOR") {
       rblock=DBA_FACTOR
     } else {
-      message("Block set to improper value, must be one of 'TREATMENT', 'CONDITION', 'FACTOR' or 'TISSUE'\n\n")
+      stop("Block set to improper value, must be one of 'TREATMENT', 'CONDITION', 'FACTOR' or 'TISSUE'\n\n")
     }
   } else {
     rblock=NULL
@@ -550,8 +551,8 @@ RunEnrichments <- function(peakAnnoList, g1, g2, outpath) {
     ego.cc.clusters2 <- compareCluster(geneCluster = genes2, fun = "enrichGO",
       ont = "CC", OrgDb = org.Hs.eg.db, pAdjustMethod = "BH", 
       pvalueCutoff = 0.05, qvalueCutoff = 0.2);
-    ego.cc.clusters2 <- simplify(ego.cc.clusters2, cutoff = 0.7, by = "p.adjust", 
-      select_fun = min)
+    ego.cc.clusters2 <- simplify(ego.cc.clusters2, cutoff = 0.7, 
+      by = "p.adjust", select_fun = min)
   })
 
   try(
