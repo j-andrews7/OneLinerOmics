@@ -35,7 +35,7 @@
 #'   This step is quite time-consuming with many genes.
 #' @param plot.enrich Boolean indicating whether enrichment analyses for DEGs 
 #'   should be run and plotted for each comparison. 
-#' @param enrich.libs A vector of valid \code{enrichR} libraries to test the 
+#' @param enrich.libs Vector of valid \code{enrichR} libraries to test the 
 #'   genes against.
 #'
 #'   Available libraries can be viewed with \code{listEnrichrDbs} from the
@@ -78,7 +78,9 @@ RunDESeq2 <- function(outpath, quants.path, samplesheet, tx2gene, level,
   count.filt = 10) {
     
   message("### EXPLORATORY DATA ANALYSIS ###\n")
-  message("# SET DIRECTORY STRUCTURE AND MODEL DESIGN #\n")
+
+  ### SET DIRECTORY STRUCTURE ###
+  message("# SETTING DIRECTORY STRUCTURE AND MODEL DESIGN #\n")
   # Create directory structure and set design formula.
   base <- outpath
   setup <- CreateOutputStructure(block, level, base)
@@ -158,12 +160,14 @@ RunDESeq2 <- function(outpath, quants.path, samplesheet, tx2gene, level,
 #'
 #' \code{ProcessDEGs} wraps several plotting functions to generate figures 
 #' specifically for the differentially expressed genes between each possible
-#' comparison. It is called by \link{RunDESeq2} but can also be re-run with the
-#' \link{RunDESeq2} output or its own output if you want to save time and don't
-#' need to generate all of the exploratory data analysis figures again.
+#' comparison. 
+#' 
+#' \code{ProcessDEGs} is called by \link{RunDESeq2} but can also be re-run with 
+#' the \link{RunDESeq2} output or its own output if you want to save time and 
+#' don't need to generate all of the exploratory data analysis figures again.
 #'
 #' This function will generate many figures in addition to saving the counts
-#' and results.
+#' and results tables.
 #' 
 #' @param dds A \linkS4class{DESeqDataSet} object as returned by 
 #'   \code{\link[DESeq2]{DESeq}}.
@@ -192,8 +196,8 @@ RunDESeq2 <- function(outpath, quants.path, samplesheet, tx2gene, level,
 #' @param enrich.libs A vector of valid \code{enrichR} libraries to test the 
 #'   genes against.
 #'
-#'   Available libraries can be viewed with \code{listEnrichrDbs} from the
-#'   \code{enrichR} package.
+#'   Available libraries can be viewed with 
+#'   \code{\link[enrichR]{listEnrichrDbs}} from the \code{enrichR} package.
 #' @param top.n Number of differentially expressed genes to create boxplots for, 
 #'   ranked by adj. p-value after applying \code{padj.thresh} and 
 #'   \code{fc.thresh} thresholds. If multiple thresholds are provided, the 
@@ -211,6 +215,9 @@ RunDESeq2 <- function(outpath, quants.path, samplesheet, tx2gene, level,
 #' @export
 #'
 #' @author Jared Andrews
+#'
+#' @seealso
+#' \code{\link{RunDESeq2}}, for generating input for this function.
 #'
 ProcessDEGs <- function(dds, rld, vsd, outpath, level, plot.annos, 
   padj.thresh = 0.05, fc.thresh = 2, plot.box = TRUE, plot.enrich = TRUE, 

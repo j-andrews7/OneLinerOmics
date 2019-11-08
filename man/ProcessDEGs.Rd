@@ -49,8 +49,8 @@ should be run and plotted for each comparison.}
 \item{enrich.libs}{A vector of valid \code{enrichR} libraries to test the 
   genes against.
 
-  Available libraries can be viewed with \code{listEnrichrDbs} from the
-  \code{enrichR} package.}
+  Available libraries can be viewed with 
+  \code{\link[enrichR]{listEnrichrDbs}} from the \code{enrichR} package.}
 
 \item{top.n}{Number of differentially expressed genes to create boxplots for, 
 ranked by adj. p-value after applying \code{padj.thresh} and 
@@ -76,6 +76,9 @@ need to generate all of the exploratory data analysis figures again.
 \details{
 This function will generate many figures in addition to saving the counts
 and results.
+}
+\seealso{
+\code{\link{RunDESeq2}}, for generating input for this function.
 }
 \author{
 Jared Andrews

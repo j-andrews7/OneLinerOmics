@@ -24,30 +24,39 @@ CreateOutputStructure <- function(block, level, base, chip = FALSE) {
     if (!dir.exists(file.path(base, paste0(block, ".Block")))) {
       dir.create(file.path(base, paste0(block, ".Block")))
     }
+
     if (!chip) {
       design <- formula(paste("~", paste(c(block, level), sep = "",
         collapse = " + ")))
+
+      if (!dir.exists(file.path(base, paste0(block, ".Block/GeneBoxPlots")))) {
+        dir.create(file.path(base, paste0(block, ".Block/GeneBoxPlots")))
+      }
+      if (!dir.exists(file.path(base, paste0(block, ".Block/DEGFigures")))) {
+        dir.create(file.path(base, paste0(block, ".Block/DEGFigures")))
+      }
+      
+    } else {
+      if (!dir.exists(file.path(base, paste0(block, 
+          ".Block/SignalBoxPlots")))) {
+        dir.create(file.path(base, paste0(block, ".Block/SignalBoxPlots")))
+      }
+      if (!dir.exists(file.path(base, paste0(block, ".Block/DBRFigures")))) {
+        dir.create(file.path(base, paste0(block, ".Block/DBRFigures")))
+      }
     }
-    if (!dir.exists(file.path(base, paste0(block, ".Block")))) {
-      dir.create(file.path(base, paste0(block, ".Block")))
-    }
+
     if (!dir.exists(file.path(base, paste0(block, ".Block/EDAFigures")))) {
       dir.create(file.path(base, paste0(block, ".Block/EDAFigures")))
     }
     if (!dir.exists(file.path(base, paste0(block, ".Block/Robjects")))) {
       dir.create(file.path(base, paste0(block, ".Block/Robjects")))
     }
-    if (!dir.exists(file.path(base, paste0(block, ".Block/GeneBoxPlots")))) {
-      dir.create(file.path(base, paste0(block, ".Block/GeneBoxPlots")))
-    }
     if (!dir.exists(file.path(base, paste0(block, ".Block/MAPlots")))) {
       dir.create(file.path(base, paste0(block, ".Block/MAPlots")))
     }
     if (!dir.exists(file.path(base, paste0(block, ".Block/Heatmaps")))) {
       dir.create(file.path(base, paste0(block, ".Block/Heatmaps")))
-    }
-    if (!dir.exists(file.path(base, paste0(block, ".Block/DEGFigures")))) {
-      dir.create(file.path(base, paste0(block, ".Block/DEGFigures")))
     }
     if (!dir.exists(file.path(base, paste0(block, ".Block/ResultsTables")))) {
       dir.create(file.path(base, paste0(block, ".Block/ResultsTables")))
@@ -57,29 +66,40 @@ CreateOutputStructure <- function(block, level, base, chip = FALSE) {
     }
     base <- file.path(base, paste0(block,".Block"))
   } else {
-    if (!chip) {
-      design <- formula(paste("~", level))
-    }
     if (!dir.exists(file.path(base, "NoBlock"))) {
       dir.create(file.path(base, "NoBlock"))
     }
+
+    if (!chip) {
+      design <- formula(paste("~", level))
+
+      if (!dir.exists(file.path(base, "NoBlock/GeneBoxPlots"))) {
+        dir.create(file.path(base, "NoBlock/GeneBoxPlots"))
+      }
+      if (!dir.exists(file.path(base, "NoBlock/DEGFigures"))) {
+        dir.create(file.path(base, "NoBlock/DEGFigures"))
+      }
+
+    } else {
+      if (!dir.exists(file.path(base, "NoBlock/SignalBoxPlots"))) {
+        dir.create(file.path(base, "NoBlock/SignalBoxPlots"))
+      }
+      if (!dir.exists(file.path(base, "NoBlock/DBRFigures"))) {
+        dir.create(file.path(base, "NoBlock/DBRFigures"))
+      }
+    }
+
     if (!dir.exists(file.path(base, "NoBlock/EDAFigures"))) {
       dir.create(file.path(base, "NoBlock/EDAFigures"))
     }
     if (!dir.exists(file.path(base, "NoBlock/Robjects"))) {
       dir.create(file.path(base, "NoBlock/Robjects"))
     }
-    if (!dir.exists(file.path(base, "NoBlock/GeneBoxPlots"))) {
-      dir.create(file.path(base, "NoBlock/GeneBoxPlots"))
-    }
     if (!dir.exists(file.path(base, paste0(block, "NoBlock/MAPlots")))) {
       dir.create(file.path(base, paste0(block, "NoBlock/MAPlots")))
     }
     if (!dir.exists(file.path(base, paste0(block, "NoBlock/Heatmaps")))) {
       dir.create(file.path(base, paste0(block, "NoBlock/Heatmaps")))
-    }
-    if (!dir.exists(file.path(base, "NoBlock/DEGFigures"))) {
-      dir.create(file.path(base, "NoBlock/DEGFigures"))
     }
     if (!dir.exists(file.path(base, "NoBlock/ResultsTables"))) {
       dir.create(file.path(base, "NoBlock/ResultsTables"))

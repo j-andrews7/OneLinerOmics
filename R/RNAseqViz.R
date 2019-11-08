@@ -30,10 +30,10 @@ PlotHeatmaps <- function(res.list, rld, vsd, level, outpath,
   padj.thresh, fc.thresh, plot.annos) {
   
   # Set color breaks and palette.
-  breaks <- c(seq(-3, -1.251, length=250), seq(-1.25, -0.1001, length=250), 
-    seq(-0.1, 0.1, length=1), seq(0.1001, 1.25, length=250), 
-    seq(1.251, 3, length=250))
-  colors <- colorRampPalette(c("#053061","#2166ac", "#f5f5f5", 
+  breaks <- c(seq(-3, -1.251, length = 250), seq(-1.25, -0.1001, length = 250), 
+    seq(-0.1, 0.1, length = 1), seq(0.1001, 1.25, length = 250), 
+    seq(1.251, 3, length = 250))
+  colors <- colorRampPalette(c("#053061", "#2166ac", "#f5f5f5", 
     "#b2182b", "#67001f"))(n = 1000)
   
   for (i in seq_along(res.list)) {
@@ -67,7 +67,7 @@ PlotHeatmaps <- function(res.list, rld, vsd, level, outpath,
         pheatmap(matrix, annotation_col = annotation_data, color = colors, 
           scale = "row", breaks = breaks, show_rownames = FALSE, 
           main = paste0(comp, " - ", labs[ind]), 
-          fontsize_col=5)
+          fontsize_col = 5)
         pheatmap(matrix, annotation_col = annotation_data, color = colors, 
           scale = "row", breaks = breaks, show_rownames = FALSE, 
           main = paste0(comp, " - ", labs[ind]), 

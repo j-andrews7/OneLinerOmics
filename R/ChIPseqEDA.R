@@ -20,6 +20,7 @@
 #' @importFrom utils write.table
 #' @importFrom DiffBind dba.overlap 
 #' @importFrom grDevices pdf dev.off
+#' @importFrom graphics plot
 #' 
 #' @export
 #'
