@@ -9,7 +9,7 @@ PlotVarianceTransformations(dds, outpath)
 \arguments{
 \item{dds}{A \linkS4class{DESeqDataSet} object.}
 
-\item{outpath}{Path to output directory.}
+\item{outpath}{Path to output file.}
 }
 \description{
 Perform and visualize different variance stabilization transformations

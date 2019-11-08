@@ -1,6 +1,6 @@
 Package: OneLinerOmics
-Title: One liner RNA-seq and ChIP-seq analyses.
-Date: 2019-10-30
+Title: One-liner RNA-seq and ChIP-seq Analyses
+Date: 2019-11-07
 Version: 0.1.0.9000
 Authors@R: 
     person(given = "Jared",
@@ -45,7 +45,8 @@ Imports:
     SummarizedExperiment,
     magrittr,
     htmlwidgets,
-    EnhancedVolcano
+    EnhancedVolcano,
+    ChIPQC
 Suggests:
     BiocStyle,
     knitr,

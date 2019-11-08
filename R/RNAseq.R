@@ -60,7 +60,7 @@
 #'   
 #' @import DESeq2
 #' @importFrom tximport tximport
-#' @importFrom utils read.table write.table
+#' @importFrom utils read.table
 #'
 #' @export
 #'
@@ -81,7 +81,7 @@ RunDESeq2 <- function(outpath, quants.path, samplesheet, tx2gene, level,
   message("# SET DIRECTORY STRUCTURE AND MODEL DESIGN #\n")
   # Create directory structure and set design formula.
   base <- outpath
-  setup <- CreateRNAOutputStructure(block, level, base)
+  setup <- CreateOutputStructure(block, level, base)
   base <- setup$base
   design <- setup$design
   message(paste0("\nDesign is: ", design, "\n"))

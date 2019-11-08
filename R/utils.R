@@ -1,25 +1,33 @@
-#' Create RNA-seq output directory structure
+#' Create output directory structure
 #'
 #' \code{CreateRNAOutputStructure} generates the output directories used by
-#' \code{\link{RunDESeq2}} and \code{\link{ProcessDEGs}}.
+#' \code{\link{RunDESeq2}}, \code{\link{ProcessDEGs}}, 
+#' \code{\link{RunDiffBind}}, and \code{\link{ProcessDBRs}}.
 #'
 #' @param block String or character vector defining the variable(s) to use to
 #'   block for unwanted variance, e.g. batch or technical effects.
 #' @param level String defining variable of interest.
 #' @param base String defining the base output path.
+#' @param chip Boolean indicating whether output is being created for ChIP-seq.
 #' @return A named List containing the modified base output path and design
-#"   formula.
+#'   formula.
 #'
 #' @importFrom stats formula
 #'
 #' @author Jared Andrews
 #'
-CreateRNAOutputStructure <- function(block, level, base) {
+CreateOutputStructure <- function(block, level, base, chip = FALSE) {
 
+  design = NULL
   # Generate folders and craft design.
   if (!is.null(block)) {
-    design <- formula(paste("~", paste(c(block, level), sep = "",
-      collapse = " + ")))
+    if (!dir.exists(file.path(base, paste0(block, ".Block")))) {
+      dir.create(file.path(base, paste0(block, ".Block")))
+    }
+    if (!chip) {
+      design <- formula(paste("~", paste(c(block, level), sep = "",
+        collapse = " + ")))
+    }
     if (!dir.exists(file.path(base, paste0(block, ".Block")))) {
       dir.create(file.path(base, paste0(block, ".Block")))
     }
@@ -49,7 +57,9 @@ CreateRNAOutputStructure <- function(block, level, base) {
     }
     base <- file.path(base, paste0(block,".Block"))
   } else {
-    design <- formula(paste("~", level))
+    if (!chip) {
+      design <- formula(paste("~", level))
+    }
     if (!dir.exists(file.path(base, "NoBlock"))) {
       dir.create(file.path(base, "NoBlock"))
     }

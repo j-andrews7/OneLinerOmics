@@ -1,7 +1,7 @@
 #' Perform and visualize different variance stabilization transformations
 #'
 #' @param dds A \linkS4class{DESeqDataSet} object.
-#' @param outpath Path to output directory.
+#' @param outpath Path to output file.
 #'
 #' @importFrom grDevices pdf dev.off
 #' @importFrom DESeq2 rlog vst estimateSizeFactors normTransform
@@ -67,7 +67,7 @@ PlotVarianceTransformations <- function (dds, outpath) {
 #' @param vsd A \linkS4class{RangedSummarizedExperiment} object of 
 #'   \code{\link[DESeq2]{vst}} transformed counts as returned by
 #'   \link{PlotVarianceTransformations}.
-#' @param outpath Path to directory to be used for output.
+#' @param outpath Path to output file.
 #' @param level String defining variable of interest.
 #' @param plot.annos String or character vector defining the column(s) in 
 #'   \code{samplesheet} to use to annotate figures.
@@ -123,7 +123,7 @@ PlotSampleDistances <- function(rld, vsd, outpath, level, plot.annos) {
 #' @param vsd A \linkS4class{RangedSummarizedExperiment} object of 
 #'   \code{\link[DESeq2]{vst}} transformed counts as returned by
 #'   \link{PlotVarianceTransformations}.
-#' @param outpath Path to directory to be used for output.
+#' @param outpath Path to output file.
 #' @param level String defining variable of interest.
 #' @param plot.annos String or character vector defining the column(s) in 
 #'   \code{samplesheet} to use to annotate figures.

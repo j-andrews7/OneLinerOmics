@@ -46,8 +46,8 @@ This step is quite time-consuming with many genes.}
 \item{plot.enrich}{Boolean indicating whether enrichment analyses for DEGs 
 should be run and plotted for each comparison.}
 
-\item{enrich.libs}{A vector of valid \code{enrichR} libraries to test the genes 
-  against.
+\item{enrich.libs}{A vector of valid \code{enrichR} libraries to test the 
+  genes against.
 
   Available libraries can be viewed with \code{listEnrichrDbs} from the
   \code{enrichR} package.}

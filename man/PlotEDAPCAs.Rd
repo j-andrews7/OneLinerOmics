@@ -15,7 +15,7 @@ PlotEDAPCAs(rld, vsd, outpath, level, plot.annos)
 \code{\link[DESeq2]{vst}} transformed counts as returned by
 \link{PlotVarianceTransformations}.}
 
-\item{outpath}{Path to directory to be used for output.}
+\item{outpath}{Path to output file.}
 
 \item{level}{String defining variable of interest.}
 
