@@ -1,6 +1,6 @@
 Package: OneLinerOmics
 Title: One-liner RNA-seq and ChIP-seq Analyses
-Date: 2019-11-07
+Date: 2019-11-08
 Version: 0.1.0.9000
 Authors@R: 
     person(given = "Jared",
@@ -16,11 +16,11 @@ License: GPL-3 + file LICENSE
 Depends:
     enrichR,
     parallel,
-    GenomeInfoDb
+    GenomeInfoDb,
+    DiffBind
 Imports:
     DESeq2,
     ggplot2,
-    DiffBind,
     RColorBrewer,
     clusterProfiler,
     DOSE,
@@ -31,6 +31,8 @@ Imports:
     AnnotationDbi,
     GenomicFeatures,
     BiocParallel,
+    S4Vectors,
+    GenomicRanges,
     GenomicAlignments,
     Rsamtools,
     TxDb.Hsapiens.UCSC.hg19.knownGene,

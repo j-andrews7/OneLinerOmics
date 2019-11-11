@@ -84,7 +84,7 @@ PlotVarianceTransformations <- function (dds, outpath) {
 #'
 #' @author Jared Andrews
 #'
-PlotSampleDistances <- function(rld, vsd, outpath, level, plot.annos) {
+PlotRNASampleDistances <- function(rld, vsd, outpath, level, plot.annos) {
 
   pdf(outpath)
   i <- 1
@@ -137,7 +137,7 @@ PlotSampleDistances <- function(rld, vsd, outpath, level, plot.annos) {
 #'
 #' @author Jared Andrews
 #'
-PlotEDAPCAs <- function(rld, vsd, outpath, level, plot.annos) {
+PlotRNAEDAPCAs <- function(rld, vsd, outpath, level, plot.annos) {
 
   pdf(outpath, height = 5, width = 5)
   i <- 1

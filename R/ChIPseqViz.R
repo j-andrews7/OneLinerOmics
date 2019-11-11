@@ -1,3 +1,32 @@
+#' Plot ChIP PCAs
+#'
+#'
+#'
+#' @importFrom grDevices pdf dev.off
+#' @importFrom DiffBind dba.plotPCA
+#'
+#' @export
+#'
+#' @author Jared Andrews
+#'
+PlotChIPPCAs <- function(results, outpath, method, fdr.thresh, fc.thresh) {
+  pdf(outpath, height = 5, width = 5)
+
+  
+  dba.plotPCA(results, th = 1, sub = "Consensus Peaks", method = method)
+
+  for (i in seq_along(results$contrasts)) {
+    rep <- dba.report(results, th = fdr.thresh, contrast = i, fold = fc.thresh, 
+      method = method)
+
+    dba.plotPCA(results, report = rep, sub = paste0(
+      results$contrasts[[i]]$name1, " vs ", results$contrasts[[i]]$name2))
+  }
+
+  dev.off()
+}
+
+
 #' @importFrom grDevices colorRampPalette
 .heatmap_colors <- function(breaks, preset = NULL, custom.colors = NULL) {
   preset <- match.arg(preset, c("BuRd", "OrPu", "BrTe", "PuGr", 4))

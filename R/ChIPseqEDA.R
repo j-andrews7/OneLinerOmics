@@ -1,7 +1,8 @@
 #' Run ChIPQC on a sample sheet
 #'
 #' This function simply runs \code{\link[ChIPQC]{ChIPQC}} on a sample sheet and
-#' returns QC metrics. It generates a consensus peakset between all sets before
+#' returns QC metrics. It generates a consensus peakset between all sets by 
+#' retaining and merging all peaks that overlap in at least two samples before
 #' defining the fraction of reads in peaks and other metrics.
 #'
 #' A basic plot showing overlap between peaksets will also be generated, which 
@@ -28,14 +29,17 @@
 #'
 #' @seealso \code{\link[ChIPQC]{ChIPQC}}
 #'
-RunChIPQC <- function(outpath, samplesheet, chromosomes = "chr10") {
+RunChIPQC <- function(outpath, samplesheet, chromosomes = "chr18") {
 
   register(SerialParam())
   exp <- suppressMessages(suppressWarnings(ChIPQC(samplesheet, 
     chromosomes = chromosomes, consensus = TRUE, bCount = FALSE)))
+
+  exp.all <- suppressMessages(suppressWarnings(ChIPQC(samplesheet, 
+    chromosomes = chromosomes, consensus = FALSE, bCount = FALSE)))
   metrics <- as.data.frame(QCmetrics(exp))
 
-  db <- exp@DBA
+  db <- exp.all@DBA
 
   olap.rate <- dba.overlap(db, mode = DBA_OLAP_RATE)
   pdf(paste0(outpath, "/Overlaps.pdf"))

@@ -69,13 +69,15 @@ Named List containing a list named 'res.list' containing
 \description{
 \code{ProcessDEGs} wraps several plotting functions to generate figures 
 specifically for the differentially expressed genes between each possible
-comparison. It is called by \link{RunDESeq2} but can also be re-run with the
-\link{RunDESeq2} output or its own output if you want to save time and don't
-need to generate all of the exploratory data analysis figures again.
+comparison.
 }
 \details{
+\code{ProcessDEGs} is called by \link{RunDESeq2} but can also be re-run with 
+the \link{RunDESeq2} output or its own output if you want to save time and 
+don't need to generate all of the exploratory data analysis figures again.
+
 This function will generate many figures in addition to saving the counts
-and results.
+and results tables.
 }
 \seealso{
 \code{\link{RunDESeq2}}, for generating input for this function.

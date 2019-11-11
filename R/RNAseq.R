@@ -79,8 +79,8 @@ RunDESeq2 <- function(outpath, quants.path, samplesheet, tx2gene, level,
     
   message("### EXPLORATORY DATA ANALYSIS ###\n")
 
-  ### SET DIRECTORY STRUCTURE ###
-  message("# SETTING DIRECTORY STRUCTURE AND MODEL DESIGN #\n")
+  ### CREATING DIRECTORY STRUCTURE ###
+  message("# CREATING DIRECTORY STRUCTURE AND MODEL DESIGN #\n")
   # Create directory structure and set design formula.
   base <- outpath
   setup <- CreateOutputStructure(block, level, base)
@@ -124,13 +124,13 @@ RunDESeq2 <- function(outpath, quants.path, samplesheet, tx2gene, level,
   message("\n# PLOTTING SAMPLE DISTANCES #\n")
   dists.out <- paste0(base, "/EDAFigures/SampleDistances.pdf")
   message(paste0("Output: ", dists.out))
-  PlotSampleDistances(rld, vsd, dists.out, level, plot.annos)
+  PlotRNASampleDistances(rld, vsd, dists.out, level, plot.annos)
 
   ### PCA PLOTS ###
   message("\n# PCA PLOTS #\n")
   pca.out <- paste0(base, "/EDAFigures/PCA.pdf")
   message(paste0("Output: ", pca.out))
-  PlotEDAPCAs(rld, vsd, pca.out, level, plot.annos)
+  PlotRNAEDAPCAs(rld, vsd, pca.out, level, plot.annos)
   
   #======================================#
   ### DIFFERENTIAL EXPRESSION ANALYSIS ###
@@ -246,9 +246,9 @@ ProcessDEGs <- function(dds, rld, vsd, outpath, level, plot.annos,
   for (p in padj.thresh) {
     for (fc in fc.thresh) {
       PlotDEGPCAs(res.list, rld, vsd, outpath, level, plot.annos, p, fc)
-      PlotVolcanoes(res.list, dds, outpath, p, fc)
-      PlotHeatmaps(res.list, rld, vsd, level, outpath, p, fc, plot.annos)
-      PlotCombinedHeatmaps(res.list, rld, vsd, outpath, p, fc, plot.annos)
+      PlotRNAVolcanoes(res.list, dds, outpath, p, fc)
+      PlotRNAHeatmaps(res.list, rld, vsd, level, outpath, p, fc, plot.annos)
+      PlotRNACombinedHeatmaps(res.list, rld, vsd, outpath, p, fc, plot.annos)
       if (plot.enrich) {
         PlotEnrichments(res.list, outpath, p, fc, enrich.libs)
       }
@@ -258,7 +258,7 @@ ProcessDEGs <- function(dds, rld, vsd, outpath, level, plot.annos,
   if (plot.box) {
     p <- max(padj.thresh)
     fc <- min(fc.thresh)
-    PlotBoxplots(res.list, dds, rld, outpath, p, fc, top.n, level)
+    PlotRNABoxplots(res.list, dds, rld, outpath, p, fc, top.n, level)
   }
   
   ### MA PLOTs ###

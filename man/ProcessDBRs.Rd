@@ -4,7 +4,7 @@
 \alias{ProcessDBRs}
 \title{Extract, visualize, and save DBRs}
 \usage{
-ProcessDBRs(results, rblock, outpath, level, padj.thresh = 0.05,
+ProcessDBRs(results, rblock, outpath, level, fdr.thresh = 0.05,
   fc.thresh = 2, breaks = c(seq(-3, -1, length = 250), seq(-1, -0.1,
   length = 250), seq(-0.1, 0.1, length = 1), seq(0.1, 1, length = 250),
   seq(1, 3, length = 250)), heatmap.colors = NULL,
@@ -24,10 +24,10 @@ ProcessDBRs(results, rblock, outpath, level, padj.thresh = 0.05,
 \item{level}{String defining variable of interest in samplesheet.
 Must be one of: "Treatment", "Condition", "Tissue", or "Factor".}
 
-\item{padj.thresh}{Number or numeric scalar indicating the adjusted p-value 
-cutoff(s) to be used for determining "significant" differential binding.
-If multiple are given, multiple tables/plots will be generated using all 
-combinations of \code{padj.thresh} and \code{fc.thresh}.}
+\item{fdr.thresh}{Number or numeric scalar indicating the false discovery 
+rate (FDR) cutoff(s) to be used for determining "significant" differential 
+binding. If multiple are given, multiple tables/plots will be generated 
+using all combinations of \code{fdr.thresh} and \code{fc.thresh}.}
 
 \item{fc.thresh}{Number or numeric scalar indicating the log2 fold-change 
 cutoff(s) to be used for determining "significant" differential binding.
@@ -71,12 +71,16 @@ Named List containing a list named 'res.list' containing
 \description{
 \code{ProcessDBRs} wraps several plotting functions to generate figures 
 specifically for the differentially bound regions between each possible
-comparison. It is called by \link{RunDiffBind} but can also be re-run with 
-the \link{RunDiffBind} output or its own output if you want to save time and 
-don't need to generate all of the exploratory data analysis figures again.
+comparison.
 }
 \details{
-This function will generate many figures in addition to saving the results.
+\code{ProcessDBRs} is called by \link{RunDiffBind} but can also be re-run 
+with the \link{RunDiffBind} output or its own output if you want to save time 
+and don't need to generate all of the exploratory data analysis figures 
+again.
+
+This function will generate many figures in addition to saving the results as
+tables.
 }
 \seealso{
 \code{\link{RunDiffBind}}, for generating input for this function.

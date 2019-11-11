@@ -4,7 +4,7 @@
 \alias{RunChIPQC}
 \title{Run ChIPQC on a sample sheet}
 \usage{
-RunChIPQC(outpath, samplesheet, chromosomes = "chr10")
+RunChIPQC(outpath, samplesheet, chromosomes = "chr18")
 }
 \arguments{
 \item{outpath}{Path to directory to be used for output.}
@@ -20,7 +20,8 @@ Dataframe containing QC metrics for each sample, including
 }
 \description{
 This function simply runs \code{\link[ChIPQC]{ChIPQC}} on a sample sheet and
-returns QC metrics. It generates a consensus peakset between all sets before
+returns QC metrics. It generates a consensus peakset between all sets by 
+retaining and merging all peaks that overlap in at least two samples before
 defining the fraction of reads in peaks and other metrics.
 }
 \details{

@@ -5,7 +5,7 @@
 \title{Run DiffBind analysis on a samplesheet}
 \usage{
 RunDiffBind(outpath, samplesheet, level = c("Treatment", "Condition",
-  "Tissue", "Factor"), se = NULL, padj.thresh = 0.05, fc.thresh = 2,
+  "Tissue", "Factor"), se = NULL, fdr.thresh = 0.05, fc.thresh = 2,
   block = NULL, heatmap.colors = NULL, heatmap.preset = NULL,
   n.consensus = 2, breaks = c(seq(-3, -1, length = 250), seq(-1, -0.1,
   length = 250), seq(-0.1, 0.1, length = 1), seq(0.1, 1, length = 250),
@@ -26,10 +26,10 @@ Must be one of: "Treatment", "Condition", "Tissue", or "Factor".}
 \item{se}{Path to file containing consensus SEs, which will be used to
 to annotate whether individual peaks fall within an SE or not.}
 
-\item{padj.thresh}{Number or numeric scalar indicating the adjusted p-value 
-cutoff(s) to be used for determining "significant" differential binding.
-If multiple are given, multiple tables/plots will be generated using all 
-combinations of \code{padj.thresh} and \code{fc.thresh}.}
+\item{fdr.thresh}{Number or numeric scalar indicating the false discovery 
+rate (FDR) cutoff(s) to be used for determining "significant" differential 
+binding. If multiple are given, multiple tables/plots will be generated 
+using all combinations of \code{fdr.thresh} and \code{fc.thresh}.}
 
 \item{fc.thresh}{Number or numeric scalar indicating the log2 fold-change 
 cutoff(s) to be used for determining "significant" differential binding.
