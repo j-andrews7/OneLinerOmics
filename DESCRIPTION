@@ -48,7 +48,8 @@ Imports:
     magrittr,
     htmlwidgets,
     EnhancedVolcano,
-    ChIPQC
+    ChIPQC,
+    ggupset
 Suggests:
     BiocStyle,
     knitr,

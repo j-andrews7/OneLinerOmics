@@ -12,7 +12,8 @@ RunDiffBind(outpath, samplesheet, level = c("Treatment", "Condition",
   seq(1, 3, length = 250)), plot.enrich = TRUE,
   enrich.libs = c("GO_Molecular_Function_2018",
   "GO_Cellular_Component_2018", "GO_Biological_Process_2018",
-  "KEGG_2019_Human", "Reactome_2016", "BioCarta_2016", "Panther_2016"))
+  "KEGG_2019_Human", "Reactome_2016", "BioCarta_2016", "Panther_2016"),
+  promoters = c(-2000, 2000), method = c("DESeq2", "edgeR"))
 }
 \arguments{
 \item{outpath}{Path to directory to be used for output. Additional 
@@ -65,9 +66,16 @@ should be run and plotted for each comparison.}
 
 \item{enrich.libs}{Vector of valid \code{enrichR} libraries to test the 
   genes against.
+  
 
   Available libraries can be viewed with 
   \code{\link[enrichR]{listEnrichrDbs}} from the \code{enrichR} package.}
+
+\item{promoters}{Vector containing how many basepairs up and downstream of 
+the TSS should be used to define gene promoters.}
+
+\item{method}{String indicating method to be used for differential expression 
+analysis. Can be "DESeq2" or "edgeR".}
 }
 \value{
 Named List containing a list named 'res.list' containing 

@@ -151,12 +151,12 @@ PlotRNAEDAPCAs <- function(rld, vsd, outpath, level, plot.annos) {
 
   for (x in list(rld, vsd)) {
     p <- DESeq2::plotPCA(x, intgroup = level) + ggtitle(labs[i]) +
-      theme_classic() + theme(aspect.ratio=1)
+      theme_classic() + theme(aspect.ratio = 1)
     print(p)
 
     if (plot.annos != level) {
       p <- DESeq2::plotPCA(x, intgroup = plot.annos) + ggtitle(labs[i]) +
-        theme_classic() + theme(aspect.ratio=1)
+        theme_classic() + theme(aspect.ratio = 1)
       print(p)
     }
 
@@ -166,13 +166,13 @@ PlotRNAEDAPCAs <- function(rld, vsd, outpath, level, plot.annos) {
 
       p <- DESeq2::plotPCA(x.sub, intgroup = level) +
         ggtitle(paste0(labs[i], " - ", combs[samp], " v ", combs[samp + 1])) +
-        theme_classic() + theme(aspect.ratio=1)
+        theme_classic() + theme(aspect.ratio = 1)
       print(p)
 
       if (plot.annos != level) {
         p <- DESeq2::plotPCA(x.sub, intgroup = plot.annos) +
           ggtitle(paste0(labs[i], " - ", combs[samp], " v ", combs[samp + 1])) +
-          theme_classic() + theme(aspect.ratio=1)
+          theme_classic() + theme(aspect.ratio = 1)
         print(p)
       }
     }

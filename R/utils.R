@@ -35,28 +35,55 @@ CreateOutputStructure <- function(block, level, base, chip = FALSE) {
       if (!dir.exists(file.path(base, paste0(block, ".Block/DEGFigures")))) {
         dir.create(file.path(base, paste0(block, ".Block/DEGFigures")))
       }
-      
-    } else {
-      if (!dir.exists(file.path(base, paste0(block, 
-          ".Block/SignalBoxPlots")))) {
-        dir.create(file.path(base, paste0(block, ".Block/SignalBoxPlots")))
+      if (!dir.exists(file.path(base, paste0(block, ".Block/MAPlots")))) {
+        dir.create(file.path(base, paste0(block, ".Block/MAPlots")))
       }
-      if (!dir.exists(file.path(base, paste0(block, ".Block/DBRFigures")))) {
-        dir.create(file.path(base, paste0(block, ".Block/DBRFigures")))
+      if (!dir.exists(file.path(base, paste0(block, ".Block/EDAFigures")))) {
+        dir.create(file.path(base, paste0(block, ".Block/EDAFigures")))
+      }
+      if (!dir.exists(file.path(base, paste0(block, ".Block/Heatmaps")))) {
+        dir.create(file.path(base, paste0(block, ".Block/Heatmaps")))
+      }
+
+    } else {
+      for (i in c("DBRFigures", "ConsensusFigures")) {
+        if (!dir.exists(file.path(base, paste0(block, ".Block/", i)))) {
+          dir.create(file.path(base, paste0(block, ".Block/", i)))
+        }
+        if (!dir.exists(file.path(base, paste0(block, 
+          ".Block/", i, "/MAPlots")))) {
+
+          dir.create(file.path(base, paste0(block, 
+            ".Block/", i, "/MAPlots")))
+        }
+        if (!dir.exists(file.path(base, paste0(block, 
+          ".Block/", i, "/PeakAnnotations")))) {
+
+          dir.create(file.path(base, paste0(block, 
+            ".Block/", i, "/PeakAnnotations")))
+        }
+        if (!dir.exists(file.path(base, paste0(block, 
+          ".Block/", i, "/SignalBoxPlots")))) {
+
+          dir.create(file.path(base, paste0(block, 
+            ".Block/", i, "/SignalBoxPlots")))
+        }
+        if (!dir.exists(file.path(base, paste0(block, 
+          ".Block/", i, "/PCAPlots")))) {
+
+          dir.create(file.path(base, paste0(block, 
+            ".Block/", i, "/PCAPlots")))
+        }
+        if (!dir.exists(file.path(base, paste0(block, ".Block/", i, 
+          "/Heatmaps")))) {
+
+          dir.create(file.path(base, paste0(block, ".Block/", i, "/Heatmaps")))
+        }
       }
     }
 
-    if (!dir.exists(file.path(base, paste0(block, ".Block/EDAFigures")))) {
-      dir.create(file.path(base, paste0(block, ".Block/EDAFigures")))
-    }
     if (!dir.exists(file.path(base, paste0(block, ".Block/Robjects")))) {
       dir.create(file.path(base, paste0(block, ".Block/Robjects")))
-    }
-    if (!dir.exists(file.path(base, paste0(block, ".Block/MAPlots")))) {
-      dir.create(file.path(base, paste0(block, ".Block/MAPlots")))
-    }
-    if (!dir.exists(file.path(base, paste0(block, ".Block/Heatmaps")))) {
-      dir.create(file.path(base, paste0(block, ".Block/Heatmaps")))
     }
     if (!dir.exists(file.path(base, paste0(block, ".Block/ResultsTables")))) {
       dir.create(file.path(base, paste0(block, ".Block/ResultsTables")))
@@ -79,27 +106,52 @@ CreateOutputStructure <- function(block, level, base, chip = FALSE) {
       if (!dir.exists(file.path(base, "NoBlock/DEGFigures"))) {
         dir.create(file.path(base, "NoBlock/DEGFigures"))
       }
+      if (!dir.exists(file.path(base, paste0(block, "NoBlock/MAPlots")))) {
+        dir.create(file.path(base, paste0(block, "NoBlock/MAPlots")))
+      }
+      if (!dir.exists(file.path(base, "NoBlock/EDAFigures"))) {
+        dir.create(file.path(base, "NoBlock/EDAFigures"))
+      }
+      if (!dir.exists(file.path(base, paste0(block, "NoBlock/Heatmaps")))) {
+        dir.create(file.path(base, paste0(block, "NoBlock/Heatmaps")))
+      }
 
     } else {
-      if (!dir.exists(file.path(base, "NoBlock/SignalBoxPlots"))) {
-        dir.create(file.path(base, "NoBlock/SignalBoxPlots"))
-      }
-      if (!dir.exists(file.path(base, "NoBlock/DBRFigures"))) {
-        dir.create(file.path(base, "NoBlock/DBRFigures"))
+      for (i in c("DBRFigures", "ConsensusFigures")) {
+        if (!dir.exists(file.path(base, "NoBlock/", i))) {
+          dir.create(file.path(base, "NoBlock/", i))
+        }
+        if (!dir.exists(file.path(base, "NoBlock/", i, "/SignalBoxPlots"))) {
+          dir.create(file.path(base, "NoBlock/", i, "/SignalBoxPlots"))
+        }
+        if (!dir.exists(file.path(base, paste0(block, 
+          "NoBlock/", i, "/MAPlots")))) {
+
+          dir.create(file.path(base, paste0(block, 
+            "NoBlock/", i, "/MAPlots")))
+        }
+        if (!dir.exists(file.path(base, paste0(block, 
+          "NoBlock/", i, "/PeakAnnotations")))) {
+
+          dir.create(file.path(base, paste0(block, 
+            "NoBlock/", i, "/PeakAnnotations")))
+        }
+        if (!dir.exists(file.path(base, paste0(block, 
+          "NoBlock/", i, "/PCAPlots")))) {
+
+          dir.create(file.path(base, paste0(block, 
+            "NoBlock/", i, "/PCAPlots")))
+        }
+        if (!dir.exists(file.path(base, paste0(block, "NoBlock/", i, 
+          "/Heatmaps")))) {
+
+          dir.create(file.path(base, paste0(block, "NoBlock/", i, "/Heatmaps")))
+        }
       }
     }
 
-    if (!dir.exists(file.path(base, "NoBlock/EDAFigures"))) {
-      dir.create(file.path(base, "NoBlock/EDAFigures"))
-    }
     if (!dir.exists(file.path(base, "NoBlock/Robjects"))) {
       dir.create(file.path(base, "NoBlock/Robjects"))
-    }
-    if (!dir.exists(file.path(base, paste0(block, "NoBlock/MAPlots")))) {
-      dir.create(file.path(base, paste0(block, "NoBlock/MAPlots")))
-    }
-    if (!dir.exists(file.path(base, paste0(block, "NoBlock/Heatmaps")))) {
-      dir.create(file.path(base, paste0(block, "NoBlock/Heatmaps")))
     }
     if (!dir.exists(file.path(base, "NoBlock/ResultsTables"))) {
       dir.create(file.path(base, "NoBlock/ResultsTables"))

@@ -169,77 +169,33 @@ RunDiffBind <- function(outpath, samplesheet,
   message("### FINDING DIFFERENTIALLY BOUND REGIONS ###\n\n")
   samps <- dba(sampleSheet = samplesheet, minOverlap = n.consensus)
   count <- dba.count(samps, minOverlap = n.consensus)
-  cont <- dba.contrast(count, categories = level, block = rblock)
+  cont <- dba.contrast(count, categories = rlevel, block = rblock)
   results <- dba.analyze(cont)
   
   # CONSENSUS PEAKS #
   message('# DEALING WITH CONSENSUS PEAKS #\n\n')
-  txdb=TxDb.Hsapiens.UCSC.hg19.knownGene
-  if (!is.null(rblock)) {
-    report <- dba.report(results, th = 1, bCalled = TRUE, 
-      bCalledDetail = TRUE, bCounts = TRUE, method = method)
-  } else {
-    report <- dba.report(results, th = 1, bCalled = TRUE, 
-      bCalledDetail = TRUE, bCounts = TRUE, method = method)
-  }
+  txdb <- TxDb.Hsapiens.UCSC.hg19.knownGene
+  
+  report <- dba.report(results, th = 1, bCalled = TRUE, 
+    bCalledDetail = TRUE, bCounts = TRUE, method = method)
 
   # ANNOTATION #
   message('# ANNOTATING & MAKING CONSENSUS PLOTS #\n\n')
-  peakAnno <- annotatePeak(report, tssRegion = promoters,
-                       TxDb = txdb, annoDb = "org.Hs.eg.db")
+  peak.anno <- annotatePeak(report, tssRegion = promoters, TxDb = txdb, 
+    annoDb = "org.Hs.eg.db")
   
-  df <- data.frame(peakAnno)
+  df <- data.frame(peak.anno)
 
-  pdf(paste0(base, '/', mark, ".ConsensusPeaks.Figures.pdf"))
-
-  plotAnnoPie(peakAnno)
-  plotAnnoBar(peakAnno)
-  vennpie(peakAnno)
-  upsetplot(peakAnno)
-  plotDistToTSS(peakAnno, title = "Distribution of Peaks Relative to TSS")
-  dba.plotPCA(results, th = 1, sub = paste0(
-    "Consensus Peaks"), method = method)
-
-  dba.plotHeatmap(results, report = report,
-    contrast = 1, margin = 15, correlations = FALSE, scale = "row", 
-    density.info = "none", colScheme = hmap.colors, breaks = breaks, 
-    main = paste0("Consensus Peaks\n", "Top 1000 (by variability)"))
-  dba.plotHeatmap(results, report = report, contrast = 1, 
-    margin = 15, correlations = FALSE, scale = "row", density.info = "none", 
-    colScheme = hmap.colors, breaks = breaks, Colv = NULL, 
-    main = paste0("Consensus Peaks\n", "Top 1000 (by variability)"))
-  dba.plotHeatmap(results, report = report, contrast = 1, 
-    margin = 15, correlations = FALSE, scale = "row", density.info = "none", 
-    colScheme = hmap.colors, breaks = breaks, maxSites = 10000, 
-    main = paste0("Consensus Peaks\n", "Top 10000 (by variability)"))
-  dba.plotHeatmap(results, report = report, contrast = 1, 
-    margin = 15, correlations = FALSE, scale = "row", density.info = "none", 
-    colScheme = hmap.colors, breaks = breaks, maxSites = 10000, Colv = NULL, 
-    main = paste0("Consensus Peaks\n", "Top 10000 (by variability)"))
-  dba.plotHeatmap(results, report = report, contrast = 1, 
-    margin = 15, correlations = FALSE, scale = "row", density.info = "none", 
-    colScheme = hmap.colors, breaks = breaks, maxSites = 10000, 
-    main = paste0("Consensus Peaks\n", "All Peaks"))
-  dba.plotHeatmap(results, report = report, contrast = 1, 
-    margin = 15, correlations = FALSE, scale = "row", density.info = "none", 
-    colScheme = hmap.colors, breaks = breaks, maxSites = 10000, Colv = NULL, 
-    main = paste0("Consensus Peaks\n", "All Peaks"))
-  dba.plotHeatmap(results, report = report, contrast = 1, 
-    margin = 15, density.info = "none", main = paste0("Consensus Peaks\n", 
-      "Correlation"))
-
-  dev.off()
+  PlotChIPAnnos(peak.anno, outpath = base)
+  PlotChIPPCAs(results, outpath = base, method = method)
+  PlotChIPHeatmaps(results, outpath = base, method = method, breaks = breaks,
+    colors = hmap.colors)
   
   # DB PEAKS #
   message('# DEALING WITH DB PEAKS #\n\n')
-  # Subset so that we can compare localization and pathways between these groups as well.
-  if (!is.null(rblock)){
-    reportdb = dba.report(results, th = 0.05, bCalled = TRUE, 
-      bCalledDetail = TRUE, bCounts = TRUE, method = method)
-  } else {
-    reportdb = dba.report(results, th = 0.05, bCalled = TRUE, 
-      bCalledDetail = TRUE, bCounts = TRUE, method = method)
-  }
+  
+  reportdb = dba.report(results, th = 0.05, bCalled = TRUE, 
+    bCalledDetail = TRUE, bCounts = TRUE, method = method)
   
   g1up = reportdb[(reportdb$Fold > 0)]
   g2up = reportdb[(reportdb$Fold < 0)]
@@ -248,7 +204,7 @@ RunDiffBind <- function(outpath, samplesheet,
   files = GRangesList(reportdb, g1up, g2up)
   names(files) = c("All_DB", paste0(g1, ".up"), paste0(g2, ".up"))
   peakAnnoList <- lapply(files, annotatePeak, TxDb = txdb,
-    tssRegion=c(-2000, 2000), verbose = FALSE, annoDb = "org.Hs.eg.db")
+    tssRegion = promoters, verbose = FALSE, annoDb = "org.Hs.eg.db")
   ProcessDBRs(peakAnnoList, reportdb, results, rblock, g1, g2, base, mark, 
     color, breaks)
   
@@ -347,166 +303,39 @@ ProcessDBRs <- function(results, rblock, outpath, level,
 
   pdf(paste0(base ,"/", g1, '-v-', g2, ".", mark, ".DBRs.Figures.pdf"))
 
-  if (!is.null(rblock)) {
-    plotAnnoBar(peakAnnoList)
-    plotDistToTSS(peakAnnoList, 
-      title = "Distribution of Regions Relative to TSS")
-    dba.plotPCA(results, th = 0.05, contrast = 1, 
-      sub = paste0(g1, '-v-', g2, " DBRs\n", mark), method = DBA_DESEQ2_BLOCK)
-    dba.plotMA(results, th = 0.05, contrast = 1, method = DBA_DESEQ2_BLOCK)
-    dba.plotMA(results, th = 0.05, contrast = 1, bXY = TRUE, 
-      method = DBA_DESEQ2_BLOCK)
-    dba.plotVolcano(results, th = 0.05, contrast = 1, method = DBA_DESEQ2_BLOCK)
-    dba.plotBox(results, th = 0.05, contrast = 1, method = DBA_DESEQ2_BLOCK)
+  plotAnnoBar(peakAnnoList)
+  plotDistToTSS(peakAnnoList, 
+    title = "Distribution of Regions Relative to TSS")
+  dba.plotPCA(results, th = 0.05, contrast = 1, 
+    sub = paste0(g1, '-v-', g2, " DBRs\n", mark), method = method)
+  dba.plotMA(results, th = 0.05, contrast = 1, method = method)
+  dba.plotMA(results, th = 0.05, contrast = 1, bXY = TRUE, method = method)
+  dba.plotVolcano(results, th = 0.05, contrast = 1, method = method)
+  dba.plotBox(results, th = 0.05, contrast = 1, method = method)
 
-    dba.plotHeatmap(results, method = DBA_DESEQ2_BLOCK, th = 0.05, contrast = 1, 
-      margin = 15, correlations = FALSE, scale = "row", density.info = "none", 
-      colScheme = color, breaks = breaks, main = paste0(g1, '-v-', g2, 
-        " DBRs\n", mark, " Top 1000"))
-    dba.plotHeatmap(results, method = DBA_DESEQ2_BLOCK, th = 0.05, contrast = 1, 
-      margin = 15, correlations = FALSE, scale = "row", density.info = "none", 
-      colScheme = color, breaks = breaks, Colv = NULL, 
-      main = paste0(g1, '-v-', g2, " DBRs\n", mark, " Top 1000"))
-    dba.plotHeatmap(results, method = DBA_DESEQ2_BLOCK, th = 0.05, contrast = 1, 
-      margin = 15, correlations = FALSE, scale = "row", density.info = "none", 
-      colScheme = color, breaks = breaks, maxSites = 20000, 
-      main = paste0(g1, '-v-', g2, " DBRs\n", mark, " Top 20000"))
-    dba.plotHeatmap(results, method = DBA_DESEQ2_BLOCK, th = 0.05, contrast = 1, 
-      margin = 15, correlations = FALSE, scale = "row", density.info = "none", 
-      colScheme = color, breaks = breaks, maxSites = 20000, Colv = NULL, 
-      main = paste0(g1, '-v-', g2, " DBRs\n", mark, " Top 20000"))
-    dba.plotHeatmap(results, method = DBA_DESEQ2_BLOCK, th = 0.05, contrast = 1, 
-      margin = 15, density.info = "none", 
-      main = paste0(g1, "-v-", g1, " DBRs\n", mark, " - Correlation"))
-  } else {
-    plotAnnoBar(peakAnnoList)
-    plotDistToTSS(peakAnnoList, 
-      title = "Distribution of Regions Relative to TSS")
-    dba.plotPCA(results, th = 0.05, contrast = 1, 
-      sub = paste0(g1, '-v-', g2, " DBRs\n", mark), method = DBA_DESEQ2)
-    dba.plotMA(results, th = 0.05, contrast = 1, method = DBA_DESEQ2)
-    dba.plotMA(results, th = 0.05, contrast = 1, bXY = TRUE, 
-      method = DBA_DESEQ2)
-    dba.plotVolcano(results, th = 0.05, contrast = 1, method = DBA_DESEQ2)
-    dba.plotBox(results, th = 0.05, contrast = 1, method = DBA_DESEQ2)
+  dba.plotHeatmap(results, method = method, th = 0.05, contrast = 1, 
+    margin = 15, correlations = FALSE, scale = "row", density.info = "none", 
+    colScheme = color, breaks = breaks, main = paste0(g1, '-v-', g2, 
+      " DBRs\n", mark, " Top 1000"))
+  dba.plotHeatmap(results, method = method, th = 0.05, contrast = 1, 
+    margin = 15, correlations = FALSE, scale = "row", density.info = "none", 
+    colScheme = color, breaks = breaks, Colv = NULL, 
+    main = paste0(g1, '-v-', g2, " DBRs\n", mark, " Top 1000"))
+  dba.plotHeatmap(results, method = method, th = 0.05, contrast = 1, 
+    margin = 15, correlations = FALSE, scale = "row", density.info = "none", 
+    colScheme = color, breaks = breaks, maxSites = 20000, 
+    main = paste0(g1, '-v-', g2, " DBRs\n", mark, " Top 20000"))
+  dba.plotHeatmap(results, method = method, th = 0.05, contrast = 1, 
+    margin = 15, correlations = FALSE, scale = "row", density.info = "none", 
+    colScheme = color, breaks = breaks, maxSites = 20000, Colv = NULL, 
+    main = paste0(g1, '-v-', g2, " DBRs\n", mark, " Top 20000"))
+  dba.plotHeatmap(results, method = method, th = 0.05, contrast = 1, 
+    margin = 15, density.info = "none", 
+    main = paste0(g1, "-v-", g2, " DBRs\n", mark, " - Correlation"))
 
-    dba.plotHeatmap(results, method = DBA_DESEQ2, th = 0.05, contrast = 1, 
-      margin = 15, correlations = FALSE, scale = "row", density.info = "none", 
-      colScheme = color, breaks = breaks, 
-      main = paste0(g1, '-v-', g2, " DBRs\n", mark, " Top 1000"))
-    dba.plotHeatmap(results, method = DBA_DESEQ2, th = 0.05, contrast = 1, 
-      margin = 15, correlations = FALSE, scale = "row", density.info = "none", 
-      colScheme = color, breaks = breaks, Colv = NULL, 
-      main = paste0(g1, '-v-', g2, " DBRs\n", mark, " Top 1000"))
-    dba.plotHeatmap(results, method = DBA_DESEQ2, th = 0.05, contrast = 1, 
-      margin = 15, correlations = FALSE, scale = "row", density.info = "none", 
-      colScheme = color, breaks = breaks, maxSites = 20000, 
-      main = paste0(g1, '-v-', g2, " DBRs\n", mark, " Top 20000"))
-    dba.plotHeatmap(results, method = DBA_DESEQ2, th = 0.05, contrast = 1, 
-      margin = 15, correlations = FALSE, scale = "row", density.info = "none", 
-      colScheme = color, breaks = breaks, maxSites = 20000, Colv = NULL, 
-      main = paste0(g1, '-v-', g2, " DBRs\n", mark, " Top 20000"))
-    dba.plotHeatmap(results, method = DBA_DESEQ2, th = 0.05, contrast = 1, 
-      margin = 15, density.info = "none", 
-      main = paste0(g1, "-v-", g1, " DBRs\n", mark, " - Correlation"))
-  }
   dev.off()
   
   RunEnrichments(peakAnnoList, g1, g2, base)
-}
-
-
-ProcessSEs <- function(samplesheet, rblock, g1, g2, base, breaks, color) {
-  # samplesheet = File path to SE samplesheet.
-  # rblock = Blocking factor.
-  # g1 = Name of group 1.
-  # g2 = Name of group 2.
-  # base = File path to output folder.
-  # breaks = Breaks to be used for heatmaps.
-  # color = Color scheme to be used for heatmaps.
-  
-  samps = dba(sampleSheet = samplesheet)
-  
-  count = dba.count(samps)
-  if (!is.null(rblock)) {
-    cont = dba.contrast(count, count$masks[[g1]], count$masks[[g2]], g1, g2, 
-      block=rblock, minMembers = 2)
-  } else {
-    cont = dba.contrast(count, count$masks[[g1]], count$masks[[g2]], g1, g2, 
-      minMembers = 2)
-  }
-  results = dba.analyze(cont)
-  
-  # CONSENSUS PEAKS #
-  message('\n# DEALING WITH CONSENSUS SEs #\n\n')
-  txdb = TxDb.Hsapiens.UCSC.hg19.knownGene
-  if (!is.null(rblock)) {
-    report = dba.report(results, th = 1, bCalled = TRUE, bCalledDetail = TRUE, 
-      bCounts = TRUE, method = DBA_DESEQ2_BLOCK)
-  } else {
-    report = dba.report(results, th = 1, bCalled = TRUE, bCalledDetail = TRUE, 
-      bCounts = TRUE, method = DBA_DESEQ2)
-  }
-
-  # ANNOTATION #
-  message('\n# ANNOTATING & MAKING GENERIC PLOTS #\n\n')
-  peakAnno <- annotatePeak(report, tssRegion = c(-2000, 2000),
-                       TxDb = txdb, annoDb = "org.Hs.eg.db")
-  
-  df = data.frame(peakAnno)
-  
-  
-  write.table(df, row.names = FALSE, quote = FALSE, sep = "\t", 
-    file = paste0(base, "/", g1, '-v-', g2, ".", mark, ".Consensus.SEs.txt"))
-
-  pdf(paste0(base, "/", g1, '-v-', g2, ".", mark, ".Consensus.SEs.Figures.pdf"))
-
-  if (!is.null(rblock)) {
-    plotAnnoPie(peakAnno)
-    plotAnnoBar(peakAnno)
-    vennpie(peakAnno)
-    upsetplot(peakAnno)
-    plotDistToTSS(peakAnno, title = "Distribution of SEs Relative to TSS")
-    dba.plotPCA(results, report = report, 
-      sub = paste0(g1, '-v-', g2, " Consensus\n", mark, " SEs"), 
-      method = DBA_DESEQ2_BLOCK)
-    
-    dba.plotHeatmap(results, method = DBA_DESEQ2_BLOCK, report = report, 
-      margin = 15, correlations = FALSE, scale = "row", density.info = "none", 
-      colScheme = color, breaks = breaks, 
-      main = paste0(g1, '-v-', g2, " Consensus\n", mark, " Top 1000"))
-    dba.plotHeatmap(results, method = DBA_DESEQ2_BLOCK, report = report, 
-      margin = 15, correlations = FALSE, scale = "row", density.info = "none", 
-      colScheme = color, breaks = breaks, Colv = NULL, 
-      main = paste0(g1, '-v-', g2, " Consensus\n", mark, " Top 1000"))
-    dba.plotHeatmap(results, method = DBA_DESEQ2_BLOCK, report = report, 
-      margin = 15, density.info = "none", 
-      main = paste0(g1, "-v-", g1, " Consensus\n", mark, " SEs - Correlation"))
-  } else {
-    plotAnnoPie(peakAnno)
-    plotAnnoBar(peakAnno)
-    vennpie(peakAnno)
-    upsetplot(peakAnno)
-    plotDistToTSS(peakAnno, title = "Distribution of SEs Relative to TSS")
-    dba.plotPCA(results, report = report, 
-      sub = paste0(g1, '-v-', g2, " Consensus\n", mark, " SEs"), 
-      method = DBA_DESEQ2)
-    
-    dba.plotHeatmap(results, method = DBA_DESEQ2, report = report, margin = 15, 
-      correlations = FALSE, scale = "row", density.info = "none", 
-      colScheme = color, breaks = breaks, 
-      main = paste0(g1, '-v-', g2, " Consensus\n", mark, " Top 1000"))
-    dba.plotHeatmap(results, method = DBA_DESEQ2, report = report, margin = 15, 
-      correlations = FALSE, scale = "row", density.info = "none", 
-      colScheme = color, breaks = breaks, Colv = NULL, 
-      main = paste0(g1, '-v-', g2, " Consensus\n", mark, " Top 1000"))
-    dba.plotHeatmap(results, method = DBA_DESEQ2, report = report, margin = 15, 
-      density.info = "none", 
-      main = paste0(g1, "-v-", g1, " Consensus\n", mark, " SEs - Correlation"))
-  }
-  dev.off()
-  
-  return(df)
 }
 
 
