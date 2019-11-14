@@ -116,7 +116,7 @@ RunDESeq2 <- function(outpath, quants.path, samplesheet, tx2gene, level,
   message("\n# VARIANCE STABILIZATION COMPARISONS #\n")
   vst.out <- paste0(base,"/EDAFigures/VarianceTransformations.pdf")
   message(paste0("Output: ", vst.out))
-  trans <- PlotVarianceTransformations(dds, vst.out)
+  trans <- PlotRNAVarianceTransformations(dds, vst.out)
   rld <- trans$rld
   vsd <- trans$vsd
 
@@ -245,7 +245,7 @@ ProcessDEGs <- function(dds, rld, vsd, outpath, level, plot.annos,
   message("\n# GENERATING PLOTS #\n")
   for (p in padj.thresh) {
     for (fc in fc.thresh) {
-      PlotDEGPCAs(res.list, rld, vsd, outpath, level, plot.annos, p, fc)
+      PlotRNADEGPCAs(res.list, rld, vsd, outpath, level, plot.annos, p, fc)
       PlotRNAVolcanoes(res.list, dds, outpath, p, fc)
       PlotRNAHeatmaps(res.list, rld, vsd, level, outpath, p, fc, plot.annos)
       PlotRNACombinedHeatmaps(res.list, rld, vsd, outpath, p, fc, plot.annos)
@@ -276,7 +276,7 @@ ProcessDEGs <- function(dds, rld, vsd, outpath, level, plot.annos,
 
   ### SAVING TABLES ###
   message("\n# SAVING RESULTS TABLES #\n")
-  SaveRNAResults(res.list, dds, outpath)
+  SaveResults(res.list, dds, outpath)
 
   return(list(res.list = res.list, dds = dds, rld = rld, vsd = vsd))
 }

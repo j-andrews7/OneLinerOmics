@@ -16,7 +16,7 @@
 #'
 #' @author Jared Andrews
 #'
-PlotVarianceTransformations <- function (dds, outpath) {
+PlotRNAVarianceTransformations <- function (dds, outpath) {
   message("This may take a while if you have many samples.")
   rld <- suppressMessages(rlog(dds, blind = FALSE))
   vsd <- suppressMessages(vst(dds, blind = FALSE))

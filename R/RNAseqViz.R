@@ -304,7 +304,7 @@ PlotRNABoxplots <- function(res.list, dds, rld, outpath, padj.thresh, fc.thresh,
 #'
 #' @author Jared Andrews
 #'
-PlotDEGPCAs <- function(res.list, rld, vsd, outpath, level, plot.annos, 
+PlotRNADEGPCAs <- function(res.list, rld, vsd, outpath, level, plot.annos, 
   padj.thresh, fc.thresh) {
 
   for (i in seq_along(res.list)) {
