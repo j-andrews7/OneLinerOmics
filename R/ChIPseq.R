@@ -163,7 +163,7 @@ RunDiffBind <- function(outpath, samplesheet, txdb,
   # LOAD SUPER ENHANCERS #
   if (!is.null(se)) {
     message("# LOADING SUPER ENHANCERS #\n")
-    se <- read.table(se, sep = '\t', header = TRUE)
+    se <- read.table(se, sep = '\t', header = TRUE, quote = NULL)
   }  
 
   # FINDING DIFFERENTIALLY BOUND REGIONS #

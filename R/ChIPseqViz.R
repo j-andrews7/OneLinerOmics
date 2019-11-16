@@ -186,11 +186,11 @@ PlotChIPHeatmaps <- function(results, outpath, method, breaks, colors,
   if (consensus) {
     dba.plotHeatmap(results, th = 1, margin = 7, correlations = FALSE, 
       scale = "row", density.info = "none", colScheme = colors, breaks = breaks, 
-      maxSites = nrow(results$binding), main = paste0(lab, " - All Peaks"))
+      maxSites = 10000, main = paste0(lab, " - Top 10000 Variable Peaks"))
     dba.plotHeatmap(results, th = 1, margin = 7, correlations = FALSE, 
       scale = "row", density.info = "none", colScheme = colors, breaks = breaks, 
-      maxSites = nrow(results$binding), Colv = NULL, 
-      main = paste0(lab, " - All Peaks"))
+      maxSites = 10000, Colv = NULL, 
+      main = paste0(lab, " - Top 10000 Variable Peaks"))
     dba.plotHeatmap(results, th = 1, margin = 7, density.info = "none", 
       main = paste0(lab, " Peaks - Correlation"))
 
