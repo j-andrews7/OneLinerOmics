@@ -94,6 +94,9 @@ ChIP-seq portion of this package." />
   </a>
   <ul class="dropdown-menu" role="menu">
     <li>
+      <a href="../articles/ChIPseqAnalysis.html">Analyzing ChIP-seq data</a>
+    </li>
+    <li>
       <a href="../articles/RNAseqAnalysis.html">Analyzing RNA-seq data</a>
     </li>
   </ul>
@@ -134,13 +137,14 @@ ChIP-seq portion of this package.</p>
   <span class='st'>"Condition"</span>, <span class='st'>"Tissue"</span>, <span class='st'>"Factor"</span>), <span class='kw'>se</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>fdr.thresh</span> <span class='kw'>=</span> <span class='fl'>0.05</span>,
   <span class='kw'>fc.thresh</span> <span class='kw'>=</span> <span class='fl'>2</span>, <span class='kw'>block</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>heatmap.colors</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='kw'>heatmap.preset</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>reverse</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>n.consensus</span> <span class='kw'>=</span> <span class='fl'>2</span>,
-  <span class='kw'>breaks</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/seq.html'>seq</a></span>(-<span class='fl'>3</span>, -<span class='fl'>1</span>, <span class='kw'>length</span> <span class='kw'>=</span> <span class='fl'>250</span>), <span class='fu'><a href='https://rdrr.io/r/base/seq.html'>seq</a></span>(-<span class='fl'>1</span>, -<span class='fl'>0.1</span>, <span class='kw'>length</span> <span class='kw'>=</span> <span class='fl'>250</span>),
-  <span class='fu'><a href='https://rdrr.io/r/base/seq.html'>seq</a></span>(-<span class='fl'>0.1</span>, <span class='fl'>0.1</span>, <span class='kw'>length</span> <span class='kw'>=</span> <span class='fl'>1</span>), <span class='fu'><a href='https://rdrr.io/r/base/seq.html'>seq</a></span>(<span class='fl'>0.1</span>, <span class='fl'>1</span>, <span class='kw'>length</span> <span class='kw'>=</span> <span class='fl'>250</span>), <span class='fu'><a href='https://rdrr.io/r/base/seq.html'>seq</a></span>(<span class='fl'>1</span>, <span class='fl'>3</span>, <span class='kw'>length</span> <span class='kw'>=</span>
-  <span class='fl'>250</span>)), <span class='kw'>plot.enrich</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
+  <span class='kw'>breaks</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/seq.html'>seq</a></span>(-<span class='fl'>3</span>, -<span class='fl'>1.0001</span>, <span class='kw'>length</span> <span class='kw'>=</span> <span class='fl'>250</span>), <span class='fu'><a href='https://rdrr.io/r/base/seq.html'>seq</a></span>(-<span class='fl'>1</span>, -<span class='fl'>0.1</span>, <span class='kw'>length</span> <span class='kw'>=</span> <span class='fl'>250</span>),
+  <span class='fu'><a href='https://rdrr.io/r/base/seq.html'>seq</a></span>(-<span class='fl'>0.999</span>, <span class='fl'>0.999</span>, <span class='kw'>length</span> <span class='kw'>=</span> <span class='fl'>1</span>), <span class='fu'><a href='https://rdrr.io/r/base/seq.html'>seq</a></span>(<span class='fl'>0.1</span>, <span class='fl'>1</span>, <span class='kw'>length</span> <span class='kw'>=</span> <span class='fl'>250</span>), <span class='fu'><a href='https://rdrr.io/r/base/seq.html'>seq</a></span>(<span class='fl'>1.0001</span>, <span class='fl'>3</span>,
+  <span class='kw'>length</span> <span class='kw'>=</span> <span class='fl'>250</span>)), <span class='kw'>plot.enrich</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
   <span class='kw'>enrich.libs</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"GO_Molecular_Function_2018"</span>,
   <span class='st'>"GO_Cellular_Component_2018"</span>, <span class='st'>"GO_Biological_Process_2018"</span>,
   <span class='st'>"KEGG_2019_Human"</span>, <span class='st'>"Reactome_2016"</span>, <span class='st'>"BioCarta_2016"</span>, <span class='st'>"Panther_2016"</span>),
-  <span class='kw'>promoters</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(-<span class='fl'>2000</span>, <span class='fl'>2000</span>), <span class='kw'>method</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"DESeq2"</span>, <span class='st'>"edgeR"</span>))</pre>
+  <span class='kw'>promoters</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(-<span class='fl'>2000</span>, <span class='fl'>2000</span>), <span class='kw'>method</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"DESeq2"</span>, <span class='st'>"edgeR"</span>),
+  <span class='kw'>scale.full</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -242,6 +246,14 @@ downstream of the TSS should be used to define gene promoters.</p></td>
       <th>method</th>
       <td><p>String indicating method to be used for differential expression 
 analysis. Can be "DESeq2" or "edgeR".</p></td>
+    </tr>
+    <tr>
+      <th>scale.full</th>
+      <td><p>Boolean indicating whether the full library size (total 
+number of reads) for each sample is used for scaling normalization. If
+<code>FALSE</code>, the total number of reads present in the peaks for each 
+sample is used (preferable if overall binding levels are expected to be 
+similar between samples).</p></td>
     </tr>
     </table>
 

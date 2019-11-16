@@ -238,7 +238,7 @@ SaveResults <- function(results, outpath, dds = NULL, chip = FALSE,
 
       write.table(final, file = paste0(out, results$contrasts[[i]]$name1, "-v-",
         results$contrasts[[i]]$name2, ".AllPeaks.txt"), sep = "\t", 
-        quote = FALSE)
+        quote = FALSE, row.names = FALSE)
     }
   }
 }

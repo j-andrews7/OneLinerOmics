@@ -93,6 +93,9 @@ specifically for differentially bound regions in a given comparison." />
   </a>
   <ul class="dropdown-menu" role="menu">
     <li>
+      <a href="../articles/ChIPseqAnalysis.html">Analyzing ChIP-seq data</a>
+    </li>
+    <li>
       <a href="../articles/RNAseqAnalysis.html">Analyzing RNA-seq data</a>
     </li>
   </ul>
@@ -129,9 +132,9 @@ specifically for differentially bound regions in a given comparison.</p>
     </div>
 
     <pre class="usage"><span class='fu'>ProcessDBRs</span>(<span class='no'>results</span>, <span class='no'>outpath</span>, <span class='no'>txdb</span>, <span class='kw'>fdr.thresh</span> <span class='kw'>=</span> <span class='fl'>0.05</span>, <span class='kw'>fc.thresh</span> <span class='kw'>=</span> <span class='fl'>1</span>,
-  <span class='kw'>method</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>promoters</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(-<span class='fl'>2000</span>, <span class='fl'>2000</span>), <span class='kw'>breaks</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/seq.html'>seq</a></span>(-<span class='fl'>3</span>, -<span class='fl'>1</span>,
-  <span class='kw'>length</span> <span class='kw'>=</span> <span class='fl'>250</span>), <span class='fu'><a href='https://rdrr.io/r/base/seq.html'>seq</a></span>(-<span class='fl'>1</span>, -<span class='fl'>0.1</span>, <span class='kw'>length</span> <span class='kw'>=</span> <span class='fl'>250</span>), <span class='fu'><a href='https://rdrr.io/r/base/seq.html'>seq</a></span>(-<span class='fl'>0.1</span>, <span class='fl'>0.1</span>, <span class='kw'>length</span> <span class='kw'>=</span> <span class='fl'>1</span>),
-  <span class='fu'><a href='https://rdrr.io/r/base/seq.html'>seq</a></span>(<span class='fl'>0.1</span>, <span class='fl'>1</span>, <span class='kw'>length</span> <span class='kw'>=</span> <span class='fl'>250</span>), <span class='fu'><a href='https://rdrr.io/r/base/seq.html'>seq</a></span>(<span class='fl'>1</span>, <span class='fl'>3</span>, <span class='kw'>length</span> <span class='kw'>=</span> <span class='fl'>250</span>)),
+  <span class='kw'>method</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>promoters</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(-<span class='fl'>2000</span>, <span class='fl'>2000</span>), <span class='kw'>breaks</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/seq.html'>seq</a></span>(-<span class='fl'>3</span>,
+  -<span class='fl'>1.0001</span>, <span class='kw'>length</span> <span class='kw'>=</span> <span class='fl'>250</span>), <span class='fu'><a href='https://rdrr.io/r/base/seq.html'>seq</a></span>(-<span class='fl'>1</span>, -<span class='fl'>0.1</span>, <span class='kw'>length</span> <span class='kw'>=</span> <span class='fl'>250</span>), <span class='fu'><a href='https://rdrr.io/r/base/seq.html'>seq</a></span>(-<span class='fl'>0.999</span>, <span class='fl'>0.999</span>,
+  <span class='kw'>length</span> <span class='kw'>=</span> <span class='fl'>1</span>), <span class='fu'><a href='https://rdrr.io/r/base/seq.html'>seq</a></span>(<span class='fl'>0.1</span>, <span class='fl'>1</span>, <span class='kw'>length</span> <span class='kw'>=</span> <span class='fl'>250</span>), <span class='fu'><a href='https://rdrr.io/r/base/seq.html'>seq</a></span>(<span class='fl'>1.0001</span>, <span class='fl'>3</span>, <span class='kw'>length</span> <span class='kw'>=</span> <span class='fl'>250</span>)),
   <span class='kw'>heatmap.colors</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>heatmap.preset</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>reverse</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
   <span class='kw'>plot.enrich</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>enrich.libs</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"GO_Molecular_Function_2018"</span>,
   <span class='st'>"GO_Cellular_Component_2018"</span>, <span class='st'>"GO_Biological_Process_2018"</span>,

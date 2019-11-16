@@ -62,6 +62,11 @@
 #'   downstream of the TSS should be used to define gene promoters.
 #' @param method String indicating method to be used for differential expression 
 #'   analysis. Can be "DESeq2" or "edgeR".
+#' @param scale.full Boolean indicating whether the full library size (total 
+#'   number of reads) for each sample is used for scaling normalization. If
+#'   \code{FALSE}, the total number of reads present in the peaks for each 
+#'   sample is used (preferable if overall binding levels are expected to be 
+#'   similar between samples).
 #' @return A \code{DBA} object from \code{\link[DiffBind]{dba.analyze}}.
 #'
 #' @importFrom utils read.table
@@ -89,15 +94,16 @@ RunDiffBind <- function(outpath, samplesheet, txdb,
   heatmap.preset = NULL,
   reverse = FALSE,
   n.consensus = 2, 
-  breaks = c(seq(-3, -1, length = 250), seq(-1, -0.1, length = 250),
-    seq(-0.1, 0.1,length = 1), seq(0.1, 1, length = 250), 
-    seq(1, 3, length = 250)),
+  breaks = c(seq(-3, -1.0001, length = 250), seq(-1, -0.1, length = 250),
+    seq(-0.999, 0.999,length = 1), seq(0.1, 1, length = 250), 
+    seq(1.0001, 3, length = 250)),
   plot.enrich = TRUE, 
   enrich.libs = c("GO_Molecular_Function_2018", 
   "GO_Cellular_Component_2018", "GO_Biological_Process_2018", "KEGG_2019_Human",
   "Reactome_2016", "BioCarta_2016", "Panther_2016"),
   promoters = c(-2000, 2000),
-  method = c("DESeq2", "edgeR")) {
+  method = c("DESeq2", "edgeR"),
+  scale.full = TRUE) {
 
   message("### SETUP ###\n")
   rblock = NULL
@@ -164,8 +170,12 @@ RunDiffBind <- function(outpath, samplesheet, txdb,
   message("### FINDING DIFFERENTIALLY BOUND REGIONS ###\n\n")
   samps <- dba(sampleSheet = samplesheet, minOverlap = n.consensus)
   count <- dba.count(samps, minOverlap = n.consensus)
-  cont <- dba.contrast(count, categories = rlevel, block = rblock)
-  results <- dba.analyze(cont)
+  if (!is.null(rblock)) {
+    cont <- dba.contrast(count, categories = rlevel, block = rblock)
+  } else {
+    cont <- dba.contrast(count, categories = rlevel)
+  }
+  results <- dba.analyze(cont, bFullLibrarySize = scale.full)
   
   # CONSENSUS PEAKS #
   message("# DEALING WITH CONSENSUS PEAKS #\n")
@@ -178,7 +188,7 @@ RunDiffBind <- function(outpath, samplesheet, txdb,
   peak.anno <- annotatePeak(report, tssRegion = promoters, TxDb = txdb, 
     annoDb = "org.Hs.eg.db")
 
-  PlotChIPAnnos(peak.anno, outpath = base)
+  PlotChIPAnnos(list(peak.anno), outpath = base)
   PlotChIPPCAs(results, outpath = base, method = method)
   PlotChIPHeatmaps(results, outpath = base, method = method, breaks = breaks,
     colors = hmap.colors)
@@ -191,7 +201,7 @@ RunDiffBind <- function(outpath, samplesheet, txdb,
     breaks = breaks, heatmap.colors = heatmap.colors, 
     heatmap.preset = heatmap.preset, reverse = reverse, 
     plot.enrich = plot.enrich, enrich.libs = enrich.libs)
-  
+
   message("# SAVING RESULTS TABLES #\n")
   SaveResults(results, outpath = base, chip = TRUE, method = method, 
     promoters = promoters, se = se, txdb = txdb)
@@ -276,9 +286,9 @@ ProcessDBRs <- function(results, outpath, txdb,
   fc.thresh = 1,
   method = NULL,
   promoters = c(-2000, 2000),
-  breaks = c(seq(-3, -1, length = 250), seq(-1, -0.1, length = 250),
-    seq(-0.1, 0.1,length = 1), seq(0.1, 1, length = 250), 
-    seq(1, 3, length = 250)), 
+  breaks = c(seq(-3, -1.0001, length = 250), seq(-1, -0.1, length = 250),
+    seq(-0.999, 0.999,length = 1), seq(0.1, 1, length = 250), 
+    seq(1.0001, 3, length = 250)), 
   heatmap.colors = NULL, 
   heatmap.preset = NULL,
   reverse = FALSE,
@@ -293,41 +303,63 @@ ProcessDBRs <- function(results, outpath, txdb,
   for (fc in fc.thresh) {
     for (fdr in fdr.thresh) {
       for (i in seq_along(results$contrasts)) {
-        reportdb = dba.report(results, th = fdr, fold = fc, bCalled = TRUE, 
+        reportdb <- dba.report(results, th = fdr, fold = fc, bCalled = TRUE, 
           bCounts = TRUE, method = method, contrast = i)
-      
-        g1up = reportdb[(reportdb$Fold > 0)]
-        g2up = reportdb[(reportdb$Fold < 0)]
 
         g1 <- results$contrasts[[i]]$name1
         g2 <- results$contrasts[[i]]$name2
+
+        # Check for no DB peaks and skip if TRUE.
+        if (length(reportdb) == 0) {
+          message(paste0("No DB regions in ", g1, " v ", g2, ", skipping."))
+          next
+        }
+      
+        g1up <- reportdb[(reportdb$Fold > 0)]
+        g2up <- reportdb[(reportdb$Fold < 0)]
 
         # Create a named list of our subsets.
         files <- GRangesList(reportdb, g1up, g2up)
         names(files) <- c(paste0(g1, "-v-", g2), paste0(g1, ".up"), 
           paste0(g2, ".up"))
 
+        # Filter those with no elements, as annotatePeak will error otherwise.
+        keep <- lengths(files) != 0
+        files <- files[keep]
+
         peak.anno.list <- lapply(files, annotatePeak, TxDb = txdb,
           tssRegion = promoters, verbose = FALSE, annoDb = "org.Hs.eg.db")
         
-        PlotChIPAnnos(peak.anno.list, outpath, consensus = FALSE, comp = , 
-          fc = fc, fdr = fdr)
+        PlotChIPAnnos(peak.anno.list, outpath, consensus = FALSE, 
+          comp = names(files)[1], fc = fc, fdr = fdr)
 
         pdf(paste0(outpath, "/DBRFigures/MAPlots/", g1, "-v-", g2, ".fdr.", 
-          fdr, ".log2fc.", fc, "MAplots.pdf"), width = 5, height = 5)
-        dba.plotMA(results, report = reportdb, contrast = i, method = method)
-        dba.plotMA(results, report = reportdb, contrast = i, method = method,
+          fdr, ".log2fc.", fc, ".MAplots.pdf"), width = 5, height = 5)
+        dba.plotMA(results, th = fdr, fold = fc, contrast = i, method = method)
+        dba.plotMA(results, th = fdr, fold = fc, contrast = i, method = method,
           bXY = TRUE)
         dev.off()
 
         pdf(paste0(outpath, "/DBRFigures/SignalBoxPlots/", g1, "-v-", g2, 
-          ".fdr.", fdr, ".log2fc.", fc, "MAplots.pdf"), width = 7, height = 5)
+          ".fdr.", fdr, ".log2fc.", fc, ".BoxPlots.pdf"), width = 7, height = 5)
+
+        # Handle 0 DB peaks in one direction or another.
+        inc <- FALSE
+        dec <- FALSE
+        if (length(g1up) > 0) {
+          inc <- TRUE
+        }
+        if (length(g2up) > 0) {
+          dec <- TRUE
+        }
+
         dba.plotBox(results, report = reportdb, contrast = i, method = method,
-          bAll = TRUE)
+          bReversePos = TRUE, bDBIncreased = inc, bDBDecreased = dec)
         dev.off()
 
         pdf(paste0(outpath, "/DBRFigures/VolcanoPlots/", g1, "-v-", g2, 
-          ".fdr.", fdr, ".log2fc.", fc, "MAplots.pdf"), width = 5, height = 5)
+          ".fdr.", fdr, ".log2fc.", fc, ".VolcanoPlots.pdf"), width = 5, 
+        height = 5)
         dba.plotVolcano(results, th = fdr, fold = fc, contrast = i, 
           method = method)
         dev.off()
@@ -342,7 +374,8 @@ ProcessDBRs <- function(results, outpath, txdb,
         fc.thresh = fc, consensus = FALSE)
 
       PlotChIPHeatmaps(results, outpath, method = method, fdr.thresh = fdr,
-        fc.thresh = fc, breaks = breaks, consensus = FALSE)
+        fc.thresh = fc, breaks = breaks, colors = hmap.colors, 
+        consensus = FALSE)
     }
   }
   

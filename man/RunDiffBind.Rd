@@ -8,13 +8,14 @@ RunDiffBind(outpath, samplesheet, txdb, level = c("Treatment",
   "Condition", "Tissue", "Factor"), se = NULL, fdr.thresh = 0.05,
   fc.thresh = 2, block = NULL, heatmap.colors = NULL,
   heatmap.preset = NULL, reverse = FALSE, n.consensus = 2,
-  breaks = c(seq(-3, -1, length = 250), seq(-1, -0.1, length = 250),
-  seq(-0.1, 0.1, length = 1), seq(0.1, 1, length = 250), seq(1, 3, length =
-  250)), plot.enrich = TRUE,
+  breaks = c(seq(-3, -1.0001, length = 250), seq(-1, -0.1, length = 250),
+  seq(-0.999, 0.999, length = 1), seq(0.1, 1, length = 250), seq(1.0001, 3,
+  length = 250)), plot.enrich = TRUE,
   enrich.libs = c("GO_Molecular_Function_2018",
   "GO_Cellular_Component_2018", "GO_Biological_Process_2018",
   "KEGG_2019_Human", "Reactome_2016", "BioCarta_2016", "Panther_2016"),
-  promoters = c(-2000, 2000), method = c("DESeq2", "edgeR"))
+  promoters = c(-2000, 2000), method = c("DESeq2", "edgeR"),
+  scale.full = TRUE)
 }
 \arguments{
 \item{outpath}{Path to directory to be used for output. Additional 
@@ -83,6 +84,12 @@ downstream of the TSS should be used to define gene promoters.}
 
 \item{method}{String indicating method to be used for differential expression 
 analysis. Can be "DESeq2" or "edgeR".}
+
+\item{scale.full}{Boolean indicating whether the full library size (total 
+number of reads) for each sample is used for scaling normalization. If
+\code{FALSE}, the total number of reads present in the peaks for each 
+sample is used (preferable if overall binding levels are expected to be 
+similar between samples).}
 }
 \value{
 A \code{DBA} object from \code{\link[DiffBind]{dba.analyze}}.

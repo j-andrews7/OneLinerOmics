@@ -8,8 +8,8 @@ PlotChIPAnnos(peak.anno, outpath, consensus = TRUE, comp = NULL,
   fc = NULL, fdr = NULL)
 }
 \arguments{
-\item{peak.anno}{A named list of \code{csAnno} objects with annotated peaks
-as returned by \code{\link[ChIPseeker]{annotatePeak}}. If 
+\item{peak.anno}{A named list of \linkS4class{csAnno} objects with annotated
+peaks as returned by \code{\link[ChIPseeker]{annotatePeak}}. If 
 \code{consensus = TRUE}, only one is expected, otherwise there should be
 three (All DBRs, group1 up, group2 up).}
 

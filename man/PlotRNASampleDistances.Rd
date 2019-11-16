@@ -9,7 +9,7 @@ PlotRNASampleDistances(rld, vsd, outpath, level, plot.annos)
 \arguments{
 \item{rld}{A \linkS4class{RangedSummarizedExperiment} object of 
 \code{\link[DESeq2]{rlog}} transformed counts as returned by
-\link{PlotVarianceTransformations}.}
+\link{PlotRNAVarianceTransformations}.}
 
 \item{vsd}{A \linkS4class{RangedSummarizedExperiment} object of 
 \code{\link[DESeq2]{vst}} transformed counts as returned by
