@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Create output directory structure — CreateOutputStructure • AndrewsBCellLymphoma</title>
+<title>Create output directory structure — CreateOutputStructure • OneLinerOmics</title>
 
 
 <!-- jquery -->
@@ -36,8 +36,9 @@
 
 
 <meta property="og:title" content="Create output directory structure — CreateOutputStructure" />
-<meta property="og:description" content="CreateOutputStructure generates the output directories used by
-RunDESeq2 and ProcessDEGs." />
+<meta property="og:description" content="CreateRNAOutputStructure generates the output directories used by
+RunDESeq2, ProcessDEGs, 
+RunDiffBind, and ProcessDBRs." />
 <meta name="twitter:card" content="summary" />
 
 
@@ -69,8 +70,8 @@ RunDESeq2 and ProcessDEGs." />
         <span class="icon-bar"></span>
       </button>
       <span class="navbar-brand">
-        <a class="navbar-link" href="../index.html">AndrewsBCellLymphoma</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.0.9000</span>
+        <a class="navbar-link" href="../index.html">OneLinerOmics</a>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.0.9000</span>
       </span>
     </div>
 
@@ -93,14 +94,17 @@ RunDESeq2 and ProcessDEGs." />
   </a>
   <ul class="dropdown-menu" role="menu">
     <li>
-      <a href="../articles/BCellAnalysis.html">Analyzing B cell lymphoma RNA-seq data</a>
+      <a href="../articles/ChIPseqAnalysis.html">Analyzing ChIP-seq data</a>
+    </li>
+    <li>
+      <a href="../articles/RNAseqAnalysis.html">Analyzing RNA-seq data</a>
     </li>
   </ul>
 </li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
         <li>
-  <a href="https://github.com/j-andrews7/AndrewsBCellLymphoma">
+  <a href="https://github.com/j-andrews7/OneLinerOmics">
     <span class="fab fa fab fa-github fa-lg"></span>
      
   </a>
@@ -119,16 +123,17 @@ RunDESeq2 and ProcessDEGs." />
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Create output directory structure</h1>
-    <small class="dont-index">Source: <a href='https://github.com/j-andrews7/AndrewsBCellLymphoma/blob/master/R/utils.R'><code>R/utils.R</code></a></small>
+    <small class="dont-index">Source: <a href='https://github.com/j-andrews7/OneLinerOmics/blob/master/R/utils.R'><code>R/utils.R</code></a></small>
     <div class="hidden name"><code>CreateOutputStructure.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p><code>CreateOutputStructure</code> generates the output directories used by
-<code><a href='RunDESeq2.html'>RunDESeq2</a></code> and <code><a href='ProcessDEGs.html'>ProcessDEGs</a></code>.</p>
+    <p><code>CreateRNAOutputStructure</code> generates the output directories used by
+<code><a href='RunDESeq2.html'>RunDESeq2</a></code>, <code><a href='ProcessDEGs.html'>ProcessDEGs</a></code>, 
+<code><a href='RunDiffBind.html'>RunDiffBind</a></code>, and <code><a href='ProcessDBRs.html'>ProcessDBRs</a></code>.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>CreateOutputStructure</span>(<span class='no'>block</span>, <span class='no'>level</span>, <span class='no'>base</span>)</pre>
+    <pre class="usage"><span class='fu'>CreateOutputStructure</span>(<span class='no'>block</span>, <span class='no'>level</span>, <span class='no'>base</span>, <span class='kw'>chip</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -146,11 +151,16 @@ block for unwanted variance, e.g. batch or technical effects.</p></td>
       <th>base</th>
       <td><p>String defining the base output path.</p></td>
     </tr>
+    <tr>
+      <th>chip</th>
+      <td><p>Boolean indicating whether output is being created for ChIP-seq.</p></td>
+    </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>A named List containing the modified base output path and design</p>
+    <p>A named List containing the modified base output path and design
+  formula.</p>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
@@ -168,7 +178,7 @@ block for unwanted variance, e.g. batch or technical effects.</p></td>
 
       <footer>
       <div class="copyright">
-  <p>Developed by Jared Andrews.</p>
+  <p>Developed by <a href='http://j-andrews7.github.io'>Jared Andrews</a>.</p>
 </div>
 
 <div class="pkgdown">

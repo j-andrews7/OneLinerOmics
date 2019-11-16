@@ -46,11 +46,11 @@ created for each comparison. If so, the \code{top.n} genes will be plotted.}
 \item{plot.enrich}{Boolean indicating whether enrichment analyses for DEGs 
 should be run and plotted for each comparison.}
 
-\item{enrich.libs}{A vector of valid \code{enrichR} libraries to test the genes 
-  against.
+\item{enrich.libs}{A vector of valid \code{enrichR} libraries to test the 
+  genes against.
 
-  Available libraries can be viewed with \code{listEnrichrDbs} from the
-  \code{enrichR} package.}
+  Available libraries can be viewed with 
+  \code{\link[enrichR]{listEnrichrDbs}} from the \code{enrichR} package.}
 
 \item{top.n}{Number of differentially expressed genes to create boxplots for, 
 ranked by adj. p-value after applying \code{padj.thresh} and 
@@ -69,13 +69,18 @@ Named List containing a list named 'res.list' containing
 \description{
 \code{ProcessDEGs} wraps several plotting functions to generate figures 
 specifically for the differentially expressed genes between each possible
-comparison. It is called by \link{RunDESeq2} but can also be re-run with the
-\link{RunDESeq2} output or its own output if you want to save time and don't
-need to generate all of the exploratory data analysis figures again.
+comparison.
 }
 \details{
+\code{ProcessDEGs} is called by \link{RunDESeq2} but can also be re-run with 
+the \link{RunDESeq2} output or its own output if you want to save time and 
+don't need to generate all of the exploratory data analysis figures again.
+
 This function will generate many figures in addition to saving the counts
-and results.
+and results tables.
+}
+\seealso{
+\code{\link{RunDESeq2}}, for generating input for this function.
 }
 \author{
 Jared Andrews

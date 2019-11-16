@@ -1,7 +1,7 @@
 #' Perform and visualize different variance stabilization transformations
 #'
 #' @param dds A \linkS4class{DESeqDataSet} object.
-#' @param outpath Path to output directory.
+#' @param outpath Path to output file.
 #'
 #' @importFrom grDevices pdf dev.off
 #' @importFrom DESeq2 rlog vst estimateSizeFactors normTransform
@@ -16,7 +16,7 @@
 #'
 #' @author Jared Andrews
 #'
-PlotVarianceTransformations <- function (dds, outpath) {
+PlotRNAVarianceTransformations <- function (dds, outpath) {
   message("This may take a while if you have many samples.")
   rld <- suppressMessages(rlog(dds, blind = FALSE))
   vsd <- suppressMessages(vst(dds, blind = FALSE))
@@ -63,11 +63,11 @@ PlotVarianceTransformations <- function (dds, outpath) {
 #'
 #' @param rld A \linkS4class{RangedSummarizedExperiment} object of 
 #'   \code{\link[DESeq2]{rlog}} transformed counts as returned by
-#'   \link{PlotVarianceTransformations}.
+#'   \link{PlotRNAVarianceTransformations}.
 #' @param vsd A \linkS4class{RangedSummarizedExperiment} object of 
 #'   \code{\link[DESeq2]{vst}} transformed counts as returned by
 #'   \link{PlotVarianceTransformations}.
-#' @param outpath Path to directory to be used for output.
+#' @param outpath Path to output file.
 #' @param level String defining variable of interest.
 #' @param plot.annos String or character vector defining the column(s) in 
 #'   \code{samplesheet} to use to annotate figures.
@@ -84,7 +84,7 @@ PlotVarianceTransformations <- function (dds, outpath) {
 #'
 #' @author Jared Andrews
 #'
-PlotSampleDistances <- function(rld, vsd, outpath, level, plot.annos) {
+PlotRNASampleDistances <- function(rld, vsd, outpath, level, plot.annos) {
 
   pdf(outpath)
   i <- 1
@@ -122,8 +122,8 @@ PlotSampleDistances <- function(rld, vsd, outpath, level, plot.annos) {
 #'   \link{PlotVarianceTransformations}.
 #' @param vsd A \linkS4class{RangedSummarizedExperiment} object of 
 #'   \code{\link[DESeq2]{vst}} transformed counts as returned by
-#'   \link{PlotVarianceTransformations}.
-#' @param outpath Path to directory to be used for output.
+#'   \link{PlotRNAVarianceTransformations}.
+#' @param outpath Path to output file.
 #' @param level String defining variable of interest.
 #' @param plot.annos String or character vector defining the column(s) in 
 #'   \code{samplesheet} to use to annotate figures.
@@ -137,7 +137,7 @@ PlotSampleDistances <- function(rld, vsd, outpath, level, plot.annos) {
 #'
 #' @author Jared Andrews
 #'
-PlotEDAPCAs <- function(rld, vsd, outpath, level, plot.annos) {
+PlotRNAEDAPCAs <- function(rld, vsd, outpath, level, plot.annos) {
 
   pdf(outpath, height = 5, width = 5)
   i <- 1
@@ -151,12 +151,12 @@ PlotEDAPCAs <- function(rld, vsd, outpath, level, plot.annos) {
 
   for (x in list(rld, vsd)) {
     p <- DESeq2::plotPCA(x, intgroup = level) + ggtitle(labs[i]) +
-      theme_classic() + theme(aspect.ratio=1)
+      theme_classic() + theme(aspect.ratio = 1)
     print(p)
 
     if (plot.annos != level) {
       p <- DESeq2::plotPCA(x, intgroup = plot.annos) + ggtitle(labs[i]) +
-        theme_classic() + theme(aspect.ratio=1)
+        theme_classic() + theme(aspect.ratio = 1)
       print(p)
     }
 
@@ -166,13 +166,13 @@ PlotEDAPCAs <- function(rld, vsd, outpath, level, plot.annos) {
 
       p <- DESeq2::plotPCA(x.sub, intgroup = level) +
         ggtitle(paste0(labs[i], " - ", combs[samp], " v ", combs[samp + 1])) +
-        theme_classic() + theme(aspect.ratio=1)
+        theme_classic() + theme(aspect.ratio = 1)
       print(p)
 
       if (plot.annos != level) {
         p <- DESeq2::plotPCA(x.sub, intgroup = plot.annos) +
           ggtitle(paste0(labs[i], " - ", combs[samp], " v ", combs[samp + 1])) +
-          theme_classic() + theme(aspect.ratio=1)
+          theme_classic() + theme(aspect.ratio = 1)
         print(p)
       }
     }

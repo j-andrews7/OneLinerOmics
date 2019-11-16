@@ -179,7 +179,7 @@ suppressPackageStartupMessages(library(OneLinerOmics))
 ```
 
 The only thing you need now is a sample sheet, which is just a table with sample names and metadata columns. 
-We can take a peek at the sample sheet I'm using so he can see how they're constructed. 
+We can take a peek at the sample sheet I'm using so we can see how they're constructed. 
 It can include as many metadata columns as you'd like.
 
 ```{r samplesheet, eval=FALSE}

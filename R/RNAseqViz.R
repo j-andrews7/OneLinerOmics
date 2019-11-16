@@ -26,14 +26,14 @@
 #'
 #' @author Jared Andrews
 #'
-PlotHeatmaps <- function(res.list, rld, vsd, level, outpath, 
+PlotRNAHeatmaps <- function(res.list, rld, vsd, level, outpath, 
   padj.thresh, fc.thresh, plot.annos) {
   
   # Set color breaks and palette.
-  breaks <- c(seq(-3, -1.251, length=250), seq(-1.25, -0.1001, length=250), 
-    seq(-0.1, 0.1, length=1), seq(0.1001, 1.25, length=250), 
-    seq(1.251, 3, length=250))
-  colors <- colorRampPalette(c("#053061","#2166ac", "#f5f5f5", 
+  breaks <- c(seq(-3, -1.251, length = 250), seq(-1.25, -0.1001, length = 250), 
+    seq(-0.1, 0.1, length = 1), seq(0.1001, 1.25, length = 250), 
+    seq(1.251, 3, length = 250))
+  colors <- colorRampPalette(c("#053061", "#2166ac", "#f5f5f5", 
     "#b2182b", "#67001f"))(n = 1000)
   
   for (i in seq_along(res.list)) {
@@ -67,7 +67,7 @@ PlotHeatmaps <- function(res.list, rld, vsd, level, outpath,
         pheatmap(matrix, annotation_col = annotation_data, color = colors, 
           scale = "row", breaks = breaks, show_rownames = FALSE, 
           main = paste0(comp, " - ", labs[ind]), 
-          fontsize_col=5)
+          fontsize_col = 5)
         pheatmap(matrix, annotation_col = annotation_data, color = colors, 
           scale = "row", breaks = breaks, show_rownames = FALSE, 
           main = paste0(comp, " - ", labs[ind]), 
@@ -123,7 +123,7 @@ PlotHeatmaps <- function(res.list, rld, vsd, level, outpath,
 #'
 #' @author Jared Andrews
 #'
-PlotCombinedHeatmaps <- function(res.list, rld, vsd, outpath, 
+PlotRNACombinedHeatmaps <- function(res.list, rld, vsd, outpath, 
   padj.thresh, fc.thresh, plot.annos) {
 
   message("Generating combined DEG heatmap using genes with p.adj <= ", 
@@ -154,13 +154,13 @@ PlotCombinedHeatmaps <- function(res.list, rld, vsd, outpath,
   for (x in list(rld, vsd)) {
     heat <- assay(x)[siggy,]
     df <- as.data.frame(colData(rld)[, plot.annos])
-    p <- pheatmap(heat, cluster_rows = TRUE, show_rownames=  FALSE,
+    p <- pheatmap(heat, cluster_rows = TRUE, show_rownames = FALSE,
       cluster_cols = FALSE, annotation_col = df, fontsize_col = 6, 
       fontsize = 6, scale = "row", color = colors, breaks = breaks,
       main = paste0("All Comparisons - ", labs[ind]))
     print(p)
     
-    p <- pheatmap(heat, cluster_rows = TRUE, show_rownames=  FALSE,
+    p <- pheatmap(heat, cluster_rows = TRUE, show_rownames = FALSE,
       cluster_cols = TRUE, annotation_col = df, fontsize_col = 6, 
       fontsize = 6, scale = "row", color = colors, breaks = breaks,
       main = paste0("All Comparisons - ", labs[ind]))
@@ -200,7 +200,7 @@ PlotCombinedHeatmaps <- function(res.list, rld, vsd, outpath,
 #'
 #' @author Jared Andrews
 #'
-PlotBoxplots <- function(res.list, dds, rld, outpath, padj.thresh, fc.thresh, 
+PlotRNABoxplots <- function(res.list, dds, rld, outpath, padj.thresh, fc.thresh, 
   top.n, level) {
 
   for (i in seq_along(res.list)) {
@@ -304,7 +304,7 @@ PlotBoxplots <- function(res.list, dds, rld, outpath, padj.thresh, fc.thresh,
 #'
 #' @author Jared Andrews
 #'
-PlotDEGPCAs <- function(res.list, rld, vsd, outpath, level, plot.annos, 
+PlotRNADEGPCAs <- function(res.list, rld, vsd, outpath, level, plot.annos, 
   padj.thresh, fc.thresh) {
 
   for (i in seq_along(res.list)) {
@@ -385,7 +385,7 @@ PlotDEGPCAs <- function(res.list, rld, vsd, outpath, level, plot.annos,
 #'
 #' @author Jared Andrews
 #'
-PlotVolcanoes <- function(res.list, dds, outpath, padj.thresh, fc.thresh, 
+PlotRNAVolcanoes <- function(res.list, dds, outpath, padj.thresh, fc.thresh, 
   n.labels = 10, use.labels = TRUE) {
 
   for (i in seq_along(res.list)) {

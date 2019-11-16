@@ -1,0 +1,405 @@
+---
+title: Analyzing ChIP-seq data
+author:
+- name: Jared Andrews
+  email: jared.andrews07@gmail.com
+  affiliation: Washington University School of Medicine, Department of Laboratory and Genomic Medicine
+date: "Revised: November 15th, 2019"
+output:
+  BiocStyle::html_document:
+    toc_float: true
+vignette: >
+  %\VignetteIndexEntry{2. Analyzing ChIP-seq data}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}  
+---
+
+```{r, echo=FALSE, results="hide", message=FALSE}
+knitr::opts_chunk$set(error=TRUE, message=TRUE, warning=TRUE, eval=FALSE)
+library(BiocStyle)
+```
+
+# Introduction
+
+This vignette walks through ChIP-seq analysis of the B cell lymphoma ChIP-seq data included in the future Andrews et al. (2019, your favorite journal with an impact factor > 30) paper.
+It uses the convenience functions included in this [package](https://github.com/j-andrews7/AndrewsBCellLymphoma) to streamline the process.
+
+Several command line tools as well as python are also utilized - each code block should indicate whether it is `bash`, `R`, or `python` code. 
+If your system is set up properly, you can still [run _many of_ these code chunks in Rmarkdown files within RStudio](https://bookdown.org/yihui/rmarkdown/language-engines.html), assuming you have all of the software installed.
+
+Some of this code is best ran on a computing cluster, as it takes a significant amount of time locally.
+Such instances will have `- cluster` appended to the language statement at the beginning of the code block.
+
+Required Software:
+
+* R (3.6+)
+* python (ideally one [conda environment](https://docs.conda.io/projects/conda/en/latest/index.html) with python2.7, another with python3) 
+* [ROSE](https://bitbucket.org/young_computation/rose/src/master/)
+* [samtools](http://www.htslib.org/download/)
+* [bedtools](https://bedtools.readthedocs.io/en/latest/)
+* [MACS](https://github.com/taoliu/MACS) - I used v2.1.0.20150420 but more recent ones are available now.
+* [kentUtils](https://github.com/ucscGenomeBrowser/kent)
+* [bowtie2](http://bowtie-bio.sourceforge.net/bowtie2/index.shtml)
+
+# FAQ/Suggested Reading
+
+That is, if you ask me one of the following questions and haven't read/tried these first, I'm going to tell you to read/try them.
+
+* "What does this error during alignment mean?"
+  * Read the [bowtie2 manual](http://bowtie-bio.sourceforge.net/bowtie2/manual.shtml).
+  
+* "Why do I have so few peaks after peakcalling?"
+  * Your data is probably garbage. This can be confirmed visually in a genome browser (no clear peaks == garbage) or by viewing the fraction of reads in peaks/cross-correlation values during QC. You can play with the `-m` and `-q` parameters for MACS2 to adjust the sensitivity, but usually it just means your IP didn't work all that well.
+  
+* "Why won't ROSE work?"
+  * Do you have R, samtools, and python 2.7 installed?
+  * Are you calling the command from the directory where you downloaded ROSE? Adding it to `PATH` does not seem to work.
+  
+* "What are these `mcfork` errors about from ChIPQC/DiffBind?"
+  * Parallelization failure, especially if you're on Windows/WSL. Running `register(SerialParam())` will usually fix this.
+  
+* "Your paths don't make any sense! Are you some sorta dingus?"
+  * Well, yeah, but much of the alignment, peak calling, etc., code is copy-pasted with minor editing merely to demonstrate the process and serve as a record for which parameters were used. It may require a smidgen of effort to adapt to your directory structure. The main purpose of this vignette is to show how the package works, which should be much more clear.
+
+## Alignment, Indexing, and Blacklisted Read Removal
+In order to generate tracks, perform peak calling, and compare signal, we need to align all of our files to the genome. 
+This process will also sort and removed blacklisted reads from the resulting `BAM` file, then index it.
+It requires your genome sequence in `FASTA` format, which you can easily download. 
+Using a different genome version (or organism) is easy - just swap out the version (hg19 -> hg38) or look for [your organism](https://hgdownload.soe.ucsc.edu/downloads.html).
+
+```{bash dl_genome, eval=FALSE}
+# bash
+wget http://hgdownload.cse.ucsc.edu/goldenpath/hg19/bigZips/hg19.fa.gz
+gunzip hg19.fa.gz
+
+# Grab chromosome sizes, need these for blacklisting.
+wget http://hgdownload.cse.ucsc.edu/goldenpath/hg19/bigZips/hg19.chrom.sizes
+mkdir ./ChIP_Seq/ref
+mv hg19.chrom.sizes ./ChIP_Seq/ref/hg19.chrom.sizes
+```
+
+`bowtie2` also has to build an index for the genome prior to use.
+
+```{bash bowtie_index, eval=FALSE}
+# bash
+bowtie-build hg19.fa hg19
+```
+
+Blacklisted regions are those that have high artificial signal in pretty much every ChIP experiment - usually due to being extremely repetitive or near centromeres.
+[ENCODE](https://www.encodeproject.org/annotations/ENCSR636HFF/) identified these regions, so we can remove all such reads so they don't bias our normalization/differential binding analyses later on.
+A (probably quicker) alternative whould be to remove peaks that overlap these regions.
+
+```{bash dl_blacklists, eval=FALSE}
+# bash
+wget https://www.encodeproject.org/files/ENCFF001TDO/@@download/ENCFF001TDO.bed.gz
+gunzip ENCFF001TDO.bed.gz
+mv ENCFF001TDO.bed ./ChIP_Seq/ref/ENCODE_blacklists.bed
+
+# Due to how samtools view works, we create a file of regions we WANT to keep rather than exclude.
+bedtools complement -i ./ChIP_Seq/ref/ENCODE_blacklists.bed \
+-g ./ChIP_Seq/ref/hg19.chrom.sizes > ./ChIP_Seq/ref/hg19_blacklist_regions_removed.bed
+```
+
+Now we can perform the actual alignment. 
+
+```{bash alignment, eval=FALSE}
+# bash - cluster
+
+# Directory containing bowtie indices, blacklist, etc.
+genome="./ChIP_Seq/ref/hg19"
+# Base directory containing reads and where additional directories will be created.
+base_dir="./ChIP_Seq/READS/"
+
+cd "$base_dir"
+mkdir BAMS
+
+# Alignment.
+for f in ./ChIP_Seq/READS/*.fq.gz; do
+  echo Aligning "$f"
+  bowtie2 -p 6 -x ./ChIP_Seq/ref/hg19 -U "$f" | samtools view -@ 8 -b -S -u - \
+  | samtools sort -@ 8 -m 5G -o ./ChIP_Seq/BAMS/"${f%.*}".sorted.bam -;
+  samtools index ./ChIP_Seq/BAMS/"${f%.*}".sorted.bam
+done
+
+# Removal of blacklist reads.
+for f in ./ChIP_Seq/BAMS/*.bam; do
+    echo Removing blacklisted reads from "$f"
+    base=${f##*/}
+    samtools view -@ 8 -b -t ./ChIP_Seq/Ref/hg19.fa \
+    -L ./ChIP_Seq/Ref/hg19_blacklist_regions_removed.bed \
+    -o ./ChIP_Seq/BAMS/"${base%.*}".BL_removed.bam "$f";
+    samtools index ./ChIP_Seq/BAMS/"${base%.*}".BL_removed.bam;
+done
+
+```
+
+## Peak Calling
+Another essential step is peak calling. Tons of peak callers exist, some are better at broad peak calling, some are made for TFs, etc etc. 
+[MACS](https://github.com/taoliu/MACS) is one of the most common and most well-regarded peak callers out there. 
+It generally does pretty well even if you botch the options, and the author has recently began developing it again. 
+The script below is meant to run on a batch of files that have a corresponding input/IgG sample within the same folder. 
+
+Here I use a q-value of 0.01, as this should help reduce peaks called in samples with high background. You may adjust them as you see fit.
+
+```{bash call_peaks, eval=FALSE}
+# bash - cluster
+
+# This example is for H3K27AC samples, hence the wildcard use to capture that.
+
+for f in ./ChIP_Seq/BAMs/*C.sorted.BL_removed.bam; do
+    base=${f##*/}
+    macs2 callpeak -t "$f" -c ./ChIP_Seq/BAMs/*INPUT.sorted.BL_removed.bam -n "$base" \
+    --outdir ./ChIP_Seq/MACS/H3K27AC --tempdir ./ChIP_Seq/scratch/MACS2 -q 0.01 \
+    --nomodel --shiftsize=150;
+done
+```
+
+### Pre-filter
+I also only care about autosomal peaks, so I filter those out. I also have several marks, so I organized the resulting files into directories.
+
+```{bash}
+# bash
+marks=(FAIRE H3AC H3K27AC H3K4ME1)
+for m in "${marks[@]}"; do
+    for f in ./ChIP_Seq/MACS2/"$m"/PEAKS_NARROW/*.narrowPeak; do
+        sed '/_g\|chrM\|uN\|rand\|chrY\|chrX\|chr23/d' "$f" > "$f".clean
+        rename.ul .narrowPeak.clean .clean.narrowPeak "$f".clean
+    done
+done
+```
+
+## Super Enhancer Calling with ROSE
+[ROSE](http://younglab.wi.mit.edu/super_enhancer_code.html) was the original tool made for SE calling, and it's still used today. 
+Some other tools do the same thing, but they all take the same approach, so might as well stick with the OG, yeah?
+
+First, we need our peaks in a `gff` format.
+
+```{python bed2gff, eval=FALSE}
+# python
+
+import glob
+# Store file names
+marks = ["FAIRE", "H3AC", "H3K27AC", "H3K4ME1"]
+
+for m in marks:
+  in_files = glob.glob("./ChIP_Seq/MACS2/" + m + "/PEAKS_NARROW/*.narrowPeak")
+  
+  for n in in_files:
+    base = ".".join(input_file.split(".")[0:-1])
+    output_file = "./ChIP_Seq/MACS2/" + m + "/PEAKS_NARROW/" + base + ".gff"
+    
+    with open(n) as f:
+    
+        # Open output file, "w" to make it writable
+        output_f = open(output_file, "w")
+        new_ID = 1
+    
+        for line in f:
+            line = line.strip().split()
+    
+            # Handle if bed file already has an ID that should be retained.
+            if len(line) > 3:
+                if line[3] is not None and line[3] is not ".":
+                    ID = line[3]
+                else:
+                    ID = new_ID
+            else:
+                ID = new_ID
+    
+            print(line[0], ID, "PEAK", str(int(line[1]) + 1), line[2],
+                  ".", ".", ".", ID, sep="\t", file=output_f)
+    
+            new_ID += 1
+    
+        output_f.close()
+```
+
+Easy enough to use, just have to feed it the `BAM` file for both your sample and the input along with the peaks.
+Requires `samtools` and `R` on your `PATH`, so be sure both of those can be run.
+It also has to be run from the `rose` folder wherever you cloned it - trying to add the `rose` directory to your `PATH` really doesn't work.
+These are pretty standard options.
+`-t` defines what you want to consider the promoter of a gene, in this case we're using +/- 2500 bp.
+It excludes peaks in these regions from the stitching process.
+
+```{bash se_calling, eval=FALSE}
+# bash
+base=/mnt/f/BCellRework/ChIP_Seq
+for f in "$base"/BAMs/K27AC/TS*K27AC.sorted.BL_removed.bam; do
+	samp=${f##*/};
+	samp=${samp%.*};
+	short=${samp%%_*};
+	echo "processing $samp";
+	python ROSE_main.py -g hg19 -r "$f" -t 2500 -c "$base"/BAMs/INPUT/"$short"_INPUT.sorted.bam \
+	-o ../RESULTS/"$short" -i "$base"/ROSE/PEAKS_GFF/"$short"_peaks.clean.gff;
+done
+```
+
+## Making Tracks
+Ultimately, we want to be able to visualize the results as well, so we can create at least semi-normalized tracks that account for read depth to make them more visually comparable.
+Always take track visualizations with a grain of salt - use them as representations of what you've found through more thorough statistical analyses, never try to use them to make claims or you're gonna have a bad time.
+
+I use `deepTools` to generate RPKM-normalized signal bigwig generation, and ignore chrM, X, and Y for these purposes. 
+It can be installed with a simple `pip install deeptools`.
+
+```{bash make_tracks, eval=FALSE}
+# bash
+mkdir ./ChIP_Seq/TRACKS
+for f in ./ChIP_Seq/BAMs/*BL_removed.bam; do 
+  echo "$f"; 
+  bamCoverage --bam "$f" -o ./ChIP_Seq/TRACKS/"$f".rpkm.bw --binSize 10 \
+  --ignoreForNormalization chrX chrM chrY --extendReads 150 \
+  --normalizeUsing RPKM -p max/2; 
+done
+```
+
+For the peaks, look up the `bigNarrowPeak` format and convert to it with `bedToBigBed`.
+You will have to fetch the hg19 chromosome sizes first with UCSC's `fetchChromSizes` utility.
+The [`kentUtils` tools](https://github.com/ucscGenomeBrowser/kent) will give you everything you need for this. 
+You might have to change the score in the 5th column for a few lines by running something like:
+
+```{bash peak_tracks, eval=FALSE}
+# bash
+for f in *.narrowPeak; do
+  awk '{if ($5 > 1000) $5 = 1000; print $0}' "$f" > "$f".fix;
+  bedToBigBed -as=bigNarrowPeak.as -type=bed6+4 "$f".fix hg19.chrom.sizes "$f".bb;
+done
+```
+
+## Analysis with R
+
+Install this package if you haven't already with `devtools::install_github("j-andrews7/OneLinerOmics")`.
+If you don't have `devtools`, it can be installed with `install.packages("devtools")`.
+
+```{r load}
+# R
+suppressPackageStartupMessages(library(OneLinerOmics))
+```
+
+### QC
+First, we'll QC samples, as ChIP tends to be much more variable than RNA-seq in terms of quality.
+In particular, we're interested in cross-correlation values and the fraction of reads in peaks, which will help to identify poor quality samples where our IP just didn't work all that well.
+
+These _are_ difficult samples to work with, after all, and we had very low numbers of cells for many of them.
+Similar to the RNA-seq analysis, we will use a sample sheet, but this one requires a more strict structure.
+The columns shown *are the only ones allowed*.
+We will also use these sample sheets later on, so if you have more complicated comparisons you want to do, be sure to structure your sheet appropriately so that they are modeled fully within one column.
+
+Pay careful attention to provide the correct file paths to your peak and read files as well as the input controls.
+
+```{r samplesheet, eval=FALSE}
+# R
+# Basic sample sheet.
+samples <- read.table("./ChIP_Seq/ChIPQC/H3AC/SampleSheet_H3AC_QC_narrow.NoCTRL.csv", header=TRUE, sep = ",")
+head(samples, 10)
+```
+
+I use `ChIPQC` to run QC.
+This package can be a...challenge to use.
+It is capable of generating a report, but often errors, so this package just uses metrics without the report.
+
+The authors are also slow to keep it up to date, so new R/Bioconductor versions break it all the time.
+I actually had to download it from [another repo](https://github.com/shengqh/ChIPQC) that included a fix to get it to run this time around.
+Installing this package should install that version, so you shouldn't have to mess with it.
+
+```{r QC, message=TRUE}
+# R
+h3ac.exp <- RunChIPQC(outpath = "./ChIP_Seq/ChIPQC/H3AC/", 
+  samplesheet = "./ChIP_Seq/ChIPQC/H3AC/SampleSheet_H3AC_QC_narrow.NoCTRL.csv")
+
+faire.exp <- RunChIPQC("./ChIP_Seq/ChIPQC/FAIRE/",
+  "./ChIP_Seq/ChIPQC/FAIRE/SampleSheet_FAIRE_QC_narrow.NoCTRL.csv")
+
+h3k4me1.exp <- RunChIPQC("./ChIP_Seq/ChIPQC/H3K4ME1/",
+  "./ChIP_Seq/ChIPQC/H3K4ME1/SampleSheet_H3K4ME1_QC_narrow.NoCTRL.csv")
+
+h3k27ac.exp <- RunChIPQC("./ChIP_Seq/ChIPQC/H3K27AC/",
+  "./ChIP_Seq/ChIPQC/H3K27AC/SampleSheet_H3K27AC_QC_narrow.NoCTRL.csv")
+```
+
+In addition to the metrics, this function will generate a plot of the peak overlaps between samples, showing how overlap criteria will impact your consensus peak set. 
+By default, any peaks that overlap in at least 2 samples will be retained and merged. 
+Making this more stringent will help reduce noise at the cost of potentially leaving out real peaks that are unique to a few samples. 
+This curve usually exhibits a near geometric drop-off, with the number of overlapping peaks halving for each increase in strictness. 
+If the drop-off is very steep, it likely means many of your peaks are false positives (or your samples are highly variable). 
+High peak agreement will lead to a less severe drop-off.
+
+### Remove poor quality samples
+
+Kick 'em off the sample sheets. I removed samples with the following metrics:
+ * FAIRE - <3.5% Reads in Peaks
+ * H3AC - <10% Reads in Peaks
+ * H3K4ME1 - <9.5% Reads in Peaks
+ * H3K27AC - <6.5% Reads in Peaks
+ 
+Picked rather arbitrarily, but generally want at least 2-3x the typical RiP of the input samples.
+
+### Perform differential binding analysis
+Another one-liner. 
+This analysis uses [DiffBind](https://bioconductor.org/packages/release/bioc/html/DiffBind.html) along with [ChIPseeker](https://www.bioconductor.org/packages/release/bioc/html/ChIPseeker.html) for peak annotation and [enrichR](https://cran.r-project.org/web/packages/enrichR/index.html) (wrapped by [EZscRNA](https://github.com/j-andrews7/EZscRNA)) for enrichment analyses.
+
+I have 4 different marks of interest here, so I'm going to run it on each of them as well as the super enhancers from the H3k27ac data.
+From our QC up above, I know that I want to bump up the number of samples containing a peak for it to be merged, so I set `n.consensus = 4` for all but the super enhancers.
+
+```{r DiffBind, message=TRUE}
+# R
+# For annotation.
+library(TxDb.Hsapiens.UCSC.hg19.knownGene)
+txdb <- TxDb.Hsapiens.UCSC.hg19.knownGene
+
+ses <- RunDiffBind(outpath = "./ChIP_Seq/DiffBind/H3K27AC_SE/AllComparisons",
+                   samplesheet = "./ChIP_Seq/DiffBind/H3K27AC_SE/SampleSheet_H3K27AC_DiffBind_SEs.csv", 
+                   txdb = txdb, 
+                   level = "Tissue", 
+                   fdr.thresh = c(0.05, 0.01),
+                   fc.thresh = c(1, 2),
+                   heatmap.preset = "BrTe",
+                  scale.full = FALSE)
+
+h3ac <- RunDiffBind(outpath = "./ChIP_Seq/DiffBind/H3AC/AllComparisons",
+                   samplesheet = "./ChIP_Seq/DiffBind/H3AC/SampleSheet_H3AC_DiffBind.csv", 
+                   txdb = txdb,
+                   n.consensus = 4,
+                   se = "./ChIP_Seq/DiffBind/H3K27AC_SE/AllComparisons/NoBlock/ResultsTables/CLL-v-DL.AllPeaks.txt",
+                   level = "Tissue", 
+                   fdr.thresh = c(0.05, 0.01),
+                   fc.thresh = c(1, 2),
+                   heatmap.preset = "OrPu",
+                   scale.full = FALSE)
+faire <- RunDiffBind(outpath = "./ChIP_Seq/DiffBind/FAIRE/AllComparisons",
+                   samplesheet = "./ChIP_Seq/DiffBind/FAIRE/SampleSheet_FAIRE_DiffBind.csv", 
+                   txdb = txdb,
+                   n.consensus = 4,
+                   se = "./ChIP_Seq/DiffBind/H3K27AC_SE/AllComparisons/NoBlock/ResultsTables/CLL-v-DL.AllPeaks.txt",
+                   level = "Tissue", 
+                   fdr.thresh = c(0.05, 0.01),
+                   fc.thresh = c(1, 2),
+                   heatmap.preset = "PuGr",
+                   scale.full = FALSE)
+h3k4me1 <- RunDiffBind(outpath = "./ChIP_Seq/DiffBind/H3K4ME1/AllComparisons",
+                   samplesheet = "./ChIP_Seq/DiffBind/H3K4ME1/SampleSheet_H3K4ME1_DiffBind.csv", 
+                   txdb = txdb,
+                   n.consensus = 4,
+                   se = "./ChIP_Seq/DiffBind/H3K27AC_SE/AllComparisons/NoBlock/ResultsTables/CLL-v-DL.AllPeaks.txt",
+                   level = "Tissue", 
+                   fdr.thresh = c(0.05, 0.01),
+                   fc.thresh = c(1, 2),
+                   heatmap.preset = "BuOr",
+                   scale.full = FALSE)
+h3k27ac <- RunDiffBind(outpath = "./ChIP_Seq/DiffBind/H3K27AC/AllComparisons",
+                   samplesheet = "./ChIP_Seq/DiffBind/H3K27AC/SampleSheet_H3K27AC_DiffBind.csv", 
+                   txdb = txdb,
+                   n.consensus = 4,
+                   se = "./ChIP_Seq/DiffBind/H3K27AC_SE/AllComparisons/NoBlock/ResultsTables/CLL-v-DL.AllPeaks.txt",
+                   level = "Tissue", 
+                   fdr.thresh = c(0.05, 0.01),
+                   fc.thresh = c(1, 2),
+                   heatmap.preset = "BrTe",
+                   scale.full = FALSE)
+```
+
+
+# Session Information
+
+```{r session, eval=TRUE}
+sessionInfo()
+```

@@ -17,11 +17,29 @@ reference:
       - ProcessDEGs
   - title: "RNA-seq Plotting"
     desc: >
-      Functions that generate plots. Calling these individually can sometimes be useful.
+      Functions that generate plots for RNA-seq data. Calling these individually can sometimes be useful.
     contents:
-      - starts_with("Plot")
+      - starts_with("PlotRNA")
+  - title: "ChIP-seq analysis"
+    desc: >
+      Functions that perform ChIPQC/DiffBind analyses, utilizing the utility and plotting functions to generate output tables and figures. 
+      These are the crux of the ChIP-seq portion of the package and what most users should use.
+    contents:
+      - RunChIPQC
+      - RunDiffBind
+      - ProcessDBRs
+  - title: "ChIP-seq Plotting"
+    desc: >
+      Functions that generate plots for ChIP-seq data. Calling these individually can sometimes be useful.
+    contents:
+      - starts_with("PlotChIP")
+  - title: "Enrichment Analyses"
+    desc: >
+      This function performs GO/pathway enrichment analysis for lists of genes resulting from both RNA and ChIP-seq analyses.
+    contents:
+      - PlotEnrichments
   - title: "Internal utilities"
     desc: Functions used to create directory structure and save output. Users shouldn't need to call these explicitely.
     contents: 
-      - CreateRNAOutputStructure
-      - SaveRNAResults
+      - CreateOutputStructure
+      - SaveResults

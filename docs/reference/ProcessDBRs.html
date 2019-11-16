@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Extract, visualize, and save DEG lists — ProcessDEGs • OneLinerOmics</title>
+<title>Extract, visualize, and save DBRs — ProcessDBRs • OneLinerOmics</title>
 
 
 <!-- jquery -->
@@ -35,10 +35,9 @@
 
 
 
-<meta property="og:title" content="Extract, visualize, and save DEG lists — ProcessDEGs" />
-<meta property="og:description" content="ProcessDEGs wraps several plotting functions to generate figures 
-specifically for the differentially expressed genes between each possible
-comparison." />
+<meta property="og:title" content="Extract, visualize, and save DBRs — ProcessDBRs" />
+<meta property="og:description" content="ProcessDBRs wraps several plotting functions to generate figures 
+specifically for differentially bound regions in a given comparison." />
 <meta name="twitter:card" content="summary" />
 
 
@@ -122,79 +121,96 @@ comparison." />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Extract, visualize, and save DEG lists</h1>
-    <small class="dont-index">Source: <a href='https://github.com/j-andrews7/OneLinerOmics/blob/master/R/RNAseq.R'><code>R/RNAseq.R</code></a></small>
-    <div class="hidden name"><code>ProcessDEGs.Rd</code></div>
+    <h1>Extract, visualize, and save DBRs</h1>
+    <small class="dont-index">Source: <a href='https://github.com/j-andrews7/OneLinerOmics/blob/master/R/ChIPseq.R'><code>R/ChIPseq.R</code></a></small>
+    <div class="hidden name"><code>ProcessDBRs.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p><code>ProcessDEGs</code> wraps several plotting functions to generate figures 
-specifically for the differentially expressed genes between each possible
-comparison.</p>
+    <p><code>ProcessDBRs</code> wraps several plotting functions to generate figures 
+specifically for differentially bound regions in a given comparison.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>ProcessDEGs</span>(<span class='no'>dds</span>, <span class='no'>rld</span>, <span class='no'>vsd</span>, <span class='no'>outpath</span>, <span class='no'>level</span>, <span class='no'>plot.annos</span>,
-  <span class='kw'>padj.thresh</span> <span class='kw'>=</span> <span class='fl'>0.05</span>, <span class='kw'>fc.thresh</span> <span class='kw'>=</span> <span class='fl'>2</span>, <span class='kw'>plot.box</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
+    <pre class="usage"><span class='fu'>ProcessDBRs</span>(<span class='no'>results</span>, <span class='no'>outpath</span>, <span class='no'>txdb</span>, <span class='kw'>fdr.thresh</span> <span class='kw'>=</span> <span class='fl'>0.05</span>, <span class='kw'>fc.thresh</span> <span class='kw'>=</span> <span class='fl'>1</span>,
+  <span class='kw'>method</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>promoters</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(-<span class='fl'>2000</span>, <span class='fl'>2000</span>), <span class='kw'>breaks</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/seq.html'>seq</a></span>(-<span class='fl'>3</span>,
+  -<span class='fl'>1.0001</span>, <span class='kw'>length</span> <span class='kw'>=</span> <span class='fl'>250</span>), <span class='fu'><a href='https://rdrr.io/r/base/seq.html'>seq</a></span>(-<span class='fl'>1</span>, -<span class='fl'>0.1</span>, <span class='kw'>length</span> <span class='kw'>=</span> <span class='fl'>250</span>), <span class='fu'><a href='https://rdrr.io/r/base/seq.html'>seq</a></span>(-<span class='fl'>0.999</span>, <span class='fl'>0.999</span>,
+  <span class='kw'>length</span> <span class='kw'>=</span> <span class='fl'>1</span>), <span class='fu'><a href='https://rdrr.io/r/base/seq.html'>seq</a></span>(<span class='fl'>0.1</span>, <span class='fl'>1</span>, <span class='kw'>length</span> <span class='kw'>=</span> <span class='fl'>250</span>), <span class='fu'><a href='https://rdrr.io/r/base/seq.html'>seq</a></span>(<span class='fl'>1.0001</span>, <span class='fl'>3</span>, <span class='kw'>length</span> <span class='kw'>=</span> <span class='fl'>250</span>)),
+  <span class='kw'>heatmap.colors</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>heatmap.preset</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>reverse</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
   <span class='kw'>plot.enrich</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>enrich.libs</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"GO_Molecular_Function_2018"</span>,
   <span class='st'>"GO_Cellular_Component_2018"</span>, <span class='st'>"GO_Biological_Process_2018"</span>,
-  <span class='st'>"KEGG_2019_Human"</span>, <span class='st'>"Reactome_2016"</span>, <span class='st'>"BioCarta_2016"</span>, <span class='st'>"Panther_2016"</span>),
-  <span class='kw'>top.n</span> <span class='kw'>=</span> <span class='fl'>100</span>)</pre>
+  <span class='st'>"KEGG_2019_Human"</span>, <span class='st'>"Reactome_2016"</span>, <span class='st'>"BioCarta_2016"</span>, <span class='st'>"Panther_2016"</span>))</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>dds</th>
-      <td><p>A DESeqDataSet object as returned by 
-<code><a href='https://rdrr.io/pkg/DESeq2/man/DESeq.html'>DESeq</a></code>.</p></td>
-    </tr>
-    <tr>
-      <th>rld</th>
-      <td><p>A RangedSummarizedExperiment object of 
-<code><a href='https://rdrr.io/pkg/DESeq2/man/rlog.html'>rlog</a></code> transformed counts as returned by
-<a href='RunDESeq2.html'>RunDESeq2</a>.</p></td>
-    </tr>
-    <tr>
-      <th>vsd</th>
-      <td><p>A RangedSummarizedExperiment object of 
-<code><a href='https://rdrr.io/pkg/DESeq2/man/vst.html'>vst</a></code> transformed counts as returned by
-<a href='RunDESeq2.html'>RunDESeq2</a>.</p></td>
+      <th>results</th>
+      <td><p><code>DBA</code> object as returned by 
+<code><a href='https://rdrr.io/pkg/DiffBind/man/dba.analyze.html'>dba.analyze</a></code>.</p></td>
     </tr>
     <tr>
       <th>outpath</th>
       <td><p>Path to directory to be used for output.</p></td>
     </tr>
     <tr>
-      <th>level</th>
-      <td><p>String defining variable of interest.</p></td>
+      <th>txdb</th>
+      <td><p><code>TxDb</code> object to use for annotation.</p></td>
     </tr>
     <tr>
-      <th>plot.annos</th>
-      <td><p>String or character vector defining the column(s) in 
-<code>samplesheet</code> to use to annotate figures.</p></td>
-    </tr>
-    <tr>
-      <th>padj.thresh</th>
-      <td><p>Number or numeric scalar indicating the adjusted p-value 
-cutoff(s) to be used for determining "significant" differential expression.
-If multiple are given, multiple tables/plots will be generated using all 
-combinations of <code>padj.thresh</code> and <code>fc.thresh</code>.</p></td>
+      <th>fdr.thresh</th>
+      <td><p>Number or numeric scalar indicating the false discovery 
+rate (FDR) cutoff(s) to be used for determining "significant" differential 
+binding. If multiple are given, multiple tables/plots will be generated 
+using all combinations of <code>fdr.thresh</code> and <code>fc.thresh</code>.</p></td>
     </tr>
     <tr>
       <th>fc.thresh</th>
       <td><p>Number or numeric scalar indicating the log2 fold-change 
-cutoff(s) to be used for determining "significant" differential expression.
+cutoff(s) to be used for determining "significant" differential binding.
 If multiple are given, multiple tables/plots will be generated using all 
 combinations of <code>padj.thresh</code> and <code>fc.thresh</code>.</p></td>
     </tr>
     <tr>
-      <th>plot.box</th>
-      <td><p>Boolean indicating whether box plots for DEGs should be 
-created for each comparison. If so, the <code>top.n</code> genes will be plotted.</p></td>
+      <th>method</th>
+      <td><p>Method used for differential binding e.g. <code>DBA_DESEQ2</code>.</p>
+<p>Do not quote this parameter, it is a global variable from <code>DiffBind</code>.
+  If a block was used, be sure to include that 
+  (e.g. <code>DBA_DESEQ2_BLOCK</code>).</p></td>
+    </tr>
+    <tr>
+      <th>promoters</th>
+      <td><p>Scalar vector containing how many basepairs up and 
+downstream of the TSS should be used to define gene promoters.</p></td>
+    </tr>
+    <tr>
+      <th>breaks</th>
+      <td><p>Vector of sequences to be used as breaks for signal heatmaps.</p></td>
+    </tr>
+    <tr>
+      <th>heatmap.colors</th>
+      <td><p>Character vector containing custom colors to use for 
+heatmaps in hex (e.g. <code><a href='https://rdrr.io/r/base/c.html'>c("#053061", "#f5f5f5", "#67001f")</a></code>).</p></td>
+    </tr>
+    <tr>
+      <th>heatmap.preset</th>
+      <td><p>String indicating which of the color presets to use in
+  heatmaps.</p>
+<p>Available presets (low to high) are:</p><ul>
+<li><p>"BuRd" Blue to red.</p></li>
+<li><p>"OrPu" Orange to purple.</p></li>
+<li><p>"BrTe" Brown to teal.</p></li>
+<li><p>"PuGr" Purple to green.</p></li>
+<li><p>"BuOr" Sea blue to orange.</p></li>
+</ul></td>
+    </tr>
+    <tr>
+      <th>reverse</th>
+      <td><p>Boolean indicating whether to flip heatmap color scheme 
+(high color will become low, etc).</p></td>
     </tr>
     <tr>
       <th>plot.enrich</th>
-      <td><p>Boolean indicating whether enrichment analyses for DEGs 
+      <td><p>Boolean indicating whether enrichment analyses for DBRs 
 should be run and plotted for each comparison.</p></td>
     </tr>
     <tr>
@@ -204,41 +220,24 @@ should be run and plotted for each comparison.</p></td>
 <p>Available libraries can be viewed with 
   <code><a href='https://rdrr.io/pkg/enrichR/man/listEnrichrDbs.html'>listEnrichrDbs</a></code> from the <code>enrichR</code> package.</p></td>
     </tr>
-    <tr>
-      <th>top.n</th>
-      <td><p>Number of differentially expressed genes to create boxplots for, 
-ranked by adj. p-value after applying <code>padj.thresh</code> and 
-<code>fc.thresh</code> thresholds. If multiple thresholds are provided, the 
-lowest fold-change and highest adj. p-value thresholds will be used.</p></td>
-    </tr>
     </table>
 
-    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
-
-    <p>Named List containing a list named 'res.list' containing 
-  DESeqResults objects for all comparisons generated by 
-  <code>ProcessDEGs</code>, a DESeqDataSet object named 'dds'
-  from running <code><a href='https://rdrr.io/pkg/DESeq2/man/DESeq.html'>DESeq</a></code>, a 
-  RangedSummarizedExperiment object named 'rld' from running 
-  <code><a href='https://rdrr.io/pkg/DESeq2/man/rlog.html'>rlog</a></code>, and a RangedSummarizedExperiment 
-  object from running <code><a href='https://rdrr.io/pkg/DESeq2/man/vst.html'>vst</a></code> named 'vsd'.</p>
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
-    <p><code>ProcessDEGs</code> is called by <a href='RunDESeq2.html'>RunDESeq2</a> but can also be re-run with 
-the <a href='RunDESeq2.html'>RunDESeq2</a> output or its own output if you want to save time and 
-don't need to generate all of the exploratory data analysis figures again.</p>
-<p>This function will generate many figures in addition to saving the counts
-and results tables.</p>
+    <p><code>ProcessDBRs</code> is called by <a href='RunDiffBind.html'>RunDiffBind</a> but can also be re-run 
+with the <a href='RunDiffBind.html'>RunDiffBind</a> output if you want to save time and don't need to 
+generate all of the EDA/consensus figures again.</p>
+<p>This function will generate many figures in addition to saving the results as
+tables.</p>
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
-    <div class='dont-index'><p><code><a href='RunDESeq2.html'>RunDESeq2</a></code>, for generating input for this function.</p></div>
+    <div class='dont-index'><p><code><a href='RunDiffBind.html'>RunDiffBind</a></code>, for generating input for this function.</p></div>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
     <ul class="nav nav-pills nav-stacked">
       <li><a href="#arguments">Arguments</a></li>
-      <li><a href="#value">Value</a></li>
       <li><a href="#details">Details</a></li>
       <li><a href="#see-also">See also</a></li>
     </ul>

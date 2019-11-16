@@ -90,6 +90,9 @@
   </a>
   <ul class="dropdown-menu" role="menu">
     <li>
+      <a href="../articles/ChIPseqAnalysis.html">Analyzing ChIP-seq data</a>
+    </li>
+    <li>
       <a href="../articles/RNAseqAnalysis.html">Analyzing RNA-seq data</a>
     </li>
   </ul>
@@ -150,63 +153,123 @@
       <tr>
         <th colspan="2">
           <h2 id="section-rna-seq-plotting" class="hasAnchor"><a href="#section-rna-seq-plotting" class="anchor"></a>RNA-seq Plotting</h2>
-          <p class="section-desc"><p>Functions that generate plots. Calling these individually can sometimes be useful.</p></p>
+          <p class="section-desc"><p>Functions that generate plots for RNA-seq data. Calling these individually can sometimes be useful.</p></p>
         </th>
       </tr>
       <tr>
         
         <td>
-          <p><code><a href="PlotBoxplots.html">PlotBoxplots()</a></code> </p>
+          <p><code><a href="PlotRNABoxplots.html">PlotRNABoxplots()</a></code> </p>
         </td>
         <td><p>Plot gene counts as box plots</p></td>
       </tr><tr>
         
         <td>
-          <p><code><a href="PlotCombinedHeatmaps.html">PlotCombinedHeatmaps()</a></code> </p>
+          <p><code><a href="PlotRNACombinedHeatmaps.html">PlotRNACombinedHeatmaps()</a></code> </p>
         </td>
         <td><p>Generate gene heatmaps for all DEGs from a list of DESeq2 results</p></td>
       </tr><tr>
         
         <td>
-          <p><code><a href="PlotDEGPCAs.html">PlotDEGPCAs()</a></code> </p>
+          <p><code><a href="PlotRNADEGPCAs.html">PlotRNADEGPCAs()</a></code> </p>
         </td>
         <td><p>Plot PCAs from variance stabilized counts for differentially expressed genes</p></td>
       </tr><tr>
         
         <td>
-          <p><code><a href="PlotEDAPCAs.html">PlotEDAPCAs()</a></code> </p>
+          <p><code><a href="PlotRNAEDAPCAs.html">PlotRNAEDAPCAs()</a></code> </p>
         </td>
         <td><p>Plot PCAs from variance stabilized counts for EDA</p></td>
       </tr><tr>
         
         <td>
-          <p><code><a href="PlotEnrichments.html">PlotEnrichments()</a></code> </p>
-        </td>
-        <td><p>Perform GO/Pathway enrichment for DEGs via enrichR</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="PlotHeatmaps.html">PlotHeatmaps()</a></code> </p>
+          <p><code><a href="PlotRNAHeatmaps.html">PlotRNAHeatmaps()</a></code> </p>
         </td>
         <td><p>Generate per comparison DEG heatmaps for a list of DESeq2 results</p></td>
       </tr><tr>
         
         <td>
-          <p><code><a href="PlotSampleDistances.html">PlotSampleDistances()</a></code> </p>
+          <p><code><a href="PlotRNASampleDistances.html">PlotRNASampleDistances()</a></code> </p>
         </td>
         <td><p>Visualize sample distances from variance stabilized counts</p></td>
       </tr><tr>
         
         <td>
-          <p><code><a href="PlotVarianceTransformations.html">PlotVarianceTransformations()</a></code> </p>
+          <p><code><a href="PlotRNAVarianceTransformations.html">PlotRNAVarianceTransformations()</a></code> </p>
         </td>
         <td><p>Perform and visualize different variance stabilization transformations</p></td>
       </tr><tr>
         
         <td>
-          <p><code><a href="PlotVolcanoes.html">PlotVolcanoes()</a></code> </p>
+          <p><code><a href="PlotRNAVolcanoes.html">PlotRNAVolcanoes()</a></code> </p>
         </td>
         <td><p>Create volcano plots from a list of DESeq2 Results objects</p></td>
+      </tr>
+    </tbody><tbody>
+      <tr>
+        <th colspan="2">
+          <h2 id="section-chip-seq-analysis" class="hasAnchor"><a href="#section-chip-seq-analysis" class="anchor"></a>ChIP-seq analysis</h2>
+          <p class="section-desc"><p>Functions that perform ChIPQC/DiffBind analyses, utilizing the utility and plotting functions to generate output tables and figures. These are the crux of the ChIP-seq portion of the package and what most users should use.</p></p>
+        </th>
+      </tr>
+      <tr>
+        
+        <td>
+          <p><code><a href="RunChIPQC.html">RunChIPQC()</a></code> </p>
+        </td>
+        <td><p>Run ChIPQC on a sample sheet</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="RunDiffBind.html">RunDiffBind()</a></code> </p>
+        </td>
+        <td><p>Run DiffBind analysis on a samplesheet</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="ProcessDBRs.html">ProcessDBRs()</a></code> </p>
+        </td>
+        <td><p>Extract, visualize, and save DBRs</p></td>
+      </tr>
+    </tbody><tbody>
+      <tr>
+        <th colspan="2">
+          <h2 id="section-chip-seq-plotting" class="hasAnchor"><a href="#section-chip-seq-plotting" class="anchor"></a>ChIP-seq Plotting</h2>
+          <p class="section-desc"><p>Functions that generate plots for ChIP-seq data. Calling these individually can sometimes be useful.</p></p>
+        </th>
+      </tr>
+      <tr>
+        
+        <td>
+          <p><code><a href="PlotChIPAnnos.html">PlotChIPAnnos()</a></code> </p>
+        </td>
+        <td><p>Plot ChIP annotation breakdowns</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="PlotChIPHeatmaps.html">PlotChIPHeatmaps()</a></code> </p>
+        </td>
+        <td><p>Plot ChIP heatmaps</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="PlotChIPPCAs.html">PlotChIPPCAs()</a></code> </p>
+        </td>
+        <td><p>Plot ChIP PCAs</p></td>
+      </tr>
+    </tbody><tbody>
+      <tr>
+        <th colspan="2">
+          <h2 id="section-enrichment-analyses" class="hasAnchor"><a href="#section-enrichment-analyses" class="anchor"></a>Enrichment Analyses</h2>
+          <p class="section-desc"><p>This function performs GO/pathway enrichment analysis for lists of genes resulting from both RNA and ChIP-seq analyses.</p></p>
+        </th>
+      </tr>
+      <tr>
+        
+        <td>
+          <p><code><a href="PlotEnrichments.html">PlotEnrichments()</a></code> </p>
+        </td>
+        <td><p>Perform GO/Pathway enrichment for DEGs or DBRs via enrichR</p></td>
       </tr>
     </tbody><tbody>
       <tr>
@@ -218,15 +281,15 @@
       <tr>
         
         <td>
-          <p><code><a href="CreateRNAOutputStructure.html">CreateRNAOutputStructure()</a></code> </p>
+          <p><code><a href="CreateOutputStructure.html">CreateOutputStructure()</a></code> </p>
         </td>
-        <td><p>Create RNA-seq output directory structure</p></td>
+        <td><p>Create output directory structure</p></td>
       </tr><tr>
         
         <td>
-          <p><code><a href="SaveRNAResults.html">SaveRNAResults()</a></code> </p>
+          <p><code><a href="SaveResults.html">SaveResults()</a></code> </p>
         </td>
-        <td><p>Save comparison results</p></td>
+        <td><p>Save results</p></td>
       </tr>
     </tbody>
     </table>
@@ -237,6 +300,9 @@
     <ul class="nav nav-pills nav-stacked">
       <li><a href="#section-rna-seq-analysis">RNA-seq analysis</a></li>
       <li><a href="#section-rna-seq-plotting">RNA-seq Plotting</a></li>
+      <li><a href="#section-chip-seq-analysis">ChIP-seq analysis</a></li>
+      <li><a href="#section-chip-seq-plotting">ChIP-seq Plotting</a></li>
+      <li><a href="#section-enrichment-analyses">Enrichment Analyses</a></li>
       <li><a href="#section-internal-utilities">Internal utilities</a></li>
     </ul>
   </div>

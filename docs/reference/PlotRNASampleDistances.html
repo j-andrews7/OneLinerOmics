@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Run ChIPQC on a sample sheet — RunChIPQC • OneLinerOmics</title>
+<title>Visualize sample distances from variance stabilized counts — PlotRNASampleDistances • OneLinerOmics</title>
 
 
 <!-- jquery -->
@@ -35,11 +35,8 @@
 
 
 
-<meta property="og:title" content="Run ChIPQC on a sample sheet — RunChIPQC" />
-<meta property="og:description" content="This function simply runs ChIPQC on a sample sheet and
-returns QC metrics. It generates a consensus peakset between all sets by 
-retaining and merging all peaks that overlap in at least two samples before
-defining the fraction of reads in peaks and other metrics." />
+<meta property="og:title" content="Visualize sample distances from variance stabilized counts — PlotRNASampleDistances" />
+<meta property="og:description" content="Visualize sample distances from variance stabilized counts" />
 <meta name="twitter:card" content="summary" />
 
 
@@ -123,59 +120,53 @@ defining the fraction of reads in peaks and other metrics." />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Run ChIPQC on a sample sheet</h1>
-    <small class="dont-index">Source: <a href='https://github.com/j-andrews7/OneLinerOmics/blob/master/R/ChIPseqEDA.R'><code>R/ChIPseqEDA.R</code></a></small>
-    <div class="hidden name"><code>RunChIPQC.Rd</code></div>
+    <h1>Visualize sample distances from variance stabilized counts</h1>
+    <small class="dont-index">Source: <a href='https://github.com/j-andrews7/OneLinerOmics/blob/master/R/RNAseqEDA.R'><code>R/RNAseqEDA.R</code></a></small>
+    <div class="hidden name"><code>PlotRNASampleDistances.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>This function simply runs <code><a href='https://rdrr.io/pkg/ChIPQC/man/ChIPQC.html'>ChIPQC</a></code> on a sample sheet and
-returns QC metrics. It generates a consensus peakset between all sets by 
-retaining and merging all peaks that overlap in at least two samples before
-defining the fraction of reads in peaks and other metrics.</p>
+    <p>Visualize sample distances from variance stabilized counts</p>
     </div>
 
-    <pre class="usage"><span class='fu'>RunChIPQC</span>(<span class='no'>outpath</span>, <span class='no'>samplesheet</span>, <span class='kw'>chromosomes</span> <span class='kw'>=</span> <span class='st'>"chr18"</span>)</pre>
+    <pre class="usage"><span class='fu'>PlotRNASampleDistances</span>(<span class='no'>rld</span>, <span class='no'>vsd</span>, <span class='no'>outpath</span>, <span class='no'>level</span>, <span class='no'>plot.annos</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
+      <th>rld</th>
+      <td><p>A RangedSummarizedExperiment object of 
+<code><a href='https://rdrr.io/pkg/DESeq2/man/rlog.html'>rlog</a></code> transformed counts as returned by
+<a href='PlotRNAVarianceTransformations.html'>PlotRNAVarianceTransformations</a>.</p></td>
+    </tr>
+    <tr>
+      <th>vsd</th>
+      <td><p>A RangedSummarizedExperiment object of 
+<code><a href='https://rdrr.io/pkg/DESeq2/man/vst.html'>vst</a></code> transformed counts as returned by
+PlotVarianceTransformations.</p></td>
+    </tr>
+    <tr>
       <th>outpath</th>
-      <td><p>Path to directory to be used for output.</p></td>
+      <td><p>Path to output file.</p></td>
     </tr>
     <tr>
-      <th>samplesheet</th>
-      <td><p>Path to samplesheet containing sample metadata.</p></td>
+      <th>level</th>
+      <td><p>String defining variable of interest.</p></td>
     </tr>
     <tr>
-      <th>chromosomes</th>
-      <td><p>String or character vector indicating chromosomes to be 
-used for QC.</p></td>
+      <th>plot.annos</th>
+      <td><p>String or character vector defining the column(s) in 
+<code>samplesheet</code> to use to annotate figures.</p></td>
     </tr>
     </table>
 
-    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
-
-    <p>Dataframe containing QC metrics for each sample, including 
-  cross-correlation scores, fraction of reads in peaks, fragment length, etc.</p>
-    <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
-
-    <p>A basic plot showing overlap between peaksets will also be generated, which 
-can be useful for defining how many samples a peak should be found in to be
-included in the consensus peakset as defined in <code><a href='RunDiffBind.html'>RunDiffBind</a></code>.</p>
-    <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
-
-    <div class='dont-index'><p><code><a href='https://rdrr.io/pkg/ChIPQC/man/ChIPQC.html'>ChIPQC</a></code></p></div>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
     <ul class="nav nav-pills nav-stacked">
       <li><a href="#arguments">Arguments</a></li>
-      <li><a href="#value">Value</a></li>
-      <li><a href="#details">Details</a></li>
-      <li><a href="#see-also">See also</a></li>
     </ul>
 
     <h2>Author</h2>

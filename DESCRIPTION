@@ -1,6 +1,6 @@
 Package: OneLinerOmics
-Title: One liner RNA-seq and ChIP-seq analyses.
-Date: 2019-10-28
+Title: One-liner RNA-seq and ChIP-seq Analyses
+Date: 2019-11-13
 Version: 0.1.0.9000
 Authors@R: 
     person(given = "Jared",
@@ -14,12 +14,13 @@ Description: This package is a complement to Andrews et al, 2019.
     how it was used to process and analyze data in the paper.
 License: GPL-3 + file LICENSE
 Depends:
-    enrichR
+    enrichR,
+    parallel,
+    GenomeInfoDb,
+    DiffBind
 Imports:
     DESeq2,
     ggplot2,
-    ChIPQC,
-    DiffBind,
     RColorBrewer,
     clusterProfiler,
     DOSE,
@@ -29,6 +30,9 @@ Imports:
     org.Hs.eg.db,
     AnnotationDbi,
     GenomicFeatures,
+    BiocParallel,
+    S4Vectors,
+    GenomicRanges,
     GenomicAlignments,
     Rsamtools,
     TxDb.Hsapiens.UCSC.hg19.knownGene,
@@ -43,13 +47,16 @@ Imports:
     SummarizedExperiment,
     magrittr,
     htmlwidgets,
-    EnhancedVolcano
+    EnhancedVolcano,
+    ChIPQC,
+    ggupset
 Suggests:
     BiocStyle,
     knitr,
     rmarkdown
 Remotes:
-    j-andrews7/EZscRNA
+    j-andrews7/EZscRNA,
+    shengqh/ChIPQC
 URL: https://github.com/j-andrews7/OneLinerOmics
 BugReports: https://github.com/j-andrews7/OneLinerOmics/issues
 Encoding: UTF-8

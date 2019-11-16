@@ -35,8 +35,8 @@
 #'   This step is quite time-consuming with many genes.
 #' @param plot.enrich Boolean indicating whether enrichment analyses for DEGs 
 #'   should be run and plotted for each comparison. 
-#' @param enrich.libs A vector of valid \code{enrichR} libraries to test the genes 
-#'   against.
+#' @param enrich.libs Vector of valid \code{enrichR} libraries to test the 
+#'   genes against.
 #'
 #'   Available libraries can be viewed with \code{listEnrichrDbs} from the
 #'   \code{enrichR} package.
@@ -60,7 +60,7 @@
 #'   
 #' @import DESeq2
 #' @importFrom tximport tximport
-#' @importFrom utils read.table write.table
+#' @importFrom utils read.table
 #'
 #' @export
 #'
@@ -78,10 +78,12 @@ RunDESeq2 <- function(outpath, quants.path, samplesheet, tx2gene, level,
   count.filt = 10) {
     
   message("### EXPLORATORY DATA ANALYSIS ###\n")
-  message("# SET DIRECTORY STRUCTURE AND MODEL DESIGN #\n")
+
+  ### CREATING DIRECTORY STRUCTURE ###
+  message("# CREATING DIRECTORY STRUCTURE AND MODEL DESIGN #\n")
   # Create directory structure and set design formula.
   base <- outpath
-  setup <- CreateRNAOutputStructure(block, level, base)
+  setup <- CreateOutputStructure(block, level, base)
   base <- setup$base
   design <- setup$design
   message(paste0("\nDesign is: ", design, "\n"))
@@ -114,7 +116,7 @@ RunDESeq2 <- function(outpath, quants.path, samplesheet, tx2gene, level,
   message("\n# VARIANCE STABILIZATION COMPARISONS #\n")
   vst.out <- paste0(base,"/EDAFigures/VarianceTransformations.pdf")
   message(paste0("Output: ", vst.out))
-  trans <- PlotVarianceTransformations(dds, vst.out)
+  trans <- PlotRNAVarianceTransformations(dds, vst.out)
   rld <- trans$rld
   vsd <- trans$vsd
 
@@ -122,13 +124,13 @@ RunDESeq2 <- function(outpath, quants.path, samplesheet, tx2gene, level,
   message("\n# PLOTTING SAMPLE DISTANCES #\n")
   dists.out <- paste0(base, "/EDAFigures/SampleDistances.pdf")
   message(paste0("Output: ", dists.out))
-  PlotSampleDistances(rld, vsd, dists.out, level, plot.annos)
+  PlotRNASampleDistances(rld, vsd, dists.out, level, plot.annos)
 
   ### PCA PLOTS ###
   message("\n# PCA PLOTS #\n")
   pca.out <- paste0(base, "/EDAFigures/PCA.pdf")
   message(paste0("Output: ", pca.out))
-  PlotEDAPCAs(rld, vsd, pca.out, level, plot.annos)
+  PlotRNAEDAPCAs(rld, vsd, pca.out, level, plot.annos)
   
   #======================================#
   ### DIFFERENTIAL EXPRESSION ANALYSIS ###
@@ -158,12 +160,14 @@ RunDESeq2 <- function(outpath, quants.path, samplesheet, tx2gene, level,
 #'
 #' \code{ProcessDEGs} wraps several plotting functions to generate figures 
 #' specifically for the differentially expressed genes between each possible
-#' comparison. It is called by \link{RunDESeq2} but can also be re-run with the
-#' \link{RunDESeq2} output or its own output if you want to save time and don't
-#' need to generate all of the exploratory data analysis figures again.
+#' comparison. 
+#' 
+#' \code{ProcessDEGs} is called by \link{RunDESeq2} but can also be re-run with 
+#' the \link{RunDESeq2} output or its own output if you want to save time and 
+#' don't need to generate all of the exploratory data analysis figures again.
 #'
 #' This function will generate many figures in addition to saving the counts
-#' and results.
+#' and results tables.
 #' 
 #' @param dds A \linkS4class{DESeqDataSet} object as returned by 
 #'   \code{\link[DESeq2]{DESeq}}.
@@ -189,11 +193,11 @@ RunDESeq2 <- function(outpath, quants.path, samplesheet, tx2gene, level,
 #'   created for each comparison. If so, the \code{top.n} genes will be plotted.
 #' @param plot.enrich Boolean indicating whether enrichment analyses for DEGs 
 #'   should be run and plotted for each comparison.
-#' @param enrich.libs A vector of valid \code{enrichR} libraries to test the genes 
-#'   against.
+#' @param enrich.libs A vector of valid \code{enrichR} libraries to test the 
+#'   genes against.
 #'
-#'   Available libraries can be viewed with \code{listEnrichrDbs} from the
-#'   \code{enrichR} package.
+#'   Available libraries can be viewed with 
+#'   \code{\link[enrichR]{listEnrichrDbs}} from the \code{enrichR} package.
 #' @param top.n Number of differentially expressed genes to create boxplots for, 
 #'   ranked by adj. p-value after applying \code{padj.thresh} and 
 #'   \code{fc.thresh} thresholds. If multiple thresholds are provided, the 
@@ -211,6 +215,9 @@ RunDESeq2 <- function(outpath, quants.path, samplesheet, tx2gene, level,
 #' @export
 #'
 #' @author Jared Andrews
+#'
+#' @seealso
+#' \code{\link{RunDESeq2}}, for generating input for this function.
 #'
 ProcessDEGs <- function(dds, rld, vsd, outpath, level, plot.annos, 
   padj.thresh = 0.05, fc.thresh = 2, plot.box = TRUE, plot.enrich = TRUE, 
@@ -238,10 +245,10 @@ ProcessDEGs <- function(dds, rld, vsd, outpath, level, plot.annos,
   message("\n# GENERATING PLOTS #\n")
   for (p in padj.thresh) {
     for (fc in fc.thresh) {
-      PlotDEGPCAs(res.list, rld, vsd, outpath, level, plot.annos, p, fc)
-      PlotVolcanoes(res.list, dds, outpath, p, fc)
-      PlotHeatmaps(res.list, rld, vsd, level, outpath, p, fc, plot.annos)
-      PlotCombinedHeatmaps(res.list, rld, vsd, outpath, p, fc, plot.annos)
+      PlotRNADEGPCAs(res.list, rld, vsd, outpath, level, plot.annos, p, fc)
+      PlotRNAVolcanoes(res.list, dds, outpath, p, fc)
+      PlotRNAHeatmaps(res.list, rld, vsd, level, outpath, p, fc, plot.annos)
+      PlotRNACombinedHeatmaps(res.list, rld, vsd, outpath, p, fc, plot.annos)
       if (plot.enrich) {
         PlotEnrichments(res.list, outpath, p, fc, enrich.libs)
       }
@@ -251,7 +258,7 @@ ProcessDEGs <- function(dds, rld, vsd, outpath, level, plot.annos,
   if (plot.box) {
     p <- max(padj.thresh)
     fc <- min(fc.thresh)
-    PlotBoxplots(res.list, dds, rld, outpath, p, fc, top.n, level)
+    PlotRNABoxplots(res.list, dds, rld, outpath, p, fc, top.n, level)
   }
   
   ### MA PLOTs ###
@@ -269,7 +276,7 @@ ProcessDEGs <- function(dds, rld, vsd, outpath, level, plot.annos,
 
   ### SAVING TABLES ###
   message("\n# SAVING RESULTS TABLES #\n")
-  SaveRNAResults(res.list, dds, outpath)
+  SaveResults(res.list, dds, outpath)
 
   return(list(res.list = res.list, dds = dds, rld = rld, vsd = vsd))
 }
