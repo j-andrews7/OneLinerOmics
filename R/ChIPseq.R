@@ -303,11 +303,18 @@ ProcessDBRs <- function(results, outpath, txdb,
   for (fc in fc.thresh) {
     for (fdr in fdr.thresh) {
       for (i in seq_along(results$contrasts)) {
+        repper <- try({
         reportdb <- dba.report(results, th = fdr, fold = fc, bCalled = TRUE, 
           bCounts = TRUE, method = method, contrast = i)
+        })
 
         g1 <- results$contrasts[[i]]$name1
         g2 <- results$contrasts[[i]]$name2
+
+        if (class(repper) == "character") {
+          message(paste0(g1, "-v-", g2, " contrast has no DB sites, skipping."))
+          next
+        }
 
         # Check for no DB peaks and skip if TRUE.
         if (length(reportdb) == 0) {

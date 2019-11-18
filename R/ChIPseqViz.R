@@ -50,7 +50,7 @@ PlotChIPPCAs <- function(results, outpath, method, fdr.thresh = 1,
       rep <- dba.report(results, th = fdr.thresh, contrast = i, 
         fold = fc.thresh, method = method)
 
-      if (length(rep) > 0) {
+      if (length(rep) > 1) {
 
         dba.plotPCA(results, report = rep, contrast = i, sub = paste0(lab, 
          " Peaks\n",
@@ -101,15 +101,11 @@ PlotChIPAnnos <- function(peak.anno, outpath, consensus = TRUE, comp = NULL,
     pdf(paste0(outpath, 
       "/ConsensusFigures/PeakAnnotations/PeakAnnotations.pdf"), height = 4)
 
-    p <- plotAnnoPie(peak.anno[[1]])
-    print(p)
-    p <- plotAnnoBar(peak.anno[[1]])
-    print(p)
-    p <- upsetplot(peak.anno[[1]])
-    print(p)
-    p <- plotDistToTSS(peak.anno[[1]], 
+    plotAnnoPie(peak.anno[[1]])
+    plotAnnoBar(peak.anno[[1]])
+    upsetplot(peak.anno[[1]])
+    plotDistToTSS(peak.anno[[1]], 
       title = "Distribution of Peaks Relative to TSS")
-    print(p)
 
     dev.off()
   } else {
@@ -120,18 +116,13 @@ PlotChIPAnnos <- function(peak.anno, outpath, consensus = TRUE, comp = NULL,
       ".log2fc.", fc, ".PeakAnnotations.pdf"), height = 4)
 
     for (i in seq_along(peak.anno)) {
-      p <- plotAnnoPie(peak.anno[[i]], main = names(peak.anno)[i])
-      print(p)
-      p <- upsetplot(peak.anno[[i]])
-      print(p)
+      plotAnnoPie(peak.anno[[i]], main = names(peak.anno)[i])
+      upsetplot(peak.anno[[i]])
     }
 
-    p <- plotAnnoBar(peak.anno)
-    print(p)
-
-    p <- plotDistToTSS(peak.anno, 
+    plotAnnoBar(peak.anno)
+    plotDistToTSS(peak.anno, 
       title = paste0("Distribution of Peaks Relative to TSS"))
-    print(p)
     
     dev.off()
   }
@@ -202,7 +193,7 @@ PlotChIPHeatmaps <- function(results, outpath, method, breaks, colors,
         fold = fc.thresh, method = method)
 
       # Skip contrast if no DB sites.
-      if (length(rep) > 0) {
+      if (length(rep) > 1) {
         # Get positions for each peak.
         df <- as.data.frame(rep)
         sig.peaks[[i]] <- paste0(df$seqnames, ":", df$start, "-", df$end)

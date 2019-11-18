@@ -51,22 +51,10 @@ CreateOutputStructure <- function(block, level, base, chip = FALSE) {
           dir.create(file.path(base, paste0(block, ".Block/", i)))
         }
         if (!dir.exists(file.path(base, paste0(block, 
-          ".Block/", i, "/MAPlots")))) {
-
-          dir.create(file.path(base, paste0(block, 
-            ".Block/", i, "/MAPlots")))
-        }
-        if (!dir.exists(file.path(base, paste0(block, 
           ".Block/", i, "/PeakAnnotations")))) {
 
           dir.create(file.path(base, paste0(block, 
             ".Block/", i, "/PeakAnnotations")))
-        }
-        if (!dir.exists(file.path(base, paste0(block, 
-          ".Block/", i, "/SignalBoxPlots")))) {
-
-          dir.create(file.path(base, paste0(block, 
-            ".Block/", i, "/SignalBoxPlots")))
         }
         if (!dir.exists(file.path(base, paste0(block, 
           ".Block/", i, "/PCAPlots")))) {
@@ -79,12 +67,24 @@ CreateOutputStructure <- function(block, level, base, chip = FALSE) {
 
           dir.create(file.path(base, paste0(block, ".Block/", i, "/Heatmaps")))
         }
-        if (!dir.exists(file.path(base, paste0(block, ".Block/", i, 
+      }
+      if (!dir.exists(file.path(base, paste0(block, 
+          ".Block/", "DBRFigures", "/MAPlots")))) {
+
+        dir.create(file.path(base, paste0(block, 
+          ".Block/", "DBRFigures", "/MAPlots")))
+      }
+      if (!dir.exists(file.path(base, paste0(block, 
+          ".Block/", "DBRFigures", "/SignalBoxPlots")))) {
+
+        dir.create(file.path(base, paste0(block, 
+          ".Block/", "DBRFigures", "/SignalBoxPlots")))
+      }
+      if (!dir.exists(file.path(base, paste0(block, ".Block/", "DBRFigures", 
           "/VolcanoPlots")))) {
 
-          dir.create(file.path(base, paste0(block, ".Block/", i, 
-            "/VolcanoPlots")))
-        }
+        dir.create(file.path(base, paste0(block, ".Block/", "DBRFigures", 
+          "/VolcanoPlots")))
       }
     }
 
@@ -127,12 +127,6 @@ CreateOutputStructure <- function(block, level, base, chip = FALSE) {
         if (!dir.exists(file.path(base, "NoBlock", i))) {
           dir.create(file.path(base, "NoBlock", i))
         }
-        if (!dir.exists(file.path(base, "NoBlock", i, "SignalBoxPlots"))) {
-          dir.create(file.path(base, "NoBlock", i, "SignalBoxPlots"))
-        }
-        if (!dir.exists(file.path(base, "NoBlock", i, "MAPlots"))) {
-          dir.create(file.path(base, "NoBlock", i, "MAPlots"))
-        }
         if (!dir.exists(file.path(base, "NoBlock", i, "PeakAnnotations"))) {
           dir.create(file.path(base, "NoBlock", i, "PeakAnnotations"))
         }
@@ -142,9 +136,21 @@ CreateOutputStructure <- function(block, level, base, chip = FALSE) {
         if (!dir.exists(file.path(base, "NoBlock", i, "Heatmaps"))) {
           dir.create(file.path(base, "NoBlock", i, "Heatmaps"))
         }
-        if (!dir.exists(file.path(base, "NoBlock/", i, "VolcanoPlots"))) {
-          dir.create(file.path(base, "NoBlock", i, "VolcanoPlots"))
-        }
+      }
+
+      if (!dir.exists(file.path(base, "NoBlock", "DBRFigures", 
+        "SignalBoxPlots"))) {
+
+          dir.create(file.path(base, "NoBlock", "DBRFigures",
+            "SignalBoxPlots"))
+      }
+      if (!dir.exists(file.path(base, "NoBlock", "DBRFigures", "MAPlots"))) {
+        dir.create(file.path(base, "NoBlock", "DBRFigures", "MAPlots"))
+      }
+      if (!dir.exists(file.path(base, "NoBlock/", "DBRFigures", 
+        "VolcanoPlots"))) {
+
+        dir.create(file.path(base, "NoBlock", "DBRFigures", "VolcanoPlots"))
       }
     }
 

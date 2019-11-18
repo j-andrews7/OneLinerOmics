@@ -88,7 +88,18 @@
 <div class="page-header"><h1 class="hasAnchor">
 <a href="#onelineromics" class="anchor"></a>OneLinerOmics</h1></div>
 
-<p>This R package contains several functions that compress major RNA-seq and ChIP-seq analysis steps into one-liners (or two, I’m not perfect). It is meant to serve as a complement to the (future) publication and as a record of how the data was analyzed in addition to serving as a basis for the Payton Lab bulk RNA-seq and ChIP-seq analyses moving forwards.</p>
+<p>This R package contains several functions that compress major RNA-seq and ChIP-seq analysis steps into one-liners (okay, maybe two, I’m not perfect).</p>
+<div id="objective" class="section level2">
+<h2 class="hasAnchor">
+<a href="#objective" class="anchor"></a>Objective</h2>
+<p>This package serves as a complement to an in-preparation manuscript and as a record of how the data was analyzed in addition to serving as a basis for the Payton Lab bulk RNA-seq and ChIP-seq analyses moving forwards.</p>
+</div>
+<div id="what-it-can-do" class="section level2">
+<h2 class="hasAnchor">
+<a href="#what-it-can-do" class="anchor"></a>What It Can Do</h2>
+<p>Ultimately, this package tries to make generic RNA-seq and ChIP-seq analyses as high-level and straightforward as possible. It does so by requiring only the path to a samplesheet containing sample metadata and file locations and the metadata variable of interest. It will then perform RNA or ChIP-seq analyses with <code>DESeq2</code> or <code>DiffBind</code>, respectively, for all possible comparisons for the variable of interest and save the results for each analysis to disk.</p>
+<p>You can feed it multiple p-value/FDR/fold change thresholds, and it will generate fairly nice plots for differentially expressed genes or differentially bound regions including PCA/MA plots, heatmaps, volcano plots, GO/pathway enrichment analyses, boxplots, etc., saving all of them as PDFs.</p>
+</div>
 <div id="installation" class="section level2">
 <h2 class="hasAnchor">
 <a href="#installation" class="anchor"></a>Installation</h2>
@@ -98,7 +109,7 @@
 <div id="usage" class="section level2">
 <h2 class="hasAnchor">
 <a href="#usage" class="anchor"></a>Usage</h2>
-<p>Please see the <a href="https://j-andrews7.github.io/OneLinerOmics">docs</a> for a full reference and vignettes with examples (including steps like gene count quantification). The <a href="https://combine-lab.github.io/salmon/getting_started/">salmon</a>, <a href="https://bioconductor.org/packages/release/bioc/html/DESeq2.html">DESeq2</a>, and <a href="https://bioconductor.org/packages/release/bioc/html/DiffBind.html">DiffBind</a> manuals and vignettes may also be helpful for understanding what’s going on under the hood and interpreting the output.</p>
+<p>Please see the <a href="https://j-andrews7.github.io/OneLinerOmics">docs</a> for a full reference and vignettes with examples (including steps like gene count quantification, peak calling, etc). 90% of the functionality can be viewed with <code><a href="reference/RunDESeq2.html">?RunDESeq2</a></code> and <code><a href="reference/RunDiffBind.html">?RunDiffBind</a></code> after installation. The <a href="https://combine-lab.github.io/salmon/getting_started/">salmon</a>, <a href="https://bioconductor.org/packages/release/bioc/html/DESeq2.html">DESeq2</a>, and <a href="https://bioconductor.org/packages/release/bioc/html/DiffBind.html">DiffBind</a> manuals and vignettes may also be helpful for understanding what’s going on under the hood and interpreting the output.</p>
 </div>
 <div id="issues" class="section level2">
 <h2 class="hasAnchor">

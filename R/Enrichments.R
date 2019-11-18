@@ -82,16 +82,16 @@ PlotEnrichments <- function(res.list, outpath, padj.thresh,
       two.up <- res[(res[, 'padj'] <= padj.thresh) %in% TRUE & 
         res[, 'log2FoldChange'] <= -fc.thresh, ]
       
-      one.two.terms <- RunEnrichr(rownames(one.two), libraries = libraries,
-        outdir = paste0(base, "/AllGenes"))
+      one.two.terms <- suppressMessages(RunEnrichr(rownames(one.two), 
+        libraries = libraries, outdir = paste0(base, "/AllGenes")))
       VizEnrichments(one.two.terms, outdir = paste0(base, "/AllGenes"))
 
-      one.up.terms <- RunEnrichr(rownames(one.up), 
-        outdir = paste0(base, "/", g1, ".up"))
+      one.up.terms <- suppressMessages(RunEnrichr(rownames(one.up), 
+        outdir = paste0(base, "/", g1, ".up")))
       VizEnrichments(one.up.terms, outdir = paste0(base, "/", g1, ".up"))
 
-      two.up.terms <- RunEnrichr(rownames(two.up), 
-        outdir = paste0(base, "/", g2, ".up"))
+      two.up.terms <- suppressMessages(RunEnrichr(rownames(two.up), 
+        outdir = paste0(base, "/", g2, ".up")))
       VizEnrichments(two.up.terms, outdir = paste0(base, "/", g2, ".up"))
     }
   } else {
@@ -117,15 +117,15 @@ PlotEnrichments <- function(res.list, outpath, padj.thresh,
 
     if (!is.null(res.list[[paste0(g1, ".up")]])) {
       one.up <- res.list[[paste0(g1, ".up")]]
-      one.up.terms <- RunEnrichr(one.up@anno$SYMBOL, 
-        outdir = paste0(base, "/", g1, ".up"))
+      one.up.terms <- suppressMessages(RunEnrichr(one.up@anno$SYMBOL, 
+        outdir = paste0(base, "/", g1, ".up")))
       VizEnrichments(one.up.terms, outdir = paste0(base, "/", g1, ".up"))
     }
 
     if (!is.null(res.list[[paste0(g2, ".up")]])) {
       two.up <- res.list[[paste0(g2, ".up")]]
-      two.up.terms <- RunEnrichr(two.up@anno$SYMBOL, 
-        outdir = paste0(base, "/", g2, ".up"))
+      two.up.terms <- suppressMessages(RunEnrichr(two.up@anno$SYMBOL, 
+        outdir = paste0(base, "/", g2, ".up")))
       VizEnrichments(two.up.terms, outdir = paste0(base, "/", g2, ".up"))
     }
   }
