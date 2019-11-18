@@ -172,17 +172,17 @@ PlotChIPHeatmaps <- function(results, outpath, method, breaks, colors,
       fc.thresh, ".Heatmaps.pdf")
   }
 
-  pdf(paste0(outpath, out), height = 8, width = 5)
+  pdf(paste0(outpath, out), height = 8, width = 7)
 
   if (consensus) {
-    dba.plotHeatmap(results, th = 1, margin = 7, correlations = FALSE, 
+    dba.plotHeatmap(results, th = 1, margin = 6, correlations = FALSE, 
       scale = "row", density.info = "none", colScheme = colors, breaks = breaks, 
       maxSites = 10000, main = paste0(lab, " - Top 10000 Variable Peaks"))
-    dba.plotHeatmap(results, th = 1, margin = 7, correlations = FALSE, 
+    dba.plotHeatmap(results, th = 1, margin = 6, correlations = FALSE, 
       scale = "row", density.info = "none", colScheme = colors, breaks = breaks, 
       maxSites = 10000, Colv = NULL, 
       main = paste0(lab, " - Top 10000 Variable Peaks"))
-    dba.plotHeatmap(results, th = 1, margin = 7, density.info = "none", 
+    dba.plotHeatmap(results, th = 1, margin = 6, density.info = "none", 
       main = paste0(lab, " Peaks - Correlation"))
 
   } else {
@@ -198,19 +198,19 @@ PlotChIPHeatmaps <- function(results, outpath, method, breaks, colors,
         df <- as.data.frame(rep)
         sig.peaks[[i]] <- paste0(df$seqnames, ":", df$start, "-", df$end)
 
-        dba.plotHeatmap(results, margin = 7, contrast = i, report = rep,
+        dba.plotHeatmap(results, margin = 6, contrast = i, report = rep,
           correlations = FALSE, scale = "row", density.info = "none", 
           colScheme = colors, breaks = breaks, maxSites = nrow(results$binding),  
           main = paste0("All ", lab, " Peaks\n", results$contrasts[[i]]$name1, 
             " vs ", results$contrasts[[i]]$name2))
-        dba.plotHeatmap(results, margin = 7, contrast = i, report = rep,
+        dba.plotHeatmap(results, margin = 6, contrast = i, report = rep,
           correlations = FALSE, scale = "row", density.info = "none", 
           colScheme = colors, breaks = breaks, maxSites = nrow(results$binding), 
           Colv = NULL, 
           main = paste0("All ", lab, " Peaks\n", results$contrasts[[i]]$name1, 
             " vs ", results$contrasts[[i]]$name2))
-        dba.plotHeatmap(results, report = rep, contrast = 1, 
-          margin = 7, density.info = "none", main = paste0(lab, 
+        dba.plotHeatmap(results, report = rep, contrast = i, 
+          margin = 6, density.info = "none", main = paste0(lab, 
             " Peaks - Correlation",
             "\n", results$contrasts[[i]]$name1, " vs ", 
             results$contrasts[[i]]$name2))
@@ -223,12 +223,12 @@ PlotChIPHeatmaps <- function(results, outpath, method, breaks, colors,
 
     # Get counts for all unique DEGs.
     sig.peaks <- unique(unlist(sig.peaks))
-    rep <- dba.report(results, th = 1, bCounts = TRUE)
+    rep <- dba.peakset(results, consensus = TRUE, bRetrieve = TRUE)
     df <- as.data.frame(rep)
     rownames(df) <- paste0(df$seqnames, ":", df$start, "-", df$end)
     df <- df[sig.peaks,]
 
-    m <- as.matrix(df[, 12:ncol(df)])
+    m <- as.matrix(df[, 6:ncol(df)])
     p <- pheatmap(m, cluster_rows = TRUE, show_rownames = FALSE,
       cluster_cols = FALSE, scale = "row", fontsize_col = 6, color = colors,
       breaks = breaks, main = "All DB Peaks")
