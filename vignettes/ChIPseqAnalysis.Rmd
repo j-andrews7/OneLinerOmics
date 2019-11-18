@@ -353,7 +353,7 @@ ses <- RunDiffBind(outpath = "./ChIP_Seq/DiffBind/H3K27AC_SE/AllComparisons",
                    fdr.thresh = c(0.05, 0.01),
                    fc.thresh = c(1, 2),
                    heatmap.preset = "BrTe",
-                  scale.full = FALSE)
+                   scale.full = FALSE)
 
 h3ac <- RunDiffBind(outpath = "./ChIP_Seq/DiffBind/H3AC/AllComparisons",
                    samplesheet = "./ChIP_Seq/DiffBind/H3AC/SampleSheet_H3AC_DiffBind.csv", 
@@ -397,6 +397,222 @@ h3k27ac <- RunDiffBind(outpath = "./ChIP_Seq/DiffBind/H3K27AC/AllComparisons",
                    scale.full = FALSE)
 ```
 
+#### Merging Marks
+In this case, I want to generate a peakset to be used across all the marks for differential binding, allowing for easier identification of peaks with multiple marks altered between two groups of samples.
+Since I've already removed a fair amount of noise by setting `n.consensus = 4`, I'm just going to concatenate and merge the consensus peaks from each mark.
+Then I'll edit my samplesheets above to use this new peakset for each sample and re-run the differential binding analysis for each mark.
+
+Here I'm just concatenating and merging the position from a random comparison - it'll be the same positions across all comparisons, as we're not filtering at all, so it doesn't matter which is used.
+
+```{bash merge marks}
+# bash
+tail -n +2 -q ./ChIP_Seq/DiffBind/H3K27AC/AllComparisons/NoBlock/ResultsTables/CLL-v-DL.AllPeaks.txt \
+  ./ChIP_Seq/DiffBind/FAIRE/AllComparisons/NoBlock/ResultsTables/CLL-v-DL.AllPeaks.txt \
+  ./ChIP_Seq/DiffBind/H3AC/AllComparisons/NoBlock/ResultsTables/CLL-v-DL.AllPeaks.txt \
+  ./ChIP_Seq/DiffBind/H3K4ME1/AllComparisons/NoBlock/ResultsTables/CLL-v-DL.AllPeaks.txt | \
+  cut -f 1-3 - | sort -k1,1V -k2,2n - >  ./ChIP_Seq/DiffBind/MergedPeaks/All.Peaks.bed
+
+bedtools merge ./ChIP_Seq/DiffBind/MergedPeaks/All.Peaks.bed > ./ChIP_Seq/DiffBind/MergedPeaks/MergedPeaks.bed
+```
+
+Then I edited my sample sheets to use the merged peakset for all samples.
+
+```{r preview_sheet}
+# R
+# Basic sample sheet.
+samples <- read.table("./ChIP_Seq/DiffBind/MergedPeaks/H3AC/SampleSheet_H3AC_DiffBind.csv", header=TRUE, sep = ",")
+head(samples, 10)
+```
+
+
+### Running DiffBind on a Merged, Consensus Peakset
+Now the analysis can be run again using the new samplesheets to generate results for the same peaks across all marks.
+
+```{r DiffBind_rerun}
+# R
+# For annotation.
+library(TxDb.Hsapiens.UCSC.hg19.knownGene)
+txdb <- TxDb.Hsapiens.UCSC.hg19.knownGene
+
+h3ac <- RunDiffBind(outpath = "./ChIP_Seq/DiffBind/MergedPeaks/H3AC/AllComparisons",
+                   samplesheet = "./ChIP_Seq/DiffBind/MergedPeaks/H3AC/SampleSheet_H3AC_DiffBind.csv", 
+                   txdb = txdb,
+                   n.consensus = 1,
+                   se = "./ChIP_Seq/DiffBind/H3K27AC_SE/AllComparisons/NoBlock/ResultsTables/CLL-v-DL.AllPeaks.txt",
+                   level = "Tissue", 
+                   fdr.thresh = c(0.05, 0.01),
+                   fc.thresh = c(1, 2),
+                   heatmap.preset = "OrPu",
+                   scale.full = FALSE)
+faire <- RunDiffBind(outpath = "./ChIP_Seq/DiffBind/MergedPeaks/FAIRE/AllComparisons",
+                   samplesheet = "./ChIP_Seq/DiffBind/MergedPeaks/FAIRE/SampleSheet_FAIRE_DiffBind.csv", 
+                   txdb = txdb,
+                   n.consensus = 1,
+                   se = "./ChIP_Seq/DiffBind/H3K27AC_SE/AllComparisons/NoBlock/ResultsTables/CLL-v-DL.AllPeaks.txt",
+                   level = "Tissue", 
+                   fdr.thresh = c(0.05, 0.01),
+                   fc.thresh = c(1, 2),
+                   heatmap.preset = "PuGr",
+                   scale.full = FALSE)
+h3k4me1 <- RunDiffBind(outpath = "./ChIP_Seq/DiffBind/MergedPeaks/H3K4ME1/AllComparisons",
+                   samplesheet = "./ChIP_Seq/DiffBind/MergedPeaks/H3K4ME1/SampleSheet_H3K4ME1_DiffBind.csv", 
+                   txdb = txdb,
+                   n.consensus = 1,
+                   se = "./ChIP_Seq/DiffBind/H3K27AC_SE/AllComparisons/NoBlock/ResultsTables/CLL-v-DL.AllPeaks.txt",
+                   level = "Tissue", 
+                   fdr.thresh = c(0.05, 0.01),
+                   fc.thresh = c(1, 2),
+                   heatmap.preset = "BuOr",
+                   scale.full = FALSE)
+h3k27ac <- RunDiffBind(outpath = "./ChIP_Seq/DiffBind/MergedPeaks/H3K27AC/AllComparisons",
+                   samplesheet = "./ChIP_Seq/DiffBind/MergedPeaks/H3K27AC/SampleSheet_H3K27AC_DiffBind.csv", 
+                   txdb = txdb,
+                   n.consensus = 1,
+                   se = "./ChIP_Seq/DiffBind/H3K27AC_SE/AllComparisons/NoBlock/ResultsTables/CLL-v-DL.AllPeaks.txt",
+                   level = "Tissue", 
+                   fdr.thresh = c(0.05, 0.01),
+                   fc.thresh = c(1, 2),
+                   heatmap.preset = "BrTe",
+                   scale.full = FALSE)
+```
+
+Once more with `scale.full = TRUE`.
+
+```{r DiffBind_merged_scale}
+# R
+h3ac <- RunDiffBind(outpath = "./ChIP_Seq/DiffBind/MergedPeaks.scalefull/H3AC/AllComparisons",
+                   samplesheet = "./ChIP_Seq/DiffBind/MergedPeaks.scalefull/H3AC/SampleSheet_H3AC_DiffBind.csv", 
+                   txdb = txdb,
+                   n.consensus = 1,
+                   se = "./ChIP_Seq/DiffBind/H3K27AC_SE/AllComparisons/NoBlock/ResultsTables/CLL-v-DL.AllPeaks.txt",
+                   level = "Tissue", 
+                   fdr.thresh = c(0.05, 0.01),
+                   fc.thresh = c(1, 2),
+                   heatmap.preset = "OrPu",
+                   scale.full = TRUE)
+faire <- RunDiffBind(outpath = "./ChIP_Seq/DiffBind/MergedPeaks.scalefull/FAIRE/AllComparisons",
+                   samplesheet = "./ChIP_Seq/DiffBind/MergedPeaks.scalefull/FAIRE/SampleSheet_FAIRE_DiffBind.csv", 
+                   txdb = txdb,
+                   n.consensus = 1,
+                   se = "./ChIP_Seq/DiffBind/H3K27AC_SE/AllComparisons/NoBlock/ResultsTables/CLL-v-DL.AllPeaks.txt",
+                   level = "Tissue", 
+                   fdr.thresh = c(0.05, 0.01),
+                   fc.thresh = c(1, 2),
+                   heatmap.preset = "PuGr",
+                   scale.full = TRUE)
+h3k4me1 <- RunDiffBind(outpath = "./ChIP_Seq/DiffBind/MergedPeaks.scalefull/H3K4ME1/AllComparisons",
+                   samplesheet = "./ChIP_Seq/DiffBind/MergedPeaks.scalefull/H3K4ME1/SampleSheet_H3K4ME1_DiffBind.csv", 
+                   txdb = txdb,
+                   n.consensus = 1,
+                   se = "./ChIP_Seq/DiffBind/H3K27AC_SE/AllComparisons/NoBlock/ResultsTables/CLL-v-DL.AllPeaks.txt",
+                   level = "Tissue", 
+                   fdr.thresh = c(0.05, 0.01),
+                   fc.thresh = c(1, 2),
+                   heatmap.preset = "BuOr",
+                   scale.full = TRUE)
+h3k27ac <- RunDiffBind(outpath = "./ChIP_Seq/DiffBind/MergedPeaks.scalefull/H3K27AC/AllComparisons",
+                   samplesheet = "./ChIP_Seq/DiffBind/MergedPeaks.scalefull/H3K27AC/SampleSheet_H3K27AC_DiffBind.csv", 
+                   txdb = txdb,
+                   n.consensus = 1,
+                   se = "./ChIP_Seq/DiffBind/H3K27AC_SE/AllComparisons/NoBlock/ResultsTables/CLL-v-DL.AllPeaks.txt",
+                   level = "Tissue", 
+                   fdr.thresh = c(0.05, 0.01),
+                   fc.thresh = c(1, 2),
+                   heatmap.preset = "BrTe",
+                   scale.full = TRUE)
+```
+
+I also want to run another comparison (CANCER v NORMAL), so I will set that up as well.
+
+```{r DiffBind_cancernormal}
+# R
+h3ac <- RunDiffBind(outpath = "./ChIP_Seq/DiffBind/MergedPeaks/H3AC/CANCERvNORMAL",
+                   samplesheet = "./ChIP_Seq/DiffBind/MergedPeaks/H3AC/SampleSheet_H3AC_DiffBind.csv", 
+                   txdb = txdb,
+                   n.consensus = 1,
+                   se = "./ChIP_Seq/DiffBind/H3K27AC_SE/AllComparisons/NoBlock/ResultsTables/CLL-v-DL.AllPeaks.txt",
+                   level = "Condition", 
+                   fdr.thresh = c(0.05, 0.01),
+                   fc.thresh = c(1, 2),
+                   heatmap.preset = "OrPu",
+                   scale.full = FALSE)
+faire <- RunDiffBind(outpath = "./ChIP_Seq/DiffBind/MergedPeaks/FAIRE/CANCERvNORMAL",
+                   samplesheet = "./ChIP_Seq/DiffBind/MergedPeaks/FAIRE/SampleSheet_FAIRE_DiffBind.csv", 
+                   txdb = txdb,
+                   n.consensus = 1,
+                   se = "./ChIP_Seq/DiffBind/H3K27AC_SE/AllComparisons/NoBlock/ResultsTables/CLL-v-DL.AllPeaks.txt",
+                   level = "Condition", 
+                   fdr.thresh = c(0.05, 0.01),
+                   fc.thresh = c(1, 2),
+                   heatmap.preset = "PuGr",
+                   scale.full = FALSE)
+h3k4me1 <- RunDiffBind(outpath = "./ChIP_Seq/DiffBind/MergedPeaks/H3K4ME1/CANCERvNORMAL",
+                   samplesheet = "./ChIP_Seq/DiffBind/MergedPeaks/H3K4ME1/SampleSheet_H3K4ME1_DiffBind.csv", 
+                   txdb = txdb,
+                   n.consensus = 1,
+                   se = "./ChIP_Seq/DiffBind/H3K27AC_SE/AllComparisons/NoBlock/ResultsTables/CLL-v-DL.AllPeaks.txt",
+                   level = "Condition", 
+                   fdr.thresh = c(0.05, 0.01),
+                   fc.thresh = c(1, 2),
+                   heatmap.preset = "BuOr",
+                   scale.full = FALSE)
+h3k27ac <- RunDiffBind(outpath = "./ChIP_Seq/DiffBind/MergedPeaks/H3K27AC/CANCERvNORMAL",
+                   samplesheet = "./ChIP_Seq/DiffBind/MergedPeaks/H3K27AC/SampleSheet_H3K27AC_DiffBind.csv", 
+                   txdb = txdb,
+                   n.consensus = 1,
+                   se = "./ChIP_Seq/DiffBind/H3K27AC_SE/AllComparisons/NoBlock/ResultsTables/CLL-v-DL.AllPeaks.txt",
+                   level = "Condition", 
+                   fdr.thresh = c(0.05, 0.01),
+                   fc.thresh = c(1, 2),
+                   heatmap.preset = "BrTe",
+                   scale.full = FALSE)
+```
+
+And one more time, using the full scaling this time.
+
+```{r DiffBind_cancernormal_scale}
+# R
+h3ac <- RunDiffBind(outpath = "./ChIP_Seq/DiffBind/MergedPeaks.scalefull/H3AC/CANCERvNORMAL",
+                   samplesheet = "./ChIP_Seq/DiffBind/MergedPeaks.scalefull/H3AC/SampleSheet_H3AC_DiffBind.csv", 
+                   txdb = txdb,
+                   n.consensus = 1,
+                   se = "./ChIP_Seq/DiffBind/H3K27AC_SE/AllComparisons/NoBlock/ResultsTables/CLL-v-DL.AllPeaks.txt",
+                   level = "Condition", 
+                   fdr.thresh = c(0.05, 0.01),
+                   fc.thresh = c(1, 2),
+                   heatmap.preset = "OrPu",
+                   scale.full = TRUE)
+faire <- RunDiffBind(outpath = "./ChIP_Seq/DiffBind/MergedPeaks.scalefull/FAIRE/CANCERvNORMAL",
+                   samplesheet = "./ChIP_Seq/DiffBind/MergedPeaks.scalefull/FAIRE/SampleSheet_FAIRE_DiffBind.csv", 
+                   txdb = txdb,
+                   n.consensus = 1,
+                   se = "./ChIP_Seq/DiffBind/H3K27AC_SE/AllComparisons/NoBlock/ResultsTables/CLL-v-DL.AllPeaks.txt",
+                   level = "Condition", 
+                   fdr.thresh = c(0.05, 0.01),
+                   fc.thresh = c(1, 2),
+                   heatmap.preset = "PuGr",
+                   scale.full = TRUE)
+h3k4me1 <- RunDiffBind(outpath = "./ChIP_Seq/DiffBind/MergedPeaks.scalefull/H3K4ME1/CANCERvNORMAL",
+                   samplesheet = "./ChIP_Seq/DiffBind/MergedPeaks.scalefull/H3K4ME1/SampleSheet_H3K4ME1_DiffBind.csv", 
+                   txdb = txdb,
+                   n.consensus = 1,
+                   se = "./ChIP_Seq/DiffBind/H3K27AC_SE/AllComparisons/NoBlock/ResultsTables/CLL-v-DL.AllPeaks.txt",
+                   level = "Condition", 
+                   fdr.thresh = c(0.05, 0.01),
+                   fc.thresh = c(1, 2),
+                   heatmap.preset = "BuOr",
+                   scale.full = TRUE)
+h3k27ac <- RunDiffBind(outpath = "./ChIP_Seq/DiffBind/MergedPeaks.scalefull/H3K27AC/CANCERvNORMAL",
+                   samplesheet = "./ChIP_Seq/DiffBind/MergedPeaks.scalefull/H3K27AC/SampleSheet_H3K27AC_DiffBind.csv", 
+                   txdb = txdb,
+                   n.consensus = 1,
+                   se = "./ChIP_Seq/DiffBind/H3K27AC_SE/AllComparisons/NoBlock/ResultsTables/CLL-v-DL.AllPeaks.txt",
+                   level = "Condition", 
+                   fdr.thresh = c(0.05, 0.01),
+                   fc.thresh = c(1, 2),
+                   heatmap.preset = "BrTe",
+                   scale.full = TRUE)
+```
 
 # Session Information
 
