@@ -6,7 +6,7 @@
 \usage{
 ProcessDBRs(results, outpath, txdb, fdr.thresh = 0.05, fc.thresh = 1,
   method = NULL, promoters = c(-2000, 2000), breaks = c(seq(-3,
-  -1.0001, length = 250), seq(-1, -0.1, length = 250), seq(-0.999, 0.999,
+  -1.0001, length = 250), seq(-1, -0.1, length = 250), seq(-0.0999, 0.0999,
   length = 1), seq(0.1, 1, length = 250), seq(1.0001, 3, length = 250)),
   heatmap.colors = NULL, heatmap.preset = NULL, reverse = FALSE,
   plot.enrich = TRUE, enrich.libs = c("GO_Molecular_Function_2018",

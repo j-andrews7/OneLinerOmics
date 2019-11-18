@@ -248,3 +248,10 @@ SaveResults <- function(results, outpath, dds = NULL, chip = FALSE,
     }
   }
 }
+
+
+.quiet <- function(x) {
+  sink(tempfile())
+  on.exit(sink())
+  invisible(force(x))
+}

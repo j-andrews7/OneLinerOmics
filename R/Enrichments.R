@@ -82,15 +82,15 @@ PlotEnrichments <- function(res.list, outpath, padj.thresh,
       two.up <- res[(res[, 'padj'] <= padj.thresh) %in% TRUE & 
         res[, 'log2FoldChange'] <= -fc.thresh, ]
       
-      one.two.terms <- suppressMessages(RunEnrichr(rownames(one.two), 
+      one.two.terms <- .quiet(RunEnrichr(rownames(one.two), 
         libraries = libraries, outdir = paste0(base, "/AllGenes")))
       VizEnrichments(one.two.terms, outdir = paste0(base, "/AllGenes"))
 
-      one.up.terms <- suppressMessages(RunEnrichr(rownames(one.up), 
+      one.up.terms <- .quiet(RunEnrichr(rownames(one.up), 
         outdir = paste0(base, "/", g1, ".up")))
       VizEnrichments(one.up.terms, outdir = paste0(base, "/", g1, ".up"))
 
-      two.up.terms <- suppressMessages(RunEnrichr(rownames(two.up), 
+      two.up.terms <- .quiet(RunEnrichr(rownames(two.up), 
         outdir = paste0(base, "/", g2, ".up")))
       VizEnrichments(two.up.terms, outdir = paste0(base, "/", g2, ".up"))
     }
@@ -111,20 +111,21 @@ PlotEnrichments <- function(res.list, outpath, padj.thresh,
 
     one.two <- res.list[[1]]
 
-    one.two.terms <- RunEnrichr(one.two@anno$SYMBOL, libraries = libraries,
-      outdir = paste0(base, "/AllDBR.Genes"))
+    one.two.terms <- .quiet(RunEnrichr(one.two@anno$SYMBOL, 
+      libraries = libraries,
+      outdir = paste0(base, "/AllDBR.Genes")))
     VizEnrichments(one.two.terms, outdir = paste0(base, "/AllDBR.Genes"))
 
     if (!is.null(res.list[[paste0(g1, ".up")]])) {
       one.up <- res.list[[paste0(g1, ".up")]]
-      one.up.terms <- suppressMessages(RunEnrichr(one.up@anno$SYMBOL, 
+      one.up.terms <- .quiet(RunEnrichr(one.up@anno$SYMBOL, 
         outdir = paste0(base, "/", g1, ".up")))
       VizEnrichments(one.up.terms, outdir = paste0(base, "/", g1, ".up"))
     }
 
     if (!is.null(res.list[[paste0(g2, ".up")]])) {
       two.up <- res.list[[paste0(g2, ".up")]]
-      two.up.terms <- suppressMessages(RunEnrichr(two.up@anno$SYMBOL, 
+      two.up.terms <- .quiet(RunEnrichr(two.up@anno$SYMBOL, 
         outdir = paste0(base, "/", g2, ".up")))
       VizEnrichments(two.up.terms, outdir = paste0(base, "/", g2, ".up"))
     }
