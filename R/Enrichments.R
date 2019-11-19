@@ -114,20 +114,26 @@ PlotEnrichments <- function(res.list, outpath, padj.thresh,
     one.two.terms <- .quiet(RunEnrichr(one.two@anno$SYMBOL, 
       libraries = libraries,
       outdir = paste0(base, "/AllDBR.Genes")))
-    VizEnrichments(one.two.terms, outdir = paste0(base, "/AllDBR.Genes"))
+    if (length(one.two.terms) > 0) {
+      VizEnrichments(one.two.terms, outdir = paste0(base, "/AllDBR.Genes"))
+    }
 
     if (!is.null(res.list[[paste0(g1, ".up")]])) {
       one.up <- res.list[[paste0(g1, ".up")]]
       one.up.terms <- .quiet(RunEnrichr(one.up@anno$SYMBOL, 
         outdir = paste0(base, "/", g1, ".up")))
-      VizEnrichments(one.up.terms, outdir = paste0(base, "/", g1, ".up"))
+      if (length(one.up.terms) > 0) {
+        VizEnrichments(one.up.terms, outdir = paste0(base, "/", g1, ".up"))
+      }
     }
 
     if (!is.null(res.list[[paste0(g2, ".up")]])) {
       two.up <- res.list[[paste0(g2, ".up")]]
       two.up.terms <- .quiet(RunEnrichr(two.up@anno$SYMBOL, 
         outdir = paste0(base, "/", g2, ".up")))
-      VizEnrichments(two.up.terms, outdir = paste0(base, "/", g2, ".up"))
+      if (length(two.up.terms) > 0) {
+        VizEnrichments(two.up.terms, outdir = paste0(base, "/", g2, ".up"))
+      }
     }
   }
 }
