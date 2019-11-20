@@ -232,7 +232,7 @@ SaveResults <- function(results, outpath, dds = NULL, chip = FALSE,
   } else {
     for (i in seq_along(results$contrasts)) {
       out <- paste0(outpath, "/ResultsTables/")
-      report = dba.report(results, th = 1, bCalled = TRUE, 
+      report <- dba.report(results, th = 1, bCalled = TRUE, 
           bCounts = TRUE, method = method, contrast = i)
 
       peak.anno <- annotatePeak(report, tssRegion = promoters, TxDb = txdb, 
@@ -246,6 +246,16 @@ SaveResults <- function(results, outpath, dds = NULL, chip = FALSE,
         results$contrasts[[i]]$name2, ".AllPeaks.txt"), sep = "\t", 
         quote = FALSE, row.names = FALSE)
     }
+
+    rep <- dba.peakset(results, consensus = TRUE, bRetrieve = TRUE)
+    peak.anno <- annotatePeak(rep, tssRegion = promoters, TxDb = txdb, 
+        annoDb = "org.Hs.eg.db")
+    df <- data.frame(peak.anno)
+    dfs <- list("peaks" = df, "ses" = se)
+    final <- .categorize_peaks(dfs)
+
+    write.table(final, file = paste0(out, "Consensus.AllPeaks.txt"), sep = "\t", 
+        quote = FALSE, row.names = FALSE)
   }
 }
 

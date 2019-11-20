@@ -198,15 +198,24 @@ PlotChIPHeatmaps <- function(results, outpath, method, breaks, colors,
         df <- as.data.frame(rep)
         sig.peaks[[i]] <- paste0(df$seqnames, ":", df$start, "-", df$end)
 
+        rowv <- TRUE
+        if (length(rep) > 30000) {
+          rowv <- NULL
+          message(paste0("Too many DB sites to cluster rows for ", 
+          results$contrasts[[i]]$name1, " vs ", results$contrasts[[i]]$name2),
+          ", no row clustering will be performed.")
+        }
+
         dba.plotHeatmap(results, margin = 6, contrast = i, report = rep,
           correlations = FALSE, scale = "row", density.info = "none", 
-          colScheme = colors, breaks = breaks, maxSites = nrow(results$binding),  
+          Rowv = rowv, colScheme = colors, breaks = breaks, 
+          maxSites = nrow(results$binding),  
           main = paste0("All ", lab, " Peaks\n", results$contrasts[[i]]$name1, 
             " vs ", results$contrasts[[i]]$name2))
         dba.plotHeatmap(results, margin = 6, contrast = i, report = rep,
           correlations = FALSE, scale = "row", density.info = "none", 
           colScheme = colors, breaks = breaks, maxSites = nrow(results$binding), 
-          Colv = NULL, 
+          Colv = NULL, Rowv = rowv, 
           main = paste0("All ", lab, " Peaks\n", results$contrasts[[i]]$name1, 
             " vs ", results$contrasts[[i]]$name2))
         dba.plotHeatmap(results, report = rep, contrast = i, 
@@ -228,13 +237,24 @@ PlotChIPHeatmaps <- function(results, outpath, method, breaks, colors,
     rownames(df) <- paste0(df$seqnames, ":", df$start, "-", df$end)
     df <- df[sig.peaks,]
 
+    message(paste0("Total of ", nrow(df), " DB regions in combined heatmap ",
+      "across all comparisons."))
+
     m <- as.matrix(df[, 6:ncol(df)])
-    p <- pheatmap(m, cluster_rows = TRUE, show_rownames = FALSE,
+
+    rowv <- TRUE
+    if (nrow(df) > 30000) {
+      rowv <- FALSE
+      message(paste0("Too many DB sites to cluster rows for,",
+        " no row clustering will be performed."))
+    }
+
+    p <- pheatmap(m, cluster_rows = rowv, show_rownames = FALSE,
       cluster_cols = FALSE, scale = "row", fontsize_col = 6, color = colors,
       breaks = breaks, main = "All DB Peaks")
     print(p)
 
-    p <- pheatmap(m, cluster_rows = TRUE, show_rownames = FALSE,
+    p <- pheatmap(m, cluster_rows = rowv, show_rownames = FALSE,
       cluster_cols = TRUE, scale = "row", fontsize_col = 6, color = colors,
       breaks = breaks, main = "All DB Peaks")
     print(p)
