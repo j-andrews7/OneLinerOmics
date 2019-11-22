@@ -133,13 +133,13 @@ with <code>DiffBind</code>. It, along with <a href='ProcessDBRs.html'>ProcessDBR
 ChIP-seq portion of this package.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>RunDiffBind</span>(<span class='no'>outpath</span>, <span class='no'>samplesheet</span>, <span class='no'>txdb</span>, <span class='kw'>level</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"Treatment"</span>,
-  <span class='st'>"Condition"</span>, <span class='st'>"Tissue"</span>, <span class='st'>"Factor"</span>), <span class='kw'>se</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>fdr.thresh</span> <span class='kw'>=</span> <span class='fl'>0.05</span>,
-  <span class='kw'>fc.thresh</span> <span class='kw'>=</span> <span class='fl'>2</span>, <span class='kw'>block</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>heatmap.colors</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>heatmap.preset</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>reverse</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>n.consensus</span> <span class='kw'>=</span> <span class='fl'>2</span>,
-  <span class='kw'>breaks</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/seq.html'>seq</a></span>(-<span class='fl'>3</span>, -<span class='fl'>1.0001</span>, <span class='kw'>length</span> <span class='kw'>=</span> <span class='fl'>250</span>), <span class='fu'><a href='https://rdrr.io/r/base/seq.html'>seq</a></span>(-<span class='fl'>1</span>, -<span class='fl'>0.1</span>, <span class='kw'>length</span> <span class='kw'>=</span> <span class='fl'>250</span>),
-  <span class='fu'><a href='https://rdrr.io/r/base/seq.html'>seq</a></span>(-<span class='fl'>0.0999</span>, <span class='fl'>0.0999</span>, <span class='kw'>length</span> <span class='kw'>=</span> <span class='fl'>1</span>), <span class='fu'><a href='https://rdrr.io/r/base/seq.html'>seq</a></span>(<span class='fl'>0.1</span>, <span class='fl'>1</span>, <span class='kw'>length</span> <span class='kw'>=</span> <span class='fl'>250</span>), <span class='fu'><a href='https://rdrr.io/r/base/seq.html'>seq</a></span>(<span class='fl'>1.0001</span>,
-  <span class='fl'>3</span>, <span class='kw'>length</span> <span class='kw'>=</span> <span class='fl'>250</span>)), <span class='kw'>plot.enrich</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
+    <pre class="usage"><span class='fu'>RunDiffBind</span>(<span class='no'>outpath</span>, <span class='no'>samplesheet</span>, <span class='no'>txdb</span>, <span class='kw'>dba</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>level</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"Treatment"</span>, <span class='st'>"Condition"</span>, <span class='st'>"Tissue"</span>, <span class='st'>"Factor"</span>), <span class='kw'>se</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>fdr.thresh</span> <span class='kw'>=</span> <span class='fl'>0.05</span>, <span class='kw'>fc.thresh</span> <span class='kw'>=</span> <span class='fl'>2</span>, <span class='kw'>block</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>heatmap.colors</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>heatmap.preset</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>reverse</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='kw'>n.consensus</span> <span class='kw'>=</span> <span class='fl'>2</span>, <span class='kw'>breaks</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/seq.html'>seq</a></span>(-<span class='fl'>3</span>, -<span class='fl'>1.0001</span>, <span class='kw'>length</span> <span class='kw'>=</span> <span class='fl'>250</span>), <span class='fu'><a href='https://rdrr.io/r/base/seq.html'>seq</a></span>(-<span class='fl'>1</span>,
+  -<span class='fl'>0.1</span>, <span class='kw'>length</span> <span class='kw'>=</span> <span class='fl'>250</span>), <span class='fu'><a href='https://rdrr.io/r/base/seq.html'>seq</a></span>(-<span class='fl'>0.0999</span>, <span class='fl'>0.0999</span>, <span class='kw'>length</span> <span class='kw'>=</span> <span class='fl'>1</span>), <span class='fu'><a href='https://rdrr.io/r/base/seq.html'>seq</a></span>(<span class='fl'>0.1</span>, <span class='fl'>1</span>, <span class='kw'>length</span>
+  <span class='kw'>=</span> <span class='fl'>250</span>), <span class='fu'><a href='https://rdrr.io/r/base/seq.html'>seq</a></span>(<span class='fl'>1.0001</span>, <span class='fl'>3</span>, <span class='kw'>length</span> <span class='kw'>=</span> <span class='fl'>250</span>)), <span class='kw'>plot.enrich</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
   <span class='kw'>enrich.libs</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"GO_Molecular_Function_2018"</span>,
   <span class='st'>"GO_Cellular_Component_2018"</span>, <span class='st'>"GO_Biological_Process_2018"</span>,
   <span class='st'>"KEGG_2019_Human"</span>, <span class='st'>"Reactome_2016"</span>, <span class='st'>"BioCarta_2016"</span>, <span class='st'>"Panther_2016"</span>),
@@ -161,6 +161,12 @@ directories will be generated within this folder.</p></td>
     <tr>
       <th>txdb</th>
       <td><p><code>TxDb</code> object to use for annotation.</p></td>
+    </tr>
+    <tr>
+      <th>dba</th>
+      <td><p>DBA object as returned by <code><a href='https://rdrr.io/pkg/DiffBind/man/dba.count.html'>dba.count</a></code>,
+<code><a href='https://rdrr.io/pkg/DiffBind/man/dba.analyze.html'>dba.analyze</a></code> or from this function itself. If 
+provided, <code>samplesheet</code> and <code>n.consensus</code> are ignored.</p></td>
     </tr>
     <tr>
       <th>level</th>
@@ -266,6 +272,10 @@ similar between samples).</p></td>
 but lazy folks can provide multiple thresholds to <code>fdr.thresh</code>
 and/or <code>fc.thresh</code> if they aren't sure how stringent or lenient they 
 need to be with their data.</p>
+<p>Providing the resulting DBA object as input to this function can be useful 
+when running multiple times with different <code>level</code>s and <code>block</code>s 
+or thresholds, as it skips bam loading, which is by far the most 
+time-intensive part.</p>
 <p>It's generally best to provide an empty directory as the output path, as
 several directories will be generated.</p>
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>

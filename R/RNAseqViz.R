@@ -130,9 +130,9 @@ PlotRNACombinedHeatmaps <- function(res.list, rld, vsd, outpath,
       padj.thresh, " and abs(log2FoldChange) >= ", fc.thresh)
 
   # Set color breaks and palette.
-  breaks <- c(seq(-3, -1.251, length=250), seq(-1.25, -0.1001, length=250), 
+  breaks <- c(seq(-2.5, -1.251, length=250), seq(-1.25, -0.1001, length=250), 
     seq(-0.1, 0.1, length=1), seq(0.1001, 1.25, length=250), 
-    seq(1.251, 3, length=250))
+    seq(1.251, 2.5, length=250))
   colors <- colorRampPalette(c("#053061","#2166ac", "#f5f5f5", 
     "#b2182b", "#67001f"))(n = 1000)
 
@@ -166,8 +166,13 @@ PlotRNACombinedHeatmaps <- function(res.list, rld, vsd, outpath,
       main = paste0("All Comparisons - ", labs[ind]))
     print(p)
 
+    # Save counts tables.
+    write.table(heat, file = paste0(outpath, "/Heatmaps/AllComparisons.padj.", 
+      padj.thresh, ".log2fc.", fc.thresh, ".", labs[ind], ".Heatmaps.txt"))
+
     ind <- ind + 1
   }
+
   dev.off()
 }
 

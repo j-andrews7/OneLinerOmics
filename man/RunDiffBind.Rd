@@ -4,13 +4,13 @@
 \alias{RunDiffBind}
 \title{Run DiffBind analysis on a samplesheet}
 \usage{
-RunDiffBind(outpath, samplesheet, txdb, level = c("Treatment",
-  "Condition", "Tissue", "Factor"), se = NULL, fdr.thresh = 0.05,
-  fc.thresh = 2, block = NULL, heatmap.colors = NULL,
-  heatmap.preset = NULL, reverse = FALSE, n.consensus = 2,
-  breaks = c(seq(-3, -1.0001, length = 250), seq(-1, -0.1, length = 250),
-  seq(-0.0999, 0.0999, length = 1), seq(0.1, 1, length = 250), seq(1.0001,
-  3, length = 250)), plot.enrich = TRUE,
+RunDiffBind(outpath, samplesheet, txdb, dba = NULL,
+  level = c("Treatment", "Condition", "Tissue", "Factor"), se = NULL,
+  fdr.thresh = 0.05, fc.thresh = 2, block = NULL,
+  heatmap.colors = NULL, heatmap.preset = NULL, reverse = FALSE,
+  n.consensus = 2, breaks = c(seq(-3, -1.0001, length = 250), seq(-1,
+  -0.1, length = 250), seq(-0.0999, 0.0999, length = 1), seq(0.1, 1, length
+  = 250), seq(1.0001, 3, length = 250)), plot.enrich = TRUE,
   enrich.libs = c("GO_Molecular_Function_2018",
   "GO_Cellular_Component_2018", "GO_Biological_Process_2018",
   "KEGG_2019_Human", "Reactome_2016", "BioCarta_2016", "Panther_2016"),
@@ -24,6 +24,10 @@ directories will be generated within this folder.}
 \item{samplesheet}{Path to samplesheet containing sample metadata.}
 
 \item{txdb}{\code{TxDb} object to use for annotation.}
+
+\item{dba}{DBA object as returned by \code{\link[DiffBind]{dba.count}},
+\code{\link[DiffBind]{dba.analyze}} or from this function itself. If 
+provided, \code{samplesheet} and \code{n.consensus} are ignored.}
 
 \item{level}{String defining variable of interest from \code{samplesheet}. 
 Must be one of: "Treatment", "Condition", "Tissue", or "Factor".}
@@ -104,6 +108,11 @@ The default parameters should be an adequate starting place for most users,
 but lazy folks can provide multiple thresholds to \code{fdr.thresh}
 and/or \code{fc.thresh} if they aren't sure how stringent or lenient they 
 need to be with their data.
+
+Providing the resulting DBA object as input to this function can be useful 
+when running multiple times with different \code{level}s and \code{block}s 
+or thresholds, as it skips bam loading, which is by far the most 
+time-intensive part.
 
 It's generally best to provide an empty directory as the output path, as
 several directories will be generated.

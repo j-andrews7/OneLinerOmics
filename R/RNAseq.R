@@ -276,7 +276,7 @@ ProcessDEGs <- function(dds, rld, vsd, outpath, level, plot.annos,
 
   ### SAVING TABLES ###
   message("\n# SAVING RESULTS TABLES #\n")
-  SaveResults(res.list, dds, outpath)
+  SaveResults(results = res.list, outpath = outpath, dds = dds)
 
   return(list(res.list = res.list, dds = dds, rld = rld, vsd = vsd))
 }

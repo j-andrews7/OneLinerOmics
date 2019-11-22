@@ -66,7 +66,7 @@ PlotRNAVarianceTransformations <- function (dds, outpath) {
 #'   \link{PlotRNAVarianceTransformations}.
 #' @param vsd A \linkS4class{RangedSummarizedExperiment} object of 
 #'   \code{\link[DESeq2]{vst}} transformed counts as returned by
-#'   \link{PlotVarianceTransformations}.
+#'   \link{PlotRNAVarianceTransformations}.
 #' @param outpath Path to output file.
 #' @param level String defining variable of interest.
 #' @param plot.annos String or character vector defining the column(s) in 
@@ -119,7 +119,7 @@ PlotRNASampleDistances <- function(rld, vsd, outpath, level, plot.annos) {
 #'
 #' @param rld A \linkS4class{RangedSummarizedExperiment} object of 
 #'   \code{\link[DESeq2]{rlog}} transformed counts as returned by
-#'   \link{PlotVarianceTransformations}.
+#'   \link{PlotRNAVarianceTransformations}.
 #' @param vsd A \linkS4class{RangedSummarizedExperiment} object of 
 #'   \code{\link[DESeq2]{vst}} transformed counts as returned by
 #'   \link{PlotRNAVarianceTransformations}.

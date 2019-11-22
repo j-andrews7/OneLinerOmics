@@ -68,9 +68,9 @@ PlotEnrichments <- function(res.list, outpath, padj.thresh,
         ".log2fc.", fc.thresh)
       dir.create(file.path(base, "AllGenes"), showWarnings = FALSE, 
         recursive = TRUE)
-      dir.create(file.path(base, paste0(g1, "up")), showWarnings = FALSE, 
+      dir.create(file.path(base, paste0(g1, ".up")), showWarnings = FALSE, 
         recursive = TRUE)
-      dir.create(file.path(base, paste0(g2, "up")), showWarnings = FALSE, 
+      dir.create(file.path(base, paste0(g2, ".up")), showWarnings = FALSE, 
         recursive = TRUE)
 
       one.two <- res[(res[, 'padj'] <= padj.thresh) %in% TRUE & 

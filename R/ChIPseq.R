@@ -9,6 +9,11 @@
 #' and/or \code{fc.thresh} if they aren't sure how stringent or lenient they 
 #' need to be with their data.
 #'
+#' Providing the resulting DBA object as input to this function can be useful 
+#' when running multiple times with different \code{level}s and \code{block}s 
+#' or thresholds, as it skips bam loading, which is by far the most 
+#' time-intensive part. 
+#'
 #' It's generally best to provide an empty directory as the output path, as
 #' several directories will be generated. 
 #'
@@ -16,6 +21,9 @@
 #'   directories will be generated within this folder.
 #' @param samplesheet Path to samplesheet containing sample metadata.
 #' @param txdb \code{TxDb} object to use for annotation.
+#' @param dba DBA object as returned by \code{\link[DiffBind]{dba.count}},
+#'   \code{\link[DiffBind]{dba.analyze}} or from this function itself. If 
+#'   provided, \code{samplesheet} and \code{n.consensus} are ignored. 
 #' @param level String defining variable of interest from \code{samplesheet}. 
 #'   Must be one of: "Treatment", "Condition", "Tissue", or "Factor".
 #' @param se Path to file containing consensus SEs, which will be used to
@@ -85,6 +93,7 @@
 #' \code{\link{ProcessDBRs}}, for analyzing and visualizing the results.
 #'
 RunDiffBind <- function(outpath, samplesheet, txdb,
+  dba = NULL,
   level = c("Treatment", "Condition", "Tissue", "Factor"), 
   se = NULL, 
   fdr.thresh = 0.05, 
@@ -168,8 +177,13 @@ RunDiffBind <- function(outpath, samplesheet, txdb,
 
   # FINDING DIFFERENTIALLY BOUND REGIONS #
   message("### FINDING DIFFERENTIALLY BOUND REGIONS ###\n\n")
-  samps <- dba(sampleSheet = samplesheet, minOverlap = n.consensus)
-  count <- dba.count(samps, minOverlap = n.consensus)
+  if (is.null(dba)) {
+    samps <- dba(sampleSheet = samplesheet, minOverlap = n.consensus)
+    count <- dba.count(samps, minOverlap = n.consensus)
+  } else {
+    count <- dba
+  }
+  
   if (!is.null(rblock)) {
     cont <- dba.contrast(count, categories = rlevel, block = rblock)
   } else {

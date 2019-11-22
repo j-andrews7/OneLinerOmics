@@ -155,6 +155,7 @@ PlotChIPAnnos <- function(peak.anno, outpath, consensus = TRUE, comp = NULL,
 #' @importFrom grDevices pdf dev.off
 #' @importFrom DiffBind dba.plotHeatmap dba.report
 #' @importFrom pheatmap pheatmap
+#' @importFrom utils flush.console
 #'
 #' @export
 #'
@@ -170,17 +171,27 @@ PlotChIPHeatmaps <- function(results, outpath, method, breaks, colors,
     lab <- "DB"
     out <- paste0("/DBRFigures/Heatmaps/DBRs.fdr.", fdr.thresh, ".log2fc.", 
       fc.thresh, ".Heatmaps.pdf")
+    out.tab <- paste0("/DBRFigures/Heatmaps/DBRs.fdr.", fdr.thresh, ".log2fc.", 
+      fc.thresh, ".Heatmaps.txt")
   }
 
   pdf(paste0(outpath, out), height = 8, width = 7)
 
+  # maxSites can't be more than number of total peaks.
   if (consensus) {
+    if (nrow(results$binding) > 10000) {
+      max.sites <- 10000
+    } else {
+      max.sites <- nrow(results$binding)
+    }
+
     dba.plotHeatmap(results, th = 1, margin = 6, correlations = FALSE, 
       scale = "row", density.info = "none", colScheme = colors, breaks = breaks, 
-      maxSites = 10000, main = paste0(lab, " - Top 10000 Variable Peaks"))
+      maxSites = max.sites , 
+      main = paste0(lab, " - Top 10000 Variable Peaks"))
     dba.plotHeatmap(results, th = 1, margin = 6, correlations = FALSE, 
       scale = "row", density.info = "none", colScheme = colors, breaks = breaks, 
-      maxSites = 10000, Colv = NULL, 
+      maxSites = max.sites , Colv = NULL, 
       main = paste0(lab, " - Top 10000 Variable Peaks"))
     dba.plotHeatmap(results, th = 1, margin = 6, density.info = "none", 
       main = paste0(lab, " Peaks - Correlation"))
@@ -239,6 +250,7 @@ PlotChIPHeatmaps <- function(results, outpath, method, breaks, colors,
 
     message(paste0("Total of ", nrow(df), " DB regions in combined heatmap ",
       "across all comparisons."))
+    flush.console()
 
     m <- as.matrix(df[, 6:ncol(df)])
 
@@ -258,6 +270,9 @@ PlotChIPHeatmaps <- function(results, outpath, method, breaks, colors,
       cluster_cols = TRUE, scale = "row", fontsize_col = 6, color = colors,
       breaks = breaks, main = "All DB Peaks")
     print(p)
+
+    write.table(df, file = paste0(outpath, out.tab), sep = "\t", quote = FALSE,
+      row.names = FALSE)
   }
 
   dev.off()
