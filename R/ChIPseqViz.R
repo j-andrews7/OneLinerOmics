@@ -136,6 +136,8 @@ PlotChIPAnnos <- function(peak.anno, outpath, consensus = TRUE, comp = NULL,
 #'
 #' This function will generate heatmaps for each contrast individually as well
 #' as all differentially bound peaks in all samples if \code{consensus = FALSE}.
+#' A table will be saved of all peaks in the combined heatmap, with row order
+#' retained if row clustering is performed.
 #'
 #' @param results \code{DBA} object as returned by 
 #'   \code{\link[DiffBind]{dba.analyze}}.
@@ -270,6 +272,10 @@ PlotChIPHeatmaps <- function(results, outpath, method, breaks, colors,
       cluster_cols = TRUE, scale = "row", fontsize_col = 6, color = colors,
       breaks = breaks, main = "All DB Peaks")
     print(p)
+
+    if (rowv) {
+      df <- df[p$tree_row[["order"]],]
+    }
 
     write.table(df, file = paste0(outpath, out.tab), sep = "\t", quote = FALSE,
       row.names = FALSE)

@@ -144,7 +144,7 @@ ChIP-seq portion of this package.</p>
   <span class='st'>"GO_Cellular_Component_2018"</span>, <span class='st'>"GO_Biological_Process_2018"</span>,
   <span class='st'>"KEGG_2019_Human"</span>, <span class='st'>"Reactome_2016"</span>, <span class='st'>"BioCarta_2016"</span>, <span class='st'>"Panther_2016"</span>),
   <span class='kw'>promoters</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(-<span class='fl'>2000</span>, <span class='fl'>2000</span>), <span class='kw'>method</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"DESeq2"</span>, <span class='st'>"edgeR"</span>),
-  <span class='kw'>scale.full</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)</pre>
+  <span class='kw'>scale.full</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>flank.anno</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>flank.dist</span> <span class='kw'>=</span> <span class='fl'>5000</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -260,6 +260,16 @@ number of reads) for each sample is used for scaling normalization. If
 <code>FALSE</code>, the total number of reads present in the peaks for each 
 sample is used (preferable if overall binding levels are expected to be 
 similar between samples).</p></td>
+    </tr>
+    <tr>
+      <th>flank.anno</th>
+      <td><p>Boolean indicating whether flanking gene information for 
+each peak should be retrieved. Useful for broad peaks and super enhancers.</p></td>
+    </tr>
+    <tr>
+      <th>flank.distance</th>
+      <td><p>Integer for distance from edges of peak to search for
+flanking genes. Ignored if <code>flank.anno = FALSE</code>.</p></td>
     </tr>
     </table>
 

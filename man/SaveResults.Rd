@@ -5,7 +5,8 @@
 \title{Save results}
 \usage{
 SaveResults(results, outpath, dds = NULL, chip = FALSE,
-  method = NULL, promoters = NULL, se = NULL, txdb = NULL)
+  method = NULL, promoters = NULL, se = NULL, txdb = NULL,
+  flank.anno = FALSE, flank.dist = 5000)
 }
 \arguments{
 \item{results}{Either:
@@ -35,6 +36,13 @@ downstream of the TSS should be used to define gene promoters.}
 \item{se}{Dataframe containing location informatin for super enhancers.}
 
 \item{txdb}{\code{TxDb} object to use for annotation.}
+
+\item{flank.anno}{Boolean indicating whether flanking gene information for 
+each peak should be retrieved. Useful for broad peaks and super enhancers.
+Ignored if \code{chip = FALSE}.}
+
+\item{flank.distance}{Integer for distance from edges of peak to search for
+flanking genes. Ignored if \code{flank.anno = FALSE}.}
 }
 \description{
 \code{SaveResults} saves the results for each comparison in \code{results}. 

@@ -138,7 +138,8 @@ specifically for differentially bound regions in a given comparison.</p>
   <span class='kw'>heatmap.colors</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>heatmap.preset</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>reverse</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
   <span class='kw'>plot.enrich</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>enrich.libs</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"GO_Molecular_Function_2018"</span>,
   <span class='st'>"GO_Cellular_Component_2018"</span>, <span class='st'>"GO_Biological_Process_2018"</span>,
-  <span class='st'>"KEGG_2019_Human"</span>, <span class='st'>"Reactome_2016"</span>, <span class='st'>"BioCarta_2016"</span>, <span class='st'>"Panther_2016"</span>))</pre>
+  <span class='st'>"KEGG_2019_Human"</span>, <span class='st'>"Reactome_2016"</span>, <span class='st'>"BioCarta_2016"</span>, <span class='st'>"Panther_2016"</span>),
+  <span class='kw'>flank.anno</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>flank.dist</span> <span class='kw'>=</span> <span class='fl'>5000</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -216,7 +217,17 @@ should be run and plotted for each comparison.</p></td>
     <tr>
       <th>enrich.libs</th>
       <td><p>A vector of valid <code>enrichR</code> libraries to test the 
-  genes against.</p>
+genes against.</p></td>
+    </tr>
+    <tr>
+      <th>flank.anno</th>
+      <td><p>Boolean indicating whether flanking gene information for 
+each peak should be retrieved. Useful for broad peaks and super enhancers.</p></td>
+    </tr>
+    <tr>
+      <th>flank.distance</th>
+      <td><p>Integer for distance from edges of peak to search for
+  flanking genes. Ignored if <code>flank.anno = FALSE</code>.</p>
 <p>Available libraries can be viewed with 
   <code><a href='https://rdrr.io/pkg/enrichR/man/listEnrichrDbs.html'>listEnrichrDbs</a></code> from the <code>enrichR</code> package.</p></td>
     </tr>

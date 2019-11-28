@@ -11,7 +11,8 @@ ProcessDBRs(results, outpath, txdb, fdr.thresh = 0.05, fc.thresh = 1,
   heatmap.colors = NULL, heatmap.preset = NULL, reverse = FALSE,
   plot.enrich = TRUE, enrich.libs = c("GO_Molecular_Function_2018",
   "GO_Cellular_Component_2018", "GO_Biological_Process_2018",
-  "KEGG_2019_Human", "Reactome_2016", "BioCarta_2016", "Panther_2016"))
+  "KEGG_2019_Human", "Reactome_2016", "BioCarta_2016", "Panther_2016"),
+  flank.anno = TRUE, flank.dist = 5000)
 }
 \arguments{
 \item{results}{\code{DBA} object as returned by 
@@ -64,7 +65,13 @@ heatmaps in hex (e.g. \code{c("#053061", "#f5f5f5", "#67001f")}).}
 should be run and plotted for each comparison.}
 
 \item{enrich.libs}{A vector of valid \code{enrichR} libraries to test the 
-  genes against.
+genes against.}
+
+\item{flank.anno}{Boolean indicating whether flanking gene information for 
+each peak should be retrieved. Useful for broad peaks and super enhancers.}
+
+\item{flank.distance}{Integer for distance from edges of peak to search for
+  flanking genes. Ignored if \code{flank.anno = FALSE}.
 
   Available libraries can be viewed with 
   \code{\link[enrichR]{listEnrichrDbs}} from the \code{enrichR} package.}

@@ -37,6 +37,8 @@ peaks.}
 \details{
 This function will generate heatmaps for each contrast individually as well
 as all differentially bound peaks in all samples if \code{consensus = FALSE}.
+A table will be saved of all peaks in the combined heatmap, with row order
+retained if row clustering is performed.
 }
 \author{
 Jared Andrews

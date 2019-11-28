@@ -75,6 +75,10 @@
 #'   \code{FALSE}, the total number of reads present in the peaks for each 
 #'   sample is used (preferable if overall binding levels are expected to be 
 #'   similar between samples).
+#' @param flank.anno Boolean indicating whether flanking gene information for 
+#'   each peak should be retrieved. Useful for broad peaks and super enhancers.
+#' @param flank.distance Integer for distance from edges of peak to search for
+#'   flanking genes. Ignored if \code{flank.anno = FALSE}.
 #' @return A \code{DBA} object from \code{\link[DiffBind]{dba.analyze}}.
 #'
 #' @importFrom utils read.table
@@ -112,7 +116,9 @@ RunDiffBind <- function(outpath, samplesheet, txdb,
   "Reactome_2016", "BioCarta_2016", "Panther_2016"),
   promoters = c(-2000, 2000),
   method = c("DESeq2", "edgeR"),
-  scale.full = TRUE) {
+  scale.full = TRUE,
+  flank.anno = TRUE,
+  flank.dist = 5000) {
 
   message("### SETUP ###\n")
   rblock = NULL
@@ -200,7 +206,8 @@ RunDiffBind <- function(outpath, samplesheet, txdb,
   # ANNOTATION #
   message("# ANNOTATING & GENERATING CONSENSUS PLOTS #\n")
   peak.anno <- annotatePeak(report, tssRegion = promoters, TxDb = txdb, 
-    annoDb = "org.Hs.eg.db")
+    annoDb = "org.Hs.eg.db", level = "gene", addFlankGeneInfo = flank.anno, 
+    flankDistance = flank.dist)
 
   PlotChIPAnnos(list(peak.anno), outpath = base)
   PlotChIPPCAs(results, outpath = base, method = method)
@@ -214,11 +221,13 @@ RunDiffBind <- function(outpath, samplesheet, txdb,
     fdr.thresh = fdr.thresh, fc.thresh = fc.thresh, method = method, 
     breaks = breaks, heatmap.colors = heatmap.colors, 
     heatmap.preset = heatmap.preset, reverse = reverse, 
-    plot.enrich = plot.enrich, enrich.libs = enrich.libs)
+    plot.enrich = plot.enrich, enrich.libs = enrich.libs, 
+    flank.anno = flank.anno, flank.dist = flank.dist)
 
   message("# SAVING RESULTS TABLES #\n")
   SaveResults(results, outpath = base, chip = TRUE, method = method, 
-    promoters = promoters, se = se, txdb = txdb)
+    promoters = promoters, se = se, txdb = txdb, flank.anno = flank.anno, 
+    flank.dist = flank.dist)
 
   message("# SAVING ROBJECTS #")
   saveRDS(results, file=paste0(base, "/Robjects/results.rds"))
@@ -278,6 +287,10 @@ RunDiffBind <- function(outpath, samplesheet, txdb,
 #'   should be run and plotted for each comparison.
 #' @param enrich.libs A vector of valid \code{enrichR} libraries to test the 
 #'   genes against.
+#' @param flank.anno Boolean indicating whether flanking gene information for 
+#'   each peak should be retrieved. Useful for broad peaks and super enhancers.
+#' @param flank.distance Integer for distance from edges of peak to search for
+#'   flanking genes. Ignored if \code{flank.anno = FALSE}.
 #'
 #'   Available libraries can be viewed with 
 #'   \code{\link[enrichR]{listEnrichrDbs}} from the \code{enrichR} package.
@@ -309,7 +322,9 @@ ProcessDBRs <- function(results, outpath, txdb,
   plot.enrich = TRUE, 
   enrich.libs = c("GO_Molecular_Function_2018", 
   "GO_Cellular_Component_2018", "GO_Biological_Process_2018", "KEGG_2019_Human",
-  "Reactome_2016", "BioCarta_2016", "Panther_2016")) {
+  "Reactome_2016", "BioCarta_2016", "Panther_2016"),
+  flank.anno = TRUE,
+  flank.dist = 5000) {
 
   hmap.colors <- .heatmap_colors(breaks = breaks, preset = heatmap.preset, 
     custom.colors = heatmap.colors, reverse = reverse)
@@ -349,7 +364,8 @@ ProcessDBRs <- function(results, outpath, txdb,
         files <- files[keep]
 
         peak.anno.list <- lapply(files, annotatePeak, TxDb = txdb,
-          tssRegion = promoters, verbose = FALSE, annoDb = "org.Hs.eg.db")
+          tssRegion = promoters, verbose = FALSE, annoDb = "org.Hs.eg.db", 
+          addFlankGeneInfo = flank.anno, flankDistance = flank.dist)
         
         PlotChIPAnnos(peak.anno.list, outpath, consensus = FALSE, 
           comp = names(files)[1], fc = fc, fdr = fdr)

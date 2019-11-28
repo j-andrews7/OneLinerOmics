@@ -195,15 +195,23 @@ CreateOutputStructure <- function(block, level, base, chip = FALSE) {
 #'   downstream of the TSS should be used to define gene promoters.
 #' @param se Dataframe containing location informatin for super enhancers.
 #' @param txdb \code{TxDb} object to use for annotation.
+#' @param flank.anno Boolean indicating whether flanking gene information for 
+#'   each peak should be retrieved. Useful for broad peaks and super enhancers.
+#'   Ignored if \code{chip = FALSE}.
+#' @param flank.distance Integer for distance from edges of peak to search for
+#'   flanking genes. Ignored if \code{flank.anno = FALSE}.
 #'
 #' @importFrom utils write.table
+#' @importFrom org.Hs.eg.db org.Hs.eg.db 
+#' @importFrom AnnotationDbi mappedkeys
 #' 
 #' @export
 #'
 #' @author Jared Andrews
 #'
 SaveResults <- function(results, outpath, dds = NULL, chip = FALSE, 
-  method = NULL, promoters = NULL, se = NULL, txdb = NULL) {
+  method = NULL, promoters = NULL, se = NULL, txdb = NULL, 
+  flank.anno = FALSE, flank.dist = 5000) {
 
   if (!chip) {
     out <- paste0(outpath, "/ResultsTables/")
@@ -236,8 +244,17 @@ SaveResults <- function(results, outpath, dds = NULL, chip = FALSE,
           bCounts = TRUE, method = method, contrast = i)
 
       peak.anno <- annotatePeak(report, tssRegion = promoters, TxDb = txdb, 
-        annoDb = "org.Hs.eg.db")
-  
+        annoDb = "org.Hs.eg.db", addFlankGeneInfo = flank.anno, 
+        flankDistance = flank.dist)
+      
+      # Get symbols for the flanking genes, which ChIPseeker doesn't do.
+      if (flank.anno) {
+        symbies <- as.list(org.Hs.egSYMBOL[mappedkeys(org.Hs.egSYMBOL)])
+        peak.anno@anno$flank_geneSYMBOLS <- 
+          as.character(sapply(peak.anno@anno$flank_geneIds, .parse_flanking, 
+            symbols = symbies))
+      } 
+
       df <- data.frame(peak.anno)
       dfs <- list("peaks" = df, "ses" = se)
       final <- .categorize_peaks(dfs)
@@ -249,7 +266,16 @@ SaveResults <- function(results, outpath, dds = NULL, chip = FALSE,
 
     rep <- dba.peakset(results, consensus = TRUE, bRetrieve = TRUE)
     peak.anno <- annotatePeak(rep, tssRegion = promoters, TxDb = txdb, 
-        annoDb = "org.Hs.eg.db")
+        annoDb = "org.Hs.eg.db", addFlankGeneInfo = flank.anno, 
+        flankDistance = flank.dist)
+
+    if (flank.anno) {
+      symbies <- as.list(org.Hs.egSYMBOL[mappedkeys(org.Hs.egSYMBOL)])
+      peak.anno@anno$flank_geneSYMBOLS <- 
+        as.character(sapply(peak.anno@anno$flank_geneIds, .parse_flanking, 
+          symbols = symbies))
+    } 
+
     df <- data.frame(peak.anno)
     dfs <- list("peaks" = df, "ses" = se)
     final <- .categorize_peaks(dfs)
@@ -264,4 +290,28 @@ SaveResults <- function(results, outpath, dds = NULL, chip = FALSE,
   sink(tempfile())
   on.exit(sink())
   invisible(force(x))
+}
+
+ 
+.parse_flanking <- function(x, symbols) {
+  if (!is.na(x)) {
+    x <- unique(unlist(strsplit(x, ";")))
+    symbs <- c()
+
+    for (i in seq_along(x)) {
+      new.symb <- symbols[[x[i]]]
+
+      if (is.null(new.symb)) {
+        symbs[i] <- NA_character_
+      } else {
+        symbs[i] <- new.symb
+      }
+    }
+
+    out <- paste0(symbs, collapse = ";")
+  } else {
+    out <- NA_character_
+  }
+
+  return(out)
 }

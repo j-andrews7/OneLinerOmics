@@ -15,7 +15,7 @@ RunDiffBind(outpath, samplesheet, txdb, dba = NULL,
   "GO_Cellular_Component_2018", "GO_Biological_Process_2018",
   "KEGG_2019_Human", "Reactome_2016", "BioCarta_2016", "Panther_2016"),
   promoters = c(-2000, 2000), method = c("DESeq2", "edgeR"),
-  scale.full = TRUE)
+  scale.full = TRUE, flank.anno = TRUE, flank.dist = 5000)
 }
 \arguments{
 \item{outpath}{Path to directory to be used for output. Additional 
@@ -94,6 +94,12 @@ number of reads) for each sample is used for scaling normalization. If
 \code{FALSE}, the total number of reads present in the peaks for each 
 sample is used (preferable if overall binding levels are expected to be 
 similar between samples).}
+
+\item{flank.anno}{Boolean indicating whether flanking gene information for 
+each peak should be retrieved. Useful for broad peaks and super enhancers.}
+
+\item{flank.distance}{Integer for distance from edges of peak to search for
+flanking genes. Ignored if \code{flank.anno = FALSE}.}
 }
 \value{
 A \code{DBA} object from \code{\link[DiffBind]{dba.analyze}}.
