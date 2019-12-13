@@ -337,22 +337,12 @@ PlotRNADEGPCAs <- function(res.list, rld, vsd, outpath, level, plot.annos,
 
       x.sub <- x[ressig$Gene, colData(x)[,level] %in% c(g1, g2)]
 
-      p <- DESeq2::plotPCA(x, intgroup = level) +
-        ggtitle(paste0("DEGs - ", labs[ind], " - ", comp)) + theme_classic() +
-        theme(aspect.ratio=1)
-      print(p)
-
       p <- DESeq2::plotPCA(x.sub, intgroup = level) +
         ggtitle(paste0("DEGs - ", labs[ind], " - ", comp)) + theme_classic() +
         theme(aspect.ratio=1)
       print(p)
 
       if (!identical(plot.annos, level)) {
-        p <- DESeq2::plotPCA(x, intgroup = plot.annos) +
-          ggtitle(paste0("DEGs - ", labs[ind], " - ", comp)) + theme_classic() +
-          theme(aspect.ratio=1)
-        print(p)
-
         p <- DESeq2::plotPCA(x.sub, intgroup = plot.annos) +
           ggtitle(paste0("DEGs - ", labs[ind], " - ", comp)) + theme_classic() +
           theme(aspect.ratio=1)
