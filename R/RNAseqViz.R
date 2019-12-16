@@ -168,7 +168,8 @@ PlotRNACombinedHeatmaps <- function(res.list, rld, vsd, outpath,
 
     # Save counts tables.
     write.table(heat, file = paste0(outpath, "/Heatmaps/AllComparisons.padj.", 
-      padj.thresh, ".log2fc.", fc.thresh, ".", labs[ind], ".Heatmaps.txt"))
+      padj.thresh, ".log2fc.", fc.thresh, ".", labs[ind], ".Heatmaps.txt"), 
+      quote = FALSE, sep = "\t")
 
     ind <- ind + 1
   }
