@@ -3,8 +3,8 @@ title: Analyzing ChIP-seq data
 author:
 - name: Jared Andrews
   email: jared.andrews07@gmail.com
-  affiliation: Washington University School of Medicine, Department of Laboratory and Genomic Medicine
-date: "Revised: November 26th, 2019"
+  affiliation: Washington University School of Medicine, Department of Pathology and Immunology
+date: "Revised: February 25th, 2020"
 output:
   BiocStyle::html_document:
     toc_float: true
@@ -21,11 +21,13 @@ library(BiocStyle)
 
 # Introduction
 
-This vignette walks through ChIP-seq analysis of the B cell lymphoma ChIP-seq data included in the future Andrews et al. (2019, your favorite journal with an impact factor > 30) paper.
+This vignette walks through ChIP-seq analysis of the B cell lymphoma ChIP-seq data included in the future Andrews et al. paper.
 It uses the convenience functions included in this [package](https://github.com/j-andrews7/OneLinerOmics) to streamline the process.
 
 Several command line tools as well as python are also utilized - each code block should indicate whether it is `bash`, `R`, or `python` code. 
 If your system is set up properly, you can still [run _many of_ these code chunks in Rmarkdown files within RStudio](https://bookdown.org/yihui/rmarkdown/language-engines.html), assuming you have all of the software installed.
+
+All data used here is available in [GSE145841](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE145841).
 
 Some of this code is best ran on a computing cluster, as it takes a significant amount of time locally.
 Such instances will have `- cluster` appended to the language statement at the beginning of the code block.
@@ -36,7 +38,7 @@ Required Software:
 * python (ideally one [conda environment](https://docs.conda.io/projects/conda/en/latest/index.html) with python2.7, another with python3) 
 * [ROSE](https://bitbucket.org/young_computation/rose/src/master/)
 * [samtools](http://www.htslib.org/download/)
-* [bedtools](https://bedtools.readthedocs.io/en/latest/)
+* [bedtools2](https://bedtools.readthedocs.io/en/latest/)
 * [MACS](https://github.com/taoliu/MACS) - I used v2.1.0.20150420 but more recent ones are available now.
 * [kentUtils](https://github.com/ucscGenomeBrowser/kent)
 * [bowtie2](http://bowtie-bio.sourceforge.net/bowtie2/index.shtml)
@@ -49,7 +51,7 @@ That is, if you ask me one of the following questions and haven't read/tried the
   * Read the [bowtie2 manual](http://bowtie-bio.sourceforge.net/bowtie2/manual.shtml).
   
 * "Why do I have so few peaks after peakcalling?"
-  * Your data is probably garbage. This can be confirmed visually in a genome browser (no clear peaks == garbage) or by viewing the fraction of reads in peaks/cross-correlation values during QC. You can play with the `-m` and `-q` parameters for MACS2 to adjust the sensitivity, but usually it just means your IP didn't work all that well.
+  * Your data is probably low quality. This can be confirmed visually in a genome browser (no clear peaks == bad) or by viewing the fraction of reads in peaks/cross-correlation values during QC. You can play with the `-m` and `-q` parameters for MACS2 to adjust the sensitivity, but usually it just means your IP didn't work all that well.
   
 * "Why won't ROSE work?"
   * Do you have R, samtools, and python 2.7 installed?
@@ -58,7 +60,7 @@ That is, if you ask me one of the following questions and haven't read/tried the
 * "What are these `mcfork` errors about from ChIPQC/DiffBind?"
   * Parallelization failure, especially if you're on Windows/WSL. Running `register(SerialParam())` will usually fix this.
   
-* "Your paths don't make any sense! Are you some sorta dingus?"
+* "Your paths don't make any sense!"
   * Well, yeah, but much of the alignment, peak calling, etc., code is copy-pasted with minor editing merely to demonstrate the process and serve as a record for which parameters were used. It may require a smidgen of effort to adapt to your directory structure. The main purpose of this vignette is to show how the package works, which should be much more clear.
 
 ## Alignment, Indexing, and Blacklisted Read Removal
@@ -417,29 +419,23 @@ bedtools merge ./ChIP_Seq/DiffBind/MergedPeaks/All.Peaks.bed > ./ChIP_Seq/DiffBi
 
 Then I edited my sample sheets to use the merged peakset for all samples.
 
-```{r preview_sheet}
-# R
-# Basic sample sheet.
-samples <- read.table("./ChIP_Seq/DiffBind/MergedPeaks/H3AC/SampleSheet_H3AC_DiffBind.csv", header=TRUE, sep = ",")
-head(samples, 10)
-```
-
 
 ### Running DiffBind on a Merged, Consensus Peakset
 Now the analysis can be run again using the new samplesheets to generate results for the same peaks across all marks.
 
-```{r DiffBind_rerun, error=TRUE, message=TRUE, warning=TRUE}
+```{r DiffBind_rerun, error=TRUE, message=FALSE, warning=FALSE}
 # R
 
-ses <- RunDiffBind(outpath = "./ChIP_Seq/DiffBind/H3K27AC_SE/AllComparisons",
-                   samplesheet = "./ChIP_Seq/DiffBind/H3K27AC_SE/SampleSheet_H3K27AC_DiffBind_SEs.csv", 
-                   txdb = txdb, 
-                   level = "Tissue", 
-                   fdr.thresh = c(0.05, 0.01),
-                   fc.thresh = c(0.5, 1, 2),
-                   heatmap.preset = "BrTe",
-                   scale.full = FALSE)
-
+# Using the consensus SEs for H3ac, FAIRE, and H3K4me1 as well, as I want to be able to show signal correlation.
+ses_k27 <- RunDiffBind(outpath = "./ChIP_Seq/DiffBind/H3K27AC_SE/AllComparisons",
+                    samplesheet = "./ChIP_Seq/DiffBind/H3K27AC_SE/SampleSheet_H3K27AC_DiffBind_SEs.csv", 
+                    txdb = txdb, 
+                    level = "Tissue", 
+                    fdr.thresh = c(0.05, 0.01),
+                    fc.thresh = c(0.5, 1, 2),
+                    heatmap.preset = "BrTe",
+                    scale.full = FALSE)
+ 
 h3ac <- RunDiffBind(outpath = "./ChIP_Seq/DiffBind/MergedPeaks/H3AC/AllComparisons",
                    samplesheet = "./ChIP_Seq/DiffBind/MergedPeaks/H3AC/SampleSheet_H3AC_DiffBind.csv", 
                    txdb = txdb,
@@ -451,6 +447,7 @@ h3ac <- RunDiffBind(outpath = "./ChIP_Seq/DiffBind/MergedPeaks/H3AC/AllCompariso
                    heatmap.preset = "OrPu",
                    scale.full = FALSE,
                    flank.anno = FALSE)
+
 faire <- RunDiffBind(outpath = "./ChIP_Seq/DiffBind/MergedPeaks/FAIRE/AllComparisons",
                    samplesheet = "./ChIP_Seq/DiffBind/MergedPeaks/FAIRE/SampleSheet_FAIRE_DiffBind.csv", 
                    txdb = txdb,
@@ -462,6 +459,7 @@ faire <- RunDiffBind(outpath = "./ChIP_Seq/DiffBind/MergedPeaks/FAIRE/AllCompari
                    heatmap.preset = "PuGr",
                    scale.full = FALSE,
                    flank.anno = FALSE)
+
 h3k4me1 <- RunDiffBind(outpath = "./ChIP_Seq/DiffBind/MergedPeaks/H3K4ME1/AllComparisons",
                    samplesheet = "./ChIP_Seq/DiffBind/MergedPeaks/H3K4ME1/SampleSheet_H3K4ME1_DiffBind.csv", 
                    txdb = txdb,
@@ -473,6 +471,7 @@ h3k4me1 <- RunDiffBind(outpath = "./ChIP_Seq/DiffBind/MergedPeaks/H3K4ME1/AllCom
                    heatmap.preset = "BuOr",
                    scale.full = FALSE,
                    flank.anno = FALSE)
+
 h3k27ac <- RunDiffBind(outpath = "./ChIP_Seq/DiffBind/MergedPeaks/H3K27AC/AllComparisons",
                    samplesheet = "./ChIP_Seq/DiffBind/MergedPeaks/H3K27AC/SampleSheet_H3K27AC_DiffBind.csv", 
                    txdb = txdb,
@@ -487,14 +486,15 @@ h3k27ac <- RunDiffBind(outpath = "./ChIP_Seq/DiffBind/MergedPeaks/H3K27AC/AllCom
 ```
 
 
-I also want to run another comparison (CANCER v NORMAL), so I will set that up as well.
+I also want to run another comparison (BCL v Tonsils), so I will set that up as well.
 
-```{r DiffBind_cancernormal}
+```{r DiffBind_cancernormal, echo=FALSE, message=FALSE}
 # R
-ses <- RunDiffBind(outpath = "./ChIP_Seq/DiffBind/H3K27AC_SE/CANCERvNORMAL",
+
+# Using the consensus SEs for H3ac, FAIRE, and H3K4me1 as well, as I want to be able to show signal correlation.
+ses_k27 <- RunDiffBind(outpath = "./ChIP_Seq/DiffBind/H3K27AC_SE/BCLvTonsil",
                    samplesheet = "./ChIP_Seq/DiffBind/H3K27AC_SE/SampleSheet_H3K27AC_DiffBind_SEs.csv", 
                    txdb = txdb, 
-                   dba = ses,
                    level = "Condition", 
                    fdr.thresh = c(0.05, 0.01),
                    fc.thresh = c(0.5, 1, 2),
@@ -513,6 +513,7 @@ h3ac <- RunDiffBind(outpath = "./ChIP_Seq/DiffBind/MergedPeaks/H3AC/CANCERvNORMA
                    heatmap.preset = "OrPu",
                    scale.full = FALSE,
                    flank.anno = FALSE)
+
 faire <- RunDiffBind(outpath = "./ChIP_Seq/DiffBind/MergedPeaks/FAIRE/CANCERvNORMAL",
                    samplesheet = "./ChIP_Seq/DiffBind/MergedPeaks/FAIRE/SampleSheet_FAIRE_DiffBind.csv", 
                    txdb = txdb,
@@ -525,6 +526,7 @@ faire <- RunDiffBind(outpath = "./ChIP_Seq/DiffBind/MergedPeaks/FAIRE/CANCERvNOR
                    heatmap.preset = "PuGr",
                    scale.full = FALSE,
                    flank.anno = FALSE)
+
 h3k4me1 <- RunDiffBind(outpath = "./ChIP_Seq/DiffBind/MergedPeaks/H3K4ME1/CANCERvNORMAL",
                    samplesheet = "./ChIP_Seq/DiffBind/MergedPeaks/H3K4ME1/SampleSheet_H3K4ME1_DiffBind.csv", 
                    txdb = txdb,
@@ -537,6 +539,7 @@ h3k4me1 <- RunDiffBind(outpath = "./ChIP_Seq/DiffBind/MergedPeaks/H3K4ME1/CANCER
                    heatmap.preset = "BuOr",
                    scale.full = FALSE,
                    flank.anno = FALSE)
+
 h3k27ac <- RunDiffBind(outpath = "./ChIP_Seq/DiffBind/MergedPeaks/H3K27AC/CANCERvNORMAL",
                    samplesheet = "./ChIP_Seq/DiffBind/MergedPeaks/H3K27AC/SampleSheet_H3K27AC_DiffBind.csv", 
                    txdb = txdb,

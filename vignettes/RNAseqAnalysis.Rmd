@@ -3,8 +3,8 @@ title: Analyzing RNA-seq data
 author:
 - name: Jared Andrews
   email: jared.andrews07@gmail.com
-  affiliation: Washington University School of Medicine, Department of Laboratory and Genomic Medicine
-date: "Revised: December 12th, 2019"
+  affiliation: Washington University School of Medicine, Department of Pathology and Immunology
+date: "Revised: February 25th, 2020"
 output:
   BiocStyle::html_document:
     toc_float: true
@@ -21,11 +21,13 @@ library(BiocStyle)
 
 # Introduction
 
-This vignette walks through analysis of the B cell lymphoma RNA-seq data included in the future Andrews et al. (2019, your favorite journal with an impact factor > 30) paper.
+This vignette walks through analysis of the B cell lymphoma RNA-seq data included in the future Andrews et al. paper.
 It uses the convenience functions included in this [package](https://github.com/j-andrews7/AndrewsBCellLymphoma) to streamline the process.
 
 Several command line tools as well as python are also utilized - each code block should indicate whether it is `bash`, `R`, or `python` code. 
 If your system is set up properly, you can still [run these code chunks in Rmarkdown files within RStudio](https://bookdown.org/yihui/rmarkdown/language-engines.html), assuming you have all of the software installed.
+
+The large majority of this vignette can be skipped if you want, the raw gene counts (or FASTQs if you want the whole shebang) is available in [GSE145842](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE145842). That accession also contains a table with the normalized gene counts as output from DESeq2, if you just want to spot-check your gene of interest in this dataset.
 
 Required Software:
 
@@ -44,7 +46,7 @@ That is, if you ask me a question and haven't read these first, I'm going to tel
 
 ## Generating gene counts
 
-Going the `salmon` -> `DESeq2` route. This requires R, salmon v0.14, and DESeq2 (along with a few other packages). Using hg19, cause forget re-aligning all the ChIP-seq and making new tracks. `salmon` needs `mashmap` and `bedtools` as well if generating "decoy-aware" transcriptomes. The Google can show you how to install those.
+I prefer the `salmon` -> `DESeq2` route, as it's fast and accurate. This requires R, salmon v0.14, and DESeq2 (along with a few other packages). `salmon` needs `mashmap` and `bedtools` as well if generating "decoy-aware" transcriptomes. The Google can show you how to install those.
 
 ### Create decoy reference transcriptome
 
@@ -52,7 +54,9 @@ Newer versions of salmon recommend using a *decoy-aware* transcriptome to genera
 
 > **This had to be run on a cluster with 128 GB RAM. If you can avoid this step by using their pre-generated decoys, I recommend doing so.**
 
-My data is already in folders and all, so some of the paths are kinda inefficient, but I really don't care. This is needed to create the index for `salmon`. Using GENCODE v31 annotations/sequences that have been mapped back to GRCh37 (hg19).
+You will likely have a different directory stucture, so paths will have to be edited as appropriate. 
+
+First, we'll download all the annotation info and sequence data we need.
 
 ```{bash dl-annotations, eval=FALSE}
 # bash
@@ -100,7 +104,7 @@ salmon index -t ./RNA_Seq/ref/decoys/gentrome.fa -i ./RNA_Seq/ref/gencodev31_grc
 ```
 
 ### Quantify
-Actually generate the gene counts now. 
+Actually generate the gene counts with `salmon` now. 
 
 ```{bash salmon-quant, eval=FALSE}
 # bash
@@ -149,8 +153,6 @@ for f in ./RNA_Seq/quants/*; do
 done
 ```
 
-
-
 ## Analysis with R
 
 Install this package if you haven't already with `devtools::install_github("j-andrews7/AndrewsBCellLymphoma")`. If you don't have `devtools`, it can be installed with `install.packages("devtools")`.
@@ -160,52 +162,25 @@ Install this package if you haven't already with `devtools::install_github("j-an
 suppressPackageStartupMessages(library(OneLinerOmics))
 ```
 
-The only thing you need now is a sample sheet, which is just a table with sample names and metadata columns. We can take a peek at the sample sheet I'm using so he can see how they're constructed. It can include as many metadata columns as you'd like.
+The only thing you need now is a sample sheet, which is just a table with sample names and metadata columns. It can include as many metadata columns as you'd like.
 
-```{r samplesheet, eval=FALSE}
-# R
-# Basic sample sheet.
-samples <- read.table("./RNA_Seq/Samples.pairedCLL.txt", header=TRUE, sep = "\t")
-head(samples, 10)
-```
 
 ### Run DESeq2
 
-DESeq2 is a very popular R package for performing differential expression analysis. Raw RNA-seq counts follow a negative binomial distribution, which is how DESeq2 models the data. It is quick, flexible, and generally works quite well with little to no parameter tweaking. It can also help to mitigate the technical or batch effects on the analysis, a feature which we'll take advantage of here. 
+DESeq2 is a very popular R package for performing differential expression analysis. Raw RNA-seq counts follow a negative binomial distribution, which is how DESeq2 models the data. It is quick, flexible, and generally works quite well with little to no parameter tweaking. It can also help to mitigate the technical or batch effects on the analysis.
 
-Most of these samples are 150 bp, paired-end sequencing (as shown in the 'lib' column of the sample sheet). A handful are 50 bp, single-end sequencing, which introduces a significant confounding factor to the analysis. In our model design, we'll specify that we want to ignore effects due to this technical difference (by setting `block = "lib"`). The model isn't magic, so we may very well still see evidence of the library-prep differences regardless, as they are quite strong.
 
 ```{r run-deseq2, eval=FALSE}
 # R
-can.v.norm.paired <- RunDESeq2(outpath = "./RNA_Seq/Final_Analyses/Cancer.v.Normal", quants.path = "./RNA_Seq/quants", 
-          samplesheet = "./RNA_Seq/Samples.pairedCLL.txt", tx2gene = "./RNA_Seq/ref/tx2gene.txt",
+bcl.v.tonsils <- RunDESeq2(outpath = "./RNA_Seq/Final_Analyses/BCL.v.Tonsils", quants.path = "./RNA_Seq/quants", 
+          samplesheet = "./RNA_Seq/Samples.txt", tx2gene = "./RNA_Seq/ref/tx2gene.txt",
           level = "status", padj.thresh = c(0.05, 0.01, 0.001), plot.box = TRUE,
           plot.annos = c("disease", "disease.sub", "status"), count.filt = 50)
 
-paired.cll <- RunDESeq2(outpath = "./RNA_Seq/Final_Analyses/pairedCLL", quants.path = "./RNA_Seq/quants", 
-          samplesheet = "./RNA_Seq/Samples.pairedCLL.txt", tx2gene = "./RNA_Seq/ref/tx2gene.txt",
+subtypes.v.tonsils <- RunDESeq2(outpath = "./RNA_Seq/Final_Analyses/Subtypes.v.Tonsils", quants.path = "./RNA_Seq/quants", 
+          samplesheet = "./RNA_Seq/Samples.txt", tx2gene = "./RNA_Seq/ref/tx2gene.txt",
           level = "disease", padj.thresh = c(0.05, 0.01, 0.001), plot.box = FALSE,
           plot.annos = c("disease", "disease.sub", "status"), count.filt = 50)
-
-can.v.norm.all <- RunDESeq2(outpath = "./RNA_Seq/Final_Analyses/Cancer.v.Normal.AllCLL", quants.path = "./RNA_Seq/quants", 
-          samplesheet = "./RNA_Seq/Samples.allCLL.txt", tx2gene = "./RNA_Seq/ref/tx2gene.txt",
-          level = "status", padj.thresh = c(0.05, 0.01, 0.001), plot.box = TRUE,
-          plot.annos = c("disease", "disease.sub", "status"), count.filt = 50)
-
-all.cll <- RunDESeq2(outpath = "./RNA_Seq/Final_Analyses/allCLL", quants.path = "./RNA_Seq/quants", 
-          samplesheet = "./RNA_Seq/Samples.allCLL.txt", tx2gene = "./RNA_Seq/ref/tx2gene.txt",
-          level = "disease", padj.thresh = c(0.05, 0.01, 0.001), plot.box = FALSE,
-          plot.annos = c("disease", "disease.sub", "status"), count.filt = 50)
-
-can.v.norm.all.bl <- RunDESeq2(outpath = "./RNA_Seq/Final_Analyses/Cancer.v.Normal.AllCLL", quants.path = "./RNA_Seq/quants", 
-          samplesheet = "./RNA_Seq/Samples.allCLL.txt", tx2gene = "./RNA_Seq/ref/tx2gene.txt",
-          level = "status", padj.thresh = c(0.05, 0.01, 0.001), plot.box = TRUE,
-          plot.annos = c("disease", "disease.sub", "status"), count.filt = 50, block = "lib")
-
-all.cll.bl <- RunDESeq2(outpath = "./RNA_Seq/Final_Analyses/allCLL", quants.path = "./RNA_Seq/quants", 
-          samplesheet = "./RNA_Seq/Samples.allCLL.txt", tx2gene = "./RNA_Seq/ref/tx2gene.txt",
-          level = "disease", padj.thresh = c(0.05, 0.01, 0.001), plot.box = FALSE,
-          plot.annos = c("disease", "disease.sub", "status"), count.filt = 50, block = "lib")
 ```
 
 ### Next Steps
