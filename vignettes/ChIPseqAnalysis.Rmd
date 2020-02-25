@@ -328,10 +328,10 @@ High peak agreement will lead to a less severe drop-off.
 ### Remove poor quality samples
 
 Kick 'em off the sample sheets. I removed samples with the following metrics:
- * FAIRE - <3.5% Reads in Peaks
- * H3AC - <10% Reads in Peaks
- * H3K4ME1 - <9.5% Reads in Peaks
- * H3K27AC - <6.5% Reads in Peaks
+ * FAIRE - <2.5% Reads in Peaks
+ * H3AC - <8.5% Reads in Peaks
+ * H3K4ME1 - <7.5% Reads in Peaks
+ * H3K27AC - <4.5% Reads in Peaks
  
 Picked rather arbitrarily, but generally want at least 2-3x the typical RiP of the input samples.
 
