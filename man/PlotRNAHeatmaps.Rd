@@ -4,8 +4,16 @@
 \alias{PlotRNAHeatmaps}
 \title{Generate per comparison DEG heatmaps for a list of DESeq2 results}
 \usage{
-PlotRNAHeatmaps(res.list, rld, vsd, level, outpath, padj.thresh, fc.thresh,
-  plot.annos)
+PlotRNAHeatmaps(
+  res.list,
+  rld,
+  vsd,
+  level,
+  outpath,
+  padj.thresh,
+  fc.thresh,
+  plot.annos
+)
 }
 \arguments{
 \item{res.list}{Named List containing \linkS4class{DESeqResults} objects for 

@@ -4,15 +4,26 @@
 \alias{ProcessDBRs}
 \title{Extract, visualize, and save DBRs}
 \usage{
-ProcessDBRs(results, outpath, txdb, fdr.thresh = 0.05, fc.thresh = 1,
-  method = NULL, promoters = c(-2000, 2000), breaks = c(seq(-3,
-  -1.0001, length = 250), seq(-1, -0.1, length = 250), seq(-0.0999, 0.0999,
-  length = 1), seq(0.1, 1, length = 250), seq(1.0001, 3, length = 250)),
-  heatmap.colors = NULL, heatmap.preset = NULL, reverse = FALSE,
-  plot.enrich = TRUE, enrich.libs = c("GO_Molecular_Function_2018",
-  "GO_Cellular_Component_2018", "GO_Biological_Process_2018",
-  "KEGG_2019_Human", "Reactome_2016", "BioCarta_2016", "Panther_2016"),
-  flank.anno = TRUE, flank.dist = 5000)
+ProcessDBRs(
+  results,
+  outpath,
+  txdb,
+  fdr.thresh = 0.05,
+  fc.thresh = 1,
+  method = NULL,
+  promoters = c(-2000, 2000),
+  breaks = c(seq(-3, -1.0001, length = 250), seq(-1, -0.1, length = 250), seq(-0.0999,
+    0.0999, length = 1), seq(0.1, 1, length = 250), seq(1.0001, 3, length = 250)),
+  heatmap.colors = NULL,
+  heatmap.preset = NULL,
+  reverse = FALSE,
+  plot.enrich = TRUE,
+  enrich.libs = c("GO_Molecular_Function_2018", "GO_Cellular_Component_2018",
+    "GO_Biological_Process_2018", "KEGG_2019_Human", "Reactome_2016", "BioCarta_2016",
+    "Panther_2016"),
+  flank.anno = TRUE,
+  flank.dist = 5000
+)
 }
 \arguments{
 \item{results}{\code{DBA} object as returned by 

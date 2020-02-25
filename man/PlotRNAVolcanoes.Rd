@@ -4,8 +4,15 @@
 \alias{PlotRNAVolcanoes}
 \title{Create volcano plots from a list of DESeq2 Results objects}
 \usage{
-PlotRNAVolcanoes(res.list, dds, outpath, padj.thresh, fc.thresh,
-  n.labels = 10, use.labels = TRUE)
+PlotRNAVolcanoes(
+  res.list,
+  dds,
+  outpath,
+  padj.thresh,
+  fc.thresh,
+  n.labels = 10,
+  use.labels = TRUE
+)
 }
 \arguments{
 \item{res.list}{Named List containing \linkS4class{DESeqResults} objects for 

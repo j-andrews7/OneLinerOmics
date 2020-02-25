@@ -4,8 +4,16 @@
 \alias{PlotChIPHeatmaps}
 \title{Plot ChIP heatmaps}
 \usage{
-PlotChIPHeatmaps(results, outpath, method, breaks, colors,
-  fdr.thresh = 1, fc.thresh = 0, consensus = TRUE)
+PlotChIPHeatmaps(
+  results,
+  outpath,
+  method,
+  breaks,
+  colors,
+  fdr.thresh = 1,
+  fc.thresh = 0,
+  consensus = TRUE
+)
 }
 \arguments{
 \item{results}{\code{DBA} object as returned by 

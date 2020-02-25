@@ -4,9 +4,18 @@
 \alias{SaveResults}
 \title{Save results}
 \usage{
-SaveResults(results, outpath, dds = NULL, chip = FALSE,
-  method = NULL, promoters = NULL, se = NULL, txdb = NULL,
-  flank.anno = FALSE, flank.dist = 5000)
+SaveResults(
+  results,
+  outpath,
+  dds = NULL,
+  chip = FALSE,
+  method = NULL,
+  promoters = NULL,
+  se = NULL,
+  txdb = NULL,
+  flank.anno = FALSE,
+  flank.dist = 5000
+)
 }
 \arguments{
 \item{results}{Either:

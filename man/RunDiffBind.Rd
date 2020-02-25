@@ -4,18 +4,32 @@
 \alias{RunDiffBind}
 \title{Run DiffBind analysis on a samplesheet}
 \usage{
-RunDiffBind(outpath, samplesheet, txdb, dba = NULL,
-  level = c("Treatment", "Condition", "Tissue", "Factor"), se = NULL,
-  fdr.thresh = 0.05, fc.thresh = 2, block = NULL,
-  heatmap.colors = NULL, heatmap.preset = NULL, reverse = FALSE,
-  n.consensus = 2, breaks = c(seq(-3, -1.0001, length = 250), seq(-1,
-  -0.1, length = 250), seq(-0.0999, 0.0999, length = 1), seq(0.1, 1, length
-  = 250), seq(1.0001, 3, length = 250)), plot.enrich = TRUE,
-  enrich.libs = c("GO_Molecular_Function_2018",
-  "GO_Cellular_Component_2018", "GO_Biological_Process_2018",
-  "KEGG_2019_Human", "Reactome_2016", "BioCarta_2016", "Panther_2016"),
-  promoters = c(-2000, 2000), method = c("DESeq2", "edgeR"),
-  scale.full = TRUE, flank.anno = TRUE, flank.dist = 5000)
+RunDiffBind(
+  outpath,
+  samplesheet,
+  txdb,
+  dba = NULL,
+  level = c("Treatment", "Condition", "Tissue", "Factor"),
+  se = NULL,
+  fdr.thresh = 0.05,
+  fc.thresh = 2,
+  block = NULL,
+  heatmap.colors = NULL,
+  heatmap.preset = NULL,
+  reverse = FALSE,
+  n.consensus = 2,
+  breaks = c(seq(-3, -1.0001, length = 250), seq(-1, -0.1, length = 250), seq(-0.0999,
+    0.0999, length = 1), seq(0.1, 1, length = 250), seq(1.0001, 3, length = 250)),
+  plot.enrich = TRUE,
+  enrich.libs = c("GO_Molecular_Function_2018", "GO_Cellular_Component_2018",
+    "GO_Biological_Process_2018", "KEGG_2019_Human", "Reactome_2016", "BioCarta_2016",
+    "Panther_2016"),
+  promoters = c(-2000, 2000),
+  method = c("DESeq2", "edgeR"),
+  scale.full = TRUE,
+  flank.anno = TRUE,
+  flank.dist = 5000
+)
 }
 \arguments{
 \item{outpath}{Path to directory to be used for output. Additional 
@@ -118,7 +132,7 @@ need to be with their data.
 Providing the resulting DBA object as input to this function can be useful 
 when running multiple times with different \code{level}s and \code{block}s 
 or thresholds, as it skips bam loading, which is by far the most 
-time-intensive part.
+time-intensive part. 
 
 It's generally best to provide an empty directory as the output path, as
 several directories will be generated.

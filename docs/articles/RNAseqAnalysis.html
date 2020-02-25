@@ -85,10 +85,10 @@
       <h1>Analyzing RNA-seq data</h1>
                         <h4 class="author">Jared Andrews</h4>
             <address class="author_afil">
-      Washington University School of Medicine, Department of Laboratory and Genomic Medicine<br><a class="author_email" href="mailto:#"></a><a href="mailto:jared.andrews07@gmail.com" class="email">jared.andrews07@gmail.com</a>
+      Washington University School of Medicine, Department of Pathology and Immunology<br><a class="author_email" href="mailto:#"></a><a href="mailto:jared.andrews07@gmail.com" class="email">jared.andrews07@gmail.com</a>
       </address>
                   
-            <h4 class="date">Revised: December 12th, 2019</h4>
+            <h4 class="date">Revised: February 25th, 2020</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/j-andrews7/OneLinerOmics/blob/master/vignettes/RNAseqAnalysis.Rmd"><code>vignettes/RNAseqAnalysis.Rmd</code></a></small>
       <div class="hidden name"><code>RNAseqAnalysis.Rmd</code></div>
@@ -100,8 +100,9 @@
 <div id="introduction" class="section level1">
 <h1 class="hasAnchor">
 <a href="#introduction" class="anchor"></a>Introduction</h1>
-<p>This vignette walks through analysis of the B cell lymphoma RNA-seq data included in the future Andrews et al. (2019, your favorite journal with an impact factor &gt; 30) paper. It uses the convenience functions included in this <a href="https://github.com/j-andrews7/AndrewsBCellLymphoma">package</a> to streamline the process.</p>
+<p>This vignette walks through analysis of the B cell lymphoma RNA-seq data included in the future Andrews et al. paper. It uses the convenience functions included in this <a href="https://github.com/j-andrews7/AndrewsBCellLymphoma">package</a> to streamline the process.</p>
 <p>Several command line tools as well as python are also utilized - each code block should indicate whether it is <code>bash</code>, <code>R</code>, or <code>python</code> code. If your system is set up properly, you can still <a href="https://bookdown.org/yihui/rmarkdown/language-engines.html">run these code chunks in Rmarkdown files within RStudio</a>, assuming you have all of the software installed.</p>
+<p>The large majority of this vignette can be skipped if you want, the raw gene counts (or FASTQs if you want the whole shebang) is available in <a href="https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE145842">GSE145842</a>. That accession also contains a table with the normalized gene counts as output from DESeq2, if you just want to spot-check your gene of interest in this dataset.</p>
 <p>Required Software:</p>
 <ul>
 <li>R (3.6+)</li>
@@ -124,7 +125,7 @@
 <div id="generating-gene-counts" class="section level2">
 <h2 class="hasAnchor">
 <a href="#generating-gene-counts" class="anchor"></a>Generating gene counts</h2>
-<p>Going the <code>salmon</code> -&gt; <code>DESeq2</code> route. This requires R, salmon v0.14, and DESeq2 (along with a few other packages). Using hg19, cause forget re-aligning all the ChIP-seq and making new tracks. <code>salmon</code> needs <code>mashmap</code> and <code>bedtools</code> as well if generating “decoy-aware” transcriptomes. The Google can show you how to install those.</p>
+<p>I prefer the <code>salmon</code> -&gt; <code>DESeq2</code> route, as it’s fast and accurate. This requires R, salmon v0.14, and DESeq2 (along with a few other packages). <code>salmon</code> needs <code>mashmap</code> and <code>bedtools</code> as well if generating “decoy-aware” transcriptomes. The Google can show you how to install those.</p>
 <div id="create-decoy-reference-transcriptome" class="section level3">
 <h3 class="hasAnchor">
 <a href="#create-decoy-reference-transcriptome" class="anchor"></a>Create decoy reference transcriptome</h3>
@@ -132,7 +133,8 @@
 <blockquote>
 <p><strong>This had to be run on a cluster with 128 GB RAM. If you can avoid this step by using their pre-generated decoys, I recommend doing so.</strong></p>
 </blockquote>
-<p>My data is already in folders and all, so some of the paths are kinda inefficient, but I really don’t care. This is needed to create the index for <code>salmon</code>. Using GENCODE v31 annotations/sequences that have been mapped back to GRCh37 (hg19).</p>
+<p>You will likely have a different directory stucture, so paths will have to be edited as appropriate.</p>
+<p>First, we’ll download all the annotation info and sequence data we need.</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb1-1" title="1"><span class="co"># bash</span></a>
 <a class="sourceLine" id="cb1-2" title="2"><span class="fu">mkdir</span> -p RNA_seq/ref</a>
 <a class="sourceLine" id="cb1-3" title="3"></a>
@@ -169,7 +171,7 @@
 <div id="quantify" class="section level3">
 <h3 class="hasAnchor">
 <a href="#quantify" class="anchor"></a>Quantify</h3>
-<p>Actually generate the gene counts now.</p>
+<p>Actually generate the gene counts with <code>salmon</code> now.</p>
 <div class="sourceCode" id="cb5"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb5-1" title="1"><span class="co"># bash</span></a>
 <a class="sourceLine" id="cb5-2" title="2"><span class="kw"><a href="https://rdrr.io/r/base/Control.html">for</a></span> <span class="ex">f</span> in ./RNA_Seq/FASTQs/*<span class="kw">;</span> <span class="kw">do</span></a>
 <a class="sourceLine" id="cb5-3" title="3">    <span class="va">samp=</span><span class="st">"</span><span class="va">${f##</span>*/<span class="va">}</span><span class="st">"</span></a>
@@ -217,46 +219,21 @@
 <p>Install this package if you haven’t already with <code><a href="https://rdrr.io/pkg/devtools/man/remote-reexports.html">devtools::install_github("j-andrews7/AndrewsBCellLymphoma")</a></code>. If you don’t have <code>devtools</code>, it can be installed with <code><a href="https://rdrr.io/r/utils/install.packages.html">install.packages("devtools")</a></code>.</p>
 <div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb8-1" title="1"><span class="co"># R</span></a>
 <a class="sourceLine" id="cb8-2" title="2"><span class="kw"><a href="https://rdrr.io/r/base/message.html">suppressPackageStartupMessages</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span>(OneLinerOmics))</a></code></pre></div>
-<p>The only thing you need now is a sample sheet, which is just a table with sample names and metadata columns. We can take a peek at the sample sheet I’m using so he can see how they’re constructed. It can include as many metadata columns as you’d like.</p>
-<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb9-1" title="1"><span class="co"># R</span></a>
-<a class="sourceLine" id="cb9-2" title="2"><span class="co"># Basic sample sheet.</span></a>
-<a class="sourceLine" id="cb9-3" title="3">samples &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/utils/read.table.html">read.table</a></span>(<span class="st">"./RNA_Seq/Samples.pairedCLL.txt"</span>, <span class="dt">header=</span><span class="ot">TRUE</span>, <span class="dt">sep =</span> <span class="st">"</span><span class="ch">\t</span><span class="st">"</span>)</a>
-<a class="sourceLine" id="cb9-4" title="4"><span class="kw"><a href="https://rdrr.io/r/utils/head.html">head</a></span>(samples, <span class="dv">10</span>)</a></code></pre></div>
+<p>The only thing you need now is a sample sheet, which is just a table with sample names and metadata columns. It can include as many metadata columns as you’d like.</p>
 <div id="run-deseq2" class="section level3">
 <h3 class="hasAnchor">
 <a href="#run-deseq2" class="anchor"></a>Run DESeq2</h3>
-<p>DESeq2 is a very popular R package for performing differential expression analysis. Raw RNA-seq counts follow a negative binomial distribution, which is how DESeq2 models the data. It is quick, flexible, and generally works quite well with little to no parameter tweaking. It can also help to mitigate the technical or batch effects on the analysis, a feature which we’ll take advantage of here.</p>
-<p>Most of these samples are 150 bp, paired-end sequencing (as shown in the ‘lib’ column of the sample sheet). A handful are 50 bp, single-end sequencing, which introduces a significant confounding factor to the analysis. In our model design, we’ll specify that we want to ignore effects due to this technical difference (by setting <code>block = "lib"</code>). The model isn’t magic, so we may very well still see evidence of the library-prep differences regardless, as they are quite strong.</p>
-<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb10-1" title="1"><span class="co"># R</span></a>
-<a class="sourceLine" id="cb10-2" title="2">can.v.norm.paired &lt;-<span class="st"> </span><span class="kw"><a href="../reference/RunDESeq2.html">RunDESeq2</a></span>(<span class="dt">outpath =</span> <span class="st">"./RNA_Seq/Final_Analyses/Cancer.v.Normal"</span>, <span class="dt">quants.path =</span> <span class="st">"./RNA_Seq/quants"</span>, </a>
-<a class="sourceLine" id="cb10-3" title="3">          <span class="dt">samplesheet =</span> <span class="st">"./RNA_Seq/Samples.pairedCLL.txt"</span>, <span class="dt">tx2gene =</span> <span class="st">"./RNA_Seq/ref/tx2gene.txt"</span>,</a>
-<a class="sourceLine" id="cb10-4" title="4">          <span class="dt">level =</span> <span class="st">"status"</span>, <span class="dt">padj.thresh =</span> <span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">0.05</span>, <span class="fl">0.01</span>, <span class="fl">0.001</span>), <span class="dt">plot.box =</span> <span class="ot">TRUE</span>,</a>
-<a class="sourceLine" id="cb10-5" title="5">          <span class="dt">plot.annos =</span> <span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"disease"</span>, <span class="st">"disease.sub"</span>, <span class="st">"status"</span>), <span class="dt">count.filt =</span> <span class="dv">50</span>)</a>
-<a class="sourceLine" id="cb10-6" title="6"></a>
-<a class="sourceLine" id="cb10-7" title="7">paired.cll &lt;-<span class="st"> </span><span class="kw"><a href="../reference/RunDESeq2.html">RunDESeq2</a></span>(<span class="dt">outpath =</span> <span class="st">"./RNA_Seq/Final_Analyses/pairedCLL"</span>, <span class="dt">quants.path =</span> <span class="st">"./RNA_Seq/quants"</span>, </a>
-<a class="sourceLine" id="cb10-8" title="8">          <span class="dt">samplesheet =</span> <span class="st">"./RNA_Seq/Samples.pairedCLL.txt"</span>, <span class="dt">tx2gene =</span> <span class="st">"./RNA_Seq/ref/tx2gene.txt"</span>,</a>
-<a class="sourceLine" id="cb10-9" title="9">          <span class="dt">level =</span> <span class="st">"disease"</span>, <span class="dt">padj.thresh =</span> <span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">0.05</span>, <span class="fl">0.01</span>, <span class="fl">0.001</span>), <span class="dt">plot.box =</span> <span class="ot">FALSE</span>,</a>
-<a class="sourceLine" id="cb10-10" title="10">          <span class="dt">plot.annos =</span> <span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"disease"</span>, <span class="st">"disease.sub"</span>, <span class="st">"status"</span>), <span class="dt">count.filt =</span> <span class="dv">50</span>)</a>
-<a class="sourceLine" id="cb10-11" title="11"></a>
-<a class="sourceLine" id="cb10-12" title="12">can.v.norm.all &lt;-<span class="st"> </span><span class="kw"><a href="../reference/RunDESeq2.html">RunDESeq2</a></span>(<span class="dt">outpath =</span> <span class="st">"./RNA_Seq/Final_Analyses/Cancer.v.Normal.AllCLL"</span>, <span class="dt">quants.path =</span> <span class="st">"./RNA_Seq/quants"</span>, </a>
-<a class="sourceLine" id="cb10-13" title="13">          <span class="dt">samplesheet =</span> <span class="st">"./RNA_Seq/Samples.allCLL.txt"</span>, <span class="dt">tx2gene =</span> <span class="st">"./RNA_Seq/ref/tx2gene.txt"</span>,</a>
-<a class="sourceLine" id="cb10-14" title="14">          <span class="dt">level =</span> <span class="st">"status"</span>, <span class="dt">padj.thresh =</span> <span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">0.05</span>, <span class="fl">0.01</span>, <span class="fl">0.001</span>), <span class="dt">plot.box =</span> <span class="ot">TRUE</span>,</a>
-<a class="sourceLine" id="cb10-15" title="15">          <span class="dt">plot.annos =</span> <span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"disease"</span>, <span class="st">"disease.sub"</span>, <span class="st">"status"</span>), <span class="dt">count.filt =</span> <span class="dv">50</span>)</a>
-<a class="sourceLine" id="cb10-16" title="16"></a>
-<a class="sourceLine" id="cb10-17" title="17">all.cll &lt;-<span class="st"> </span><span class="kw"><a href="../reference/RunDESeq2.html">RunDESeq2</a></span>(<span class="dt">outpath =</span> <span class="st">"./RNA_Seq/Final_Analyses/allCLL"</span>, <span class="dt">quants.path =</span> <span class="st">"./RNA_Seq/quants"</span>, </a>
-<a class="sourceLine" id="cb10-18" title="18">          <span class="dt">samplesheet =</span> <span class="st">"./RNA_Seq/Samples.allCLL.txt"</span>, <span class="dt">tx2gene =</span> <span class="st">"./RNA_Seq/ref/tx2gene.txt"</span>,</a>
-<a class="sourceLine" id="cb10-19" title="19">          <span class="dt">level =</span> <span class="st">"disease"</span>, <span class="dt">padj.thresh =</span> <span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">0.05</span>, <span class="fl">0.01</span>, <span class="fl">0.001</span>), <span class="dt">plot.box =</span> <span class="ot">FALSE</span>,</a>
-<a class="sourceLine" id="cb10-20" title="20">          <span class="dt">plot.annos =</span> <span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"disease"</span>, <span class="st">"disease.sub"</span>, <span class="st">"status"</span>), <span class="dt">count.filt =</span> <span class="dv">50</span>)</a>
-<a class="sourceLine" id="cb10-21" title="21"></a>
-<a class="sourceLine" id="cb10-22" title="22">can.v.norm.all.bl &lt;-<span class="st"> </span><span class="kw"><a href="../reference/RunDESeq2.html">RunDESeq2</a></span>(<span class="dt">outpath =</span> <span class="st">"./RNA_Seq/Final_Analyses/Cancer.v.Normal.AllCLL"</span>, <span class="dt">quants.path =</span> <span class="st">"./RNA_Seq/quants"</span>, </a>
-<a class="sourceLine" id="cb10-23" title="23">          <span class="dt">samplesheet =</span> <span class="st">"./RNA_Seq/Samples.allCLL.txt"</span>, <span class="dt">tx2gene =</span> <span class="st">"./RNA_Seq/ref/tx2gene.txt"</span>,</a>
-<a class="sourceLine" id="cb10-24" title="24">          <span class="dt">level =</span> <span class="st">"status"</span>, <span class="dt">padj.thresh =</span> <span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">0.05</span>, <span class="fl">0.01</span>, <span class="fl">0.001</span>), <span class="dt">plot.box =</span> <span class="ot">TRUE</span>,</a>
-<a class="sourceLine" id="cb10-25" title="25">          <span class="dt">plot.annos =</span> <span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"disease"</span>, <span class="st">"disease.sub"</span>, <span class="st">"status"</span>), <span class="dt">count.filt =</span> <span class="dv">50</span>, <span class="dt">block =</span> <span class="st">"lib"</span>)</a>
-<a class="sourceLine" id="cb10-26" title="26"></a>
-<a class="sourceLine" id="cb10-27" title="27">all.cll.bl &lt;-<span class="st"> </span><span class="kw"><a href="../reference/RunDESeq2.html">RunDESeq2</a></span>(<span class="dt">outpath =</span> <span class="st">"./RNA_Seq/Final_Analyses/allCLL"</span>, <span class="dt">quants.path =</span> <span class="st">"./RNA_Seq/quants"</span>, </a>
-<a class="sourceLine" id="cb10-28" title="28">          <span class="dt">samplesheet =</span> <span class="st">"./RNA_Seq/Samples.allCLL.txt"</span>, <span class="dt">tx2gene =</span> <span class="st">"./RNA_Seq/ref/tx2gene.txt"</span>,</a>
-<a class="sourceLine" id="cb10-29" title="29">          <span class="dt">level =</span> <span class="st">"disease"</span>, <span class="dt">padj.thresh =</span> <span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">0.05</span>, <span class="fl">0.01</span>, <span class="fl">0.001</span>), <span class="dt">plot.box =</span> <span class="ot">FALSE</span>,</a>
-<a class="sourceLine" id="cb10-30" title="30">          <span class="dt">plot.annos =</span> <span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"disease"</span>, <span class="st">"disease.sub"</span>, <span class="st">"status"</span>), <span class="dt">count.filt =</span> <span class="dv">50</span>, <span class="dt">block =</span> <span class="st">"lib"</span>)</a></code></pre></div>
+<p>DESeq2 is a very popular R package for performing differential expression analysis. Raw RNA-seq counts follow a negative binomial distribution, which is how DESeq2 models the data. It is quick, flexible, and generally works quite well with little to no parameter tweaking. It can also help to mitigate the technical or batch effects on the analysis.</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb9-1" title="1"><span class="co"># R</span></a>
+<a class="sourceLine" id="cb9-2" title="2">bcl.v.tonsils &lt;-<span class="st"> </span><span class="kw"><a href="../reference/RunDESeq2.html">RunDESeq2</a></span>(<span class="dt">outpath =</span> <span class="st">"./RNA_Seq/Final_Analyses/BCL.v.Tonsils"</span>, <span class="dt">quants.path =</span> <span class="st">"./RNA_Seq/quants"</span>, </a>
+<a class="sourceLine" id="cb9-3" title="3">          <span class="dt">samplesheet =</span> <span class="st">"./RNA_Seq/Samples.txt"</span>, <span class="dt">tx2gene =</span> <span class="st">"./RNA_Seq/ref/tx2gene.txt"</span>,</a>
+<a class="sourceLine" id="cb9-4" title="4">          <span class="dt">level =</span> <span class="st">"status"</span>, <span class="dt">padj.thresh =</span> <span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">0.05</span>, <span class="fl">0.01</span>, <span class="fl">0.001</span>), <span class="dt">plot.box =</span> <span class="ot">TRUE</span>,</a>
+<a class="sourceLine" id="cb9-5" title="5">          <span class="dt">plot.annos =</span> <span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"disease"</span>, <span class="st">"disease.sub"</span>, <span class="st">"status"</span>), <span class="dt">count.filt =</span> <span class="dv">50</span>)</a>
+<a class="sourceLine" id="cb9-6" title="6"></a>
+<a class="sourceLine" id="cb9-7" title="7">subtypes.v.tonsils &lt;-<span class="st"> </span><span class="kw"><a href="../reference/RunDESeq2.html">RunDESeq2</a></span>(<span class="dt">outpath =</span> <span class="st">"./RNA_Seq/Final_Analyses/Subtypes.v.Tonsils"</span>, <span class="dt">quants.path =</span> <span class="st">"./RNA_Seq/quants"</span>, </a>
+<a class="sourceLine" id="cb9-8" title="8">          <span class="dt">samplesheet =</span> <span class="st">"./RNA_Seq/Samples.txt"</span>, <span class="dt">tx2gene =</span> <span class="st">"./RNA_Seq/ref/tx2gene.txt"</span>,</a>
+<a class="sourceLine" id="cb9-9" title="9">          <span class="dt">level =</span> <span class="st">"disease"</span>, <span class="dt">padj.thresh =</span> <span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">0.05</span>, <span class="fl">0.01</span>, <span class="fl">0.001</span>), <span class="dt">plot.box =</span> <span class="ot">FALSE</span>,</a>
+<a class="sourceLine" id="cb9-10" title="10">          <span class="dt">plot.annos =</span> <span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"disease"</span>, <span class="st">"disease.sub"</span>, <span class="st">"status"</span>), <span class="dt">count.filt =</span> <span class="dv">50</span>)</a></code></pre></div>
 </div>
 <div id="next-steps" class="section level3">
 <h3 class="hasAnchor">
@@ -268,7 +245,7 @@
 <div id="session-information" class="section level1">
 <h1 class="hasAnchor">
 <a href="#session-information" class="anchor"></a>Session Information</h1>
-<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb11-1" title="1"><span class="kw"><a href="https://rdrr.io/r/utils/sessionInfo.html">sessionInfo</a></span>()</a></code></pre></div>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb10-1" title="1"><span class="kw"><a href="https://rdrr.io/r/utils/sessionInfo.html">sessionInfo</a></span>()</a></code></pre></div>
 <pre><code>## R version 3.6.1 (2019-07-05)
 ## Platform: x86_64-w64-mingw32/x64 (64-bit)
 ## Running under: Windows 10 x64 (build 16299)
@@ -293,13 +270,13 @@
 ##  [7] Biobase_2.46.0              GenomicRanges_1.38.0       
 ##  [9] GenomeInfoDb_1.22.0         IRanges_2.20.0             
 ## [11] S4Vectors_0.24.0            BiocGenerics_0.32.0        
-## [13] enrichR_2.1                 BiocStyle_2.14.0           
+## [13] enrichR_2.1                 BiocStyle_2.14.2           
 ## 
 ## loaded via a namespace (and not attached):
 ##   [1] rsvd_1.0.2                               
 ##   [2] Hmisc_4.2-0                              
 ##   [3] ica_1.0-2                                
-##   [4] Rsamtools_2.2.0                          
+##   [4] Rsamtools_2.2.1                          
 ##   [5] lmtest_0.9-37                            
 ##   [6] rprojroot_1.3-2                          
 ##   [7] crayon_1.3.4                             
@@ -313,14 +290,14 @@
 ##  [15] ChIPQC_1.21.0                            
 ##  [16] irlba_2.3.3                              
 ##  [17] limma_3.42.0                             
-##  [18] scater_1.14.1                            
+##  [18] scater_1.14.0                            
 ##  [19] GOstats_2.52.0                           
 ##  [20] rjson_0.2.20                             
 ##  [21] chipseq_1.36.0                           
 ##  [22] bit64_0.9-7                              
 ##  [23] glue_1.3.1                               
 ##  [24] pheatmap_1.0.12                          
-##  [25] sctransform_0.2.0                        
+##  [25] sctransform_0.2.1                        
 ##  [26] vipor_0.4.5                              
 ##  [27] AnnotationDbi_1.48.0                     
 ##  [28] vsn_3.54.0                               
@@ -331,192 +308,203 @@
 ##  [33] XML_3.98-1.20                            
 ##  [34] tidyr_1.0.0                              
 ##  [35] zoo_1.8-6                                
-##  [36] GenomicAlignments_1.22.0                 
+##  [36] GenomicAlignments_1.22.1                 
 ##  [37] xtable_1.8-4                             
 ##  [38] magrittr_1.5                             
 ##  [39] evaluate_0.14                            
-##  [40] bibtex_0.4.2                             
+##  [40] bibtex_0.4.2.2                           
 ##  [41] ggplot2_3.2.1                            
-##  [42] Rdpack_0.11-0                            
+##  [42] Rdpack_0.11-1                            
 ##  [43] zlibbioc_1.32.0                          
-##  [44] hwriter_1.3.2                            
-##  [45] rstudioapi_0.10                          
-##  [46] EZscRNA_0.1.0.9000                       
-##  [47] EnhancedVolcano_1.4.0                    
-##  [48] rpart_4.1-15                             
-##  [49] fastmatch_1.1-0                          
-##  [50] BiocSingular_1.2.0                       
-##  [51] xfun_0.10                                
-##  [52] askpass_1.1                              
-##  [53] cluster_2.1.0                            
-##  [54] caTools_1.17.1.2                         
-##  [55] tidygraph_1.1.2                          
-##  [56] tibble_2.1.3                             
-##  [57] ggrepel_0.8.1                            
-##  [58] ape_5.3                                  
-##  [59] listenv_0.7.0                            
-##  [60] Biostrings_2.54.0                        
-##  [61] png_0.1-7                                
-##  [62] future_1.14.0                            
-##  [63] zeallot_0.1.0                            
-##  [64] withr_2.1.2                              
-##  [65] bitops_1.0-6                             
-##  [66] ggforce_0.3.1                            
-##  [67] RBGL_1.62.1                              
-##  [68] plyr_1.8.4                               
-##  [69] GSEABase_1.48.0                          
-##  [70] pillar_1.4.2                             
-##  [71] RcppParallel_4.4.4                       
-##  [72] gplots_3.0.1.1                           
-##  [73] GenomicFeatures_1.38.0                   
-##  [74] TxDb.Dmelanogaster.UCSC.dm3.ensGene_3.2.2
-##  [75] fs_1.3.1                                 
-##  [76] europepmc_0.3                            
-##  [77] DelayedMatrixStats_1.8.0                 
-##  [78] vctrs_0.2.0                              
-##  [79] urltools_1.7.3                           
-##  [80] metap_1.1                                
-##  [81] tools_3.6.1                              
-##  [82] foreign_0.8-71                           
-##  [83] beeswarm_0.2.3                           
-##  [84] munsell_0.5.0                            
-##  [85] tweenr_1.0.1                             
-##  [86] fgsea_1.12.0                             
-##  [87] compiler_3.6.1                           
-##  [88] rtracklayer_1.46.0                       
-##  [89] TxDb.Hsapiens.UCSC.hg19.knownGene_3.2.2  
-##  [90] plotly_4.9.0                             
-##  [91] GenomeInfoDbData_1.2.2                   
-##  [92] gridExtra_2.3                            
-##  [93] edgeR_3.28.0                             
-##  [94] lattice_0.20-38                          
-##  [95] AnnotationForge_1.28.0                   
-##  [96] dplyr_0.8.3                              
-##  [97] BiocFileCache_1.10.0                     
-##  [98] jsonlite_1.6                             
-##  [99] affy_1.64.0                              
-## [100] scales_1.0.0                             
-## [101] TxDb.Rnorvegicus.UCSC.rn4.ensGene_3.2.2  
-## [102] graph_1.64.0                             
-## [103] pbapply_1.4-2                            
-## [104] genefilter_1.68.0                        
-## [105] lazyeval_0.2.2                           
-## [106] latticeExtra_0.6-28                      
-## [107] R.utils_2.9.0                            
-## [108] reticulate_1.13                          
-## [109] TxDb.Mmusculus.UCSC.mm9.knownGene_3.2.2  
-## [110] brew_1.0-6                               
-## [111] checkmate_1.9.4                          
-## [112] rmarkdown_1.16                           
-## [113] pkgdown_1.4.1                            
-## [114] cowplot_1.0.0                            
-## [115] Rtsne_0.15                               
-## [116] BSgenome_1.54.0                          
-## [117] uwot_0.1.4                               
-## [118] igraph_1.2.4.1                           
-## [119] survival_2.44-1.1                        
-## [120] yaml_2.2.0                               
-## [121] plotrix_3.7-6                            
-## [122] htmltools_0.4.0                          
-## [123] memoise_1.1.0                            
-## [124] VariantAnnotation_1.32.0                 
-## [125] Seurat_3.1.1                             
-## [126] locfit_1.5-9.1                           
-## [127] graphlayouts_0.5.0                       
-## [128] batchtools_0.9.11                        
-## [129] viridisLite_0.3.0                        
-## [130] digest_0.6.22                            
-## [131] assertthat_0.2.1                         
-## [132] rappdirs_0.3.1                           
-## [133] npsurv_0.4-0                             
-## [134] RSQLite_2.1.2                            
-## [135] amap_0.8-17                              
-## [136] future.apply_1.3.0                       
-## [137] lsei_1.2-0                               
-## [138] data.table_1.12.6                        
-## [139] blob_1.2.0                               
-## [140] R.oo_1.23.0                              
-## [141] preprocessCore_1.48.0                    
-## [142] splines_3.6.1                            
-## [143] Formula_1.2-3                            
-## [144] RCurl_1.95-4.12                          
-## [145] hms_0.5.2                                
-## [146] colorspace_1.4-1                         
-## [147] base64enc_0.1-3                          
-## [148] BiocManager_1.30.9                       
-## [149] ggbeeswarm_0.6.0                         
-## [150] SDMTools_1.1-221.1                       
-## [151] nnet_7.3-12                              
-## [152] tximport_1.14.0                          
-## [153] Rcpp_1.0.2                               
-## [154] bookdown_0.14                            
-## [155] RANN_2.6.1                               
-## [156] enrichplot_1.6.0                         
-## [157] Nozzle.R1_1.1-1                          
-## [158] ChIPseeker_1.22.0                        
-## [159] R6_2.4.0                                 
-## [160] grid_3.6.1                               
-## [161] ggridges_0.5.1                           
-## [162] lifecycle_0.1.0                          
-## [163] acepack_1.4.1                            
-## [164] ShortRead_1.44.0                         
-## [165] curl_4.2                                 
-## [166] TxDb.Hsapiens.UCSC.hg18.knownGene_3.2.2  
-## [167] gdata_2.18.0                             
-## [168] affyio_1.56.0                            
-## [169] leiden_0.3.1                             
-## [170] DO.db_2.9                                
-## [171] Matrix_1.2-17                            
-## [172] TxDb.Celegans.UCSC.ce6.ensGene_3.2.2     
-## [173] qvalue_2.18.0                            
-## [174] desc_1.2.0                               
-## [175] RcppAnnoy_0.0.13                         
-## [176] org.Hs.eg.db_3.10.0                      
-## [177] RColorBrewer_1.1-2                       
-## [178] stringr_1.4.0                            
-## [179] htmlwidgets_1.5.1                        
-## [180] polyclip_1.10-0                          
-## [181] triebeard_0.3.0                          
-## [182] biomaRt_2.42.0                           
-## [183] purrr_0.3.3                              
-## [184] gridGraphics_0.4-1                       
-## [185] globals_0.12.4                           
-## [186] openssl_1.4.1                            
-## [187] htmlTable_1.13.2                         
-## [188] codetools_0.2-16                         
-## [189] GO.db_3.10.0                             
-## [190] gtools_3.8.1                             
-## [191] prettyunits_1.0.2                        
-## [192] SingleCellExperiment_1.8.0               
-## [193] dbplyr_1.4.2                             
-## [194] R.methodsS3_1.7.1                        
-## [195] gtable_0.3.0                             
-## [196] tsne_0.1-3                               
-## [197] DBI_1.0.0                                
-## [198] httr_1.4.1                               
-## [199] KernSmooth_2.23-15                       
-## [200] stringi_1.4.3                            
-## [201] progress_1.2.2                           
-## [202] reshape2_1.4.3                           
-## [203] farver_1.1.0                             
-## [204] annotate_1.64.0                          
-## [205] viridis_0.5.1                            
-## [206] Rgraphviz_2.30.0                         
-## [207] xml2_1.2.2                               
-## [208] rvcheck_0.1.6                            
-## [209] systemPipeR_1.20.0                       
-## [210] boot_1.3-22                              
-## [211] BiocNeighbors_1.4.1                      
-## [212] geneplotter_1.64.0                       
-## [213] ggplotify_0.0.4                          
-## [214] Category_2.52.0                          
-## [215] DESeq2_1.26.0                            
-## [216] bit_1.1-14                               
-## [217] TxDb.Mmusculus.UCSC.mm10.knownGene_3.10.0
-## [218] ggraph_2.0.0                             
-## [219] pkgconfig_2.0.3                          
-## [220] gbRd_0.4-11                              
-## [221] knitr_1.25</code></pre>
+##  [44] sn_1.5-4                                 
+##  [45] hwriter_1.3.2                            
+##  [46] rstudioapi_0.10                          
+##  [47] EZscRNA_0.1.0.9000                       
+##  [48] EnhancedVolcano_1.4.0                    
+##  [49] rpart_4.1-15                             
+##  [50] fastmatch_1.1-0                          
+##  [51] BiocSingular_1.2.1                       
+##  [52] xfun_0.11                                
+##  [53] askpass_1.1                              
+##  [54] multtest_2.42.0                          
+##  [55] cluster_2.1.0                            
+##  [56] caTools_1.17.1.3                         
+##  [57] tidygraph_1.1.2                          
+##  [58] tibble_2.1.3                             
+##  [59] ggrepel_0.8.1                            
+##  [60] ape_5.3                                  
+##  [61] listenv_0.8.0                            
+##  [62] Biostrings_2.54.0                        
+##  [63] png_0.1-7                                
+##  [64] future_1.15.1                            
+##  [65] zeallot_0.1.0                            
+##  [66] withr_2.1.2                              
+##  [67] bitops_1.0-6                             
+##  [68] ggforce_0.3.1                            
+##  [69] RBGL_1.62.1                              
+##  [70] plyr_1.8.5                               
+##  [71] GSEABase_1.48.0                          
+##  [72] pillar_1.4.3                             
+##  [73] RcppParallel_4.4.4                       
+##  [74] gplots_3.0.1.1                           
+##  [75] GenomicFeatures_1.38.0                   
+##  [76] multcomp_1.4-11                          
+##  [77] TxDb.Dmelanogaster.UCSC.dm3.ensGene_3.2.2
+##  [78] fs_1.3.1                                 
+##  [79] europepmc_0.3                            
+##  [80] DelayedMatrixStats_1.8.0                 
+##  [81] vctrs_0.2.0                              
+##  [82] urltools_1.7.3                           
+##  [83] metap_1.2                                
+##  [84] tools_3.6.1                              
+##  [85] foreign_0.8-71                           
+##  [86] beeswarm_0.2.3                           
+##  [87] munsell_0.5.0                            
+##  [88] tweenr_1.0.1                             
+##  [89] fgsea_1.12.0                             
+##  [90] compiler_3.6.1                           
+##  [91] rtracklayer_1.46.0                       
+##  [92] TxDb.Hsapiens.UCSC.hg19.knownGene_3.2.2  
+##  [93] plotly_4.9.1                             
+##  [94] GenomeInfoDbData_1.2.2                   
+##  [95] gridExtra_2.3                            
+##  [96] edgeR_3.28.0                             
+##  [97] lattice_0.20-38                          
+##  [98] mutoss_0.1-12                            
+##  [99] AnnotationForge_1.28.0                   
+## [100] dplyr_0.8.3                              
+## [101] BiocFileCache_1.10.2                     
+## [102] affy_1.64.0                              
+## [103] jsonlite_1.6                             
+## [104] scales_1.0.0                             
+## [105] TxDb.Rnorvegicus.UCSC.rn4.ensGene_3.2.2  
+## [106] graph_1.64.0                             
+## [107] pbapply_1.4-2                            
+## [108] genefilter_1.68.0                        
+## [109] lazyeval_0.2.2                           
+## [110] latticeExtra_0.6-29                      
+## [111] R.utils_2.9.2                            
+## [112] reticulate_1.14                          
+## [113] TxDb.Mmusculus.UCSC.mm9.knownGene_3.2.2  
+## [114] brew_1.0-6                               
+## [115] checkmate_1.9.4                          
+## [116] rmarkdown_2.0                            
+## [117] pkgdown_1.4.1                            
+## [118] sandwich_2.5-1                           
+## [119] cowplot_1.0.0                            
+## [120] Rtsne_0.15                               
+## [121] BSgenome_1.54.0                          
+## [122] uwot_0.1.5                               
+## [123] igraph_1.2.4.2                           
+## [124] survival_2.44-1.1                        
+## [125] numDeriv_2016.8-1.1                      
+## [126] yaml_2.2.0                               
+## [127] plotrix_3.7-7                            
+## [128] htmltools_0.4.0                          
+## [129] memoise_1.1.0                            
+## [130] VariantAnnotation_1.32.0                 
+## [131] Seurat_3.1.2                             
+## [132] locfit_1.5-9.1                           
+## [133] graphlayouts_0.5.0                       
+## [134] batchtools_0.9.11                        
+## [135] viridisLite_0.3.0                        
+## [136] digest_0.6.22                            
+## [137] assertthat_0.2.1                         
+## [138] rappdirs_0.3.1                           
+## [139] npsurv_0.4-0                             
+## [140] RSQLite_2.1.2                            
+## [141] amap_0.8-18                              
+## [142] future.apply_1.4.0                       
+## [143] lsei_1.2-0                               
+## [144] data.table_1.12.6                        
+## [145] blob_1.2.0                               
+## [146] R.oo_1.23.0                              
+## [147] preprocessCore_1.48.0                    
+## [148] splines_3.6.1                            
+## [149] Formula_1.2-3                            
+## [150] RCurl_1.95-4.12                          
+## [151] hms_0.5.2                                
+## [152] colorspace_1.4-1                         
+## [153] base64enc_0.1-3                          
+## [154] BiocManager_1.30.10                      
+## [155] mnormt_1.5-5                             
+## [156] ggbeeswarm_0.6.0                         
+## [157] SDMTools_1.1-221.2                       
+## [158] tximport_1.14.0                          
+## [159] nnet_7.3-12                              
+## [160] Rcpp_1.0.2                               
+## [161] bookdown_0.16                            
+## [162] RANN_2.6.1                               
+## [163] mvtnorm_1.0-11                           
+## [164] enrichplot_1.6.1                         
+## [165] Nozzle.R1_1.1-1                          
+## [166] ChIPseeker_1.22.1                        
+## [167] R6_2.4.1                                 
+## [168] grid_3.6.1                               
+## [169] ggridges_0.5.1                           
+## [170] lifecycle_0.1.0                          
+## [171] acepack_1.4.1                            
+## [172] ShortRead_1.44.1                         
+## [173] TFisher_0.2.0                            
+## [174] curl_4.3                                 
+## [175] affyio_1.56.0                            
+## [176] TxDb.Hsapiens.UCSC.hg18.knownGene_3.2.2  
+## [177] gdata_2.18.0                             
+## [178] leiden_0.3.1                             
+## [179] DO.db_2.9                                
+## [180] Matrix_1.2-17                            
+## [181] TxDb.Celegans.UCSC.ce6.ensGene_3.2.2     
+## [182] qvalue_2.18.0                            
+## [183] desc_1.2.0                               
+## [184] RcppAnnoy_0.0.14                         
+## [185] TH.data_1.0-10                           
+## [186] org.Hs.eg.db_3.10.0                      
+## [187] RColorBrewer_1.1-2                       
+## [188] stringr_1.4.0                            
+## [189] htmlwidgets_1.5.1                        
+## [190] polyclip_1.10-0                          
+## [191] triebeard_0.3.0                          
+## [192] biomaRt_2.42.0                           
+## [193] purrr_0.3.3                              
+## [194] gridGraphics_0.4-1                       
+## [195] globals_0.12.5                           
+## [196] openssl_1.4.1                            
+## [197] htmlTable_1.13.3                         
+## [198] codetools_0.2-16                         
+## [199] GO.db_3.10.0                             
+## [200] gtools_3.8.1                             
+## [201] prettyunits_1.0.2                        
+## [202] SingleCellExperiment_1.8.0               
+## [203] dbplyr_1.4.2                             
+## [204] R.methodsS3_1.7.1                        
+## [205] gtable_0.3.0                             
+## [206] tsne_0.1-3                               
+## [207] DBI_1.1.0                                
+## [208] httr_1.4.1                               
+## [209] KernSmooth_2.23-15                       
+## [210] stringi_1.4.3                            
+## [211] progress_1.2.2                           
+## [212] reshape2_1.4.3                           
+## [213] farver_2.0.1                             
+## [214] annotate_1.64.0                          
+## [215] viridis_0.5.1                            
+## [216] Rgraphviz_2.30.0                         
+## [217] xml2_1.2.2                               
+## [218] rvcheck_0.1.7                            
+## [219] systemPipeR_1.20.0                       
+## [220] boot_1.3-22                              
+## [221] BiocNeighbors_1.4.1                      
+## [222] geneplotter_1.64.0                       
+## [223] ggplotify_0.0.4                          
+## [224] Category_2.52.1                          
+## [225] DESeq2_1.26.0                            
+## [226] bit_1.1-14                               
+## [227] jpeg_0.1-8.1                             
+## [228] TxDb.Mmusculus.UCSC.mm10.knownGene_3.10.0
+## [229] ggraph_2.0.0                             
+## [230] pkgconfig_2.0.3                          
+## [231] gbRd_0.4-11                              
+## [232] knitr_1.26</code></pre>
 </div>
   </div>
 

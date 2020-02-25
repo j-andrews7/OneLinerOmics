@@ -4,8 +4,16 @@
 \alias{PlotRNABoxplots}
 \title{Plot gene counts as box plots}
 \usage{
-PlotRNABoxplots(res.list, dds, rld, outpath, padj.thresh, fc.thresh, top.n,
-  level)
+PlotRNABoxplots(
+  res.list,
+  dds,
+  rld,
+  outpath,
+  padj.thresh,
+  fc.thresh,
+  top.n,
+  level
+)
 }
 \arguments{
 \item{res.list}{Named List containing \linkS4class{DESeqResults} objects for 

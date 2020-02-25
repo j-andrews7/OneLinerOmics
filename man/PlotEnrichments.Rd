@@ -4,8 +4,14 @@
 \alias{PlotEnrichments}
 \title{Perform GO/Pathway enrichment for DEGs or DBRs via enrichR}
 \usage{
-PlotEnrichments(res.list, outpath, padj.thresh, fc.thresh, libraries,
-  chip = FALSE)
+PlotEnrichments(
+  res.list,
+  outpath,
+  padj.thresh,
+  fc.thresh,
+  libraries,
+  chip = FALSE
+)
 }
 \arguments{
 \item{res.list}{Either:

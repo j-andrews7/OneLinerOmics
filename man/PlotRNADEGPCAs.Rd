@@ -4,8 +4,16 @@
 \alias{PlotRNADEGPCAs}
 \title{Plot PCAs from variance stabilized counts for differentially expressed genes}
 \usage{
-PlotRNADEGPCAs(res.list, rld, vsd, outpath, level, plot.annos, padj.thresh,
-  fc.thresh)
+PlotRNADEGPCAs(
+  res.list,
+  rld,
+  vsd,
+  outpath,
+  level,
+  plot.annos,
+  padj.thresh,
+  fc.thresh
+)
 }
 \arguments{
 \item{res.list}{Named List containing \linkS4class{DESeqResults} objects for 

@@ -4,8 +4,15 @@
 \alias{PlotRNACombinedHeatmaps}
 \title{Generate gene heatmaps for all DEGs from a list of DESeq2 results}
 \usage{
-PlotRNACombinedHeatmaps(res.list, rld, vsd, outpath, padj.thresh,
-  fc.thresh, plot.annos)
+PlotRNACombinedHeatmaps(
+  res.list,
+  rld,
+  vsd,
+  outpath,
+  padj.thresh,
+  fc.thresh,
+  plot.annos
+)
 }
 \arguments{
 \item{res.list}{Named List containing \linkS4class{DESeqResults} objects for 

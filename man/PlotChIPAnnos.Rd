@@ -4,8 +4,14 @@
 \alias{PlotChIPAnnos}
 \title{Plot ChIP annotation breakdowns}
 \usage{
-PlotChIPAnnos(peak.anno, outpath, consensus = TRUE, comp = NULL,
-  fc = NULL, fdr = NULL)
+PlotChIPAnnos(
+  peak.anno,
+  outpath,
+  consensus = TRUE,
+  comp = NULL,
+  fc = NULL,
+  fdr = NULL
+)
 }
 \arguments{
 \item{peak.anno}{A named list of \linkS4class{csAnno} objects with annotated

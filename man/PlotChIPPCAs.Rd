@@ -4,8 +4,14 @@
 \alias{PlotChIPPCAs}
 \title{Plot ChIP PCAs}
 \usage{
-PlotChIPPCAs(results, outpath, method, fdr.thresh = 1, fc.thresh = 0,
-  consensus = TRUE)
+PlotChIPPCAs(
+  results,
+  outpath,
+  method,
+  fdr.thresh = 1,
+  fc.thresh = 0,
+  consensus = TRUE
+)
 }
 \arguments{
 \item{results}{\code{DBA} object as returned by 
