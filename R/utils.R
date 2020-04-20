@@ -252,7 +252,7 @@ SaveResults <- function(results, outpath, dds = NULL, chip = FALSE,
     for (i in seq_along(results$contrasts)) {
       out <- paste0(outpath, "/ResultsTables/")
       report <- dba.report(results, th = 1, bCalled = TRUE, 
-          bCounts = TRUE, method = method, contrast = i)
+          bCounts = TRUE, method = method, contrast = i, bCalledDetail = TRUE)
 
       peak.anno <- annotatePeak(report, tssRegion = promoters, TxDb = txdb, 
         annoDb = "org.Hs.eg.db", addFlankGeneInfo = flank.anno, 
