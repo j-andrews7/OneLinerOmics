@@ -201,7 +201,7 @@ RunDiffBind <- function(outpath, samplesheet, txdb,
   message("# DEALING WITH CONSENSUS PEAKS #\n")
   
   report <- dba.report(results, th = 1, bCalled = TRUE, 
-    bCounts = TRUE, method = method)
+    bCounts = TRUE, method = method, bCalledDetail = TRUE)
 
   # ANNOTATION #
   message("# ANNOTATING & GENERATING CONSENSUS PLOTS #\n")
@@ -334,7 +334,7 @@ ProcessDBRs <- function(results, outpath, txdb,
       for (i in seq_along(results$contrasts)) {
         repper <- try({
         reportdb <- dba.report(results, th = fdr, fold = fc, bCalled = TRUE, 
-          bCounts = TRUE, method = method, contrast = i)
+          bCounts = TRUE, method = method, contrast = i, bCalledDetail = TRUE)
         })
 
         g1 <- results$contrasts[[i]]$name1
