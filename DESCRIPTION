@@ -8,7 +8,7 @@ Authors@R:
            role = c("aut", "cre"),
            email = "jared.andrews07@gmail.com",
            comment = c(ORCID = "0000-0002-0780-6248"))
-Description: This package is a complement to Andrews et al, 2019. 
+Description: This package is a complement to Andrews et al, eBioMedicine 2021. 
     It provides simple functions for major analyses of RNA-seq 
     and ChIP-seq data in addition to vignettes detailing
     how it was used to process and analyze data in the paper.
