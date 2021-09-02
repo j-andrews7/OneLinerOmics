@@ -21,7 +21,7 @@ library(BiocStyle)
 
 # Introduction
 
-This vignette walks through analysis of the B cell lymphoma RNA-seq data included in the future Andrews et al. paper.
+This vignette walks through analysis of the B cell lymphoma RNA-seq data included in the [Andrews, J. et al., eBioMedicine 2021 paper](https://www.thelancet.com/journals/ebiom/article/PIIS2352-3964(21)00352-2/fulltext).
 It uses the convenience functions included in this [package](https://github.com/j-andrews7/OneLinerOmics) to streamline the process.
 
 Several command line tools as well as python are also utilized - each code block should indicate whether it is `bash`, `R`, or `python` code. 
