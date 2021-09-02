@@ -5,7 +5,7 @@
 This R package contains several functions that compress major RNA-seq and ChIP-seq analysis steps into one-liners (okay, maybe two, I'm not perfect).
 
 ## Objective
-This package serves as a complement to an in-preparation manuscript and as a record of how the data was analyzed in addition to serving as a basis for the Payton Lab bulk RNA-seq and ChIP-seq analyses moving forwards.
+This package serves as a complement to [Andrews, J. et al., eBioMedicine 2021](https://www.thelancet.com/journals/ebiom/article/PIIS2352-3964(21)00352-2/fulltext) and as a record of how the data was analyzed.
 
 ## What It Can Do
 Ultimately, this package tries to make generic RNA-seq and ChIP-seq analyses as high-level and straightforward as possible. 
